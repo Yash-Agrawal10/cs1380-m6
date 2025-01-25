@@ -32,9 +32,11 @@ const path = require('path');
 
 function query(indexFile, args) {
   const queryString = args.join(' ');
-  const processedQueryString = execSync(`echo "${queryString}" | ./c/process.sh | ./c/stem.js | tr "\r\n" " "`, { encoding: 'utf-8' }).trim();
+  const processPath = path.resolve('./c/process.sh');
+  const stemPath = path.resolve('./c/stem.js');
+  const processedQueryString = execSync(`echo "${queryString}" | ${processPath} | ${stemPath} | tr "\r\n" " "`, {encoding: 'utf-8'}).trim();
   fs.readFile(indexFile, 'utf-8', (err, data) => {
-    let output = [];
+    const output = [];
     const globalIndexLines = data.split('\n');
     for (const line of globalIndexLines) {
       const term = line.split('|')[0].trim();
@@ -43,7 +45,7 @@ function query(indexFile, args) {
       }
     }
     console.log(output.join('\n'));
-  })
+  });
 }
 
 const args = process.argv.slice(2); // Get command-line arguments
@@ -52,5 +54,5 @@ if (args.length < 1) {
   process.exit(1);
 }
 
-const indexFile = 'd/global-index.txt'; // Path to the global index file
+const indexFile = path.resolve('d/global-index.txt'); // Path to the global index file
 query(indexFile, args);
