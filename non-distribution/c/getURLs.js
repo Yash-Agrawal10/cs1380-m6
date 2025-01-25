@@ -26,7 +26,7 @@ let text = "";
 
 rl.on('line', (line) => {
   // 2. Read HTML input from standard input (stdin) line by line using the `readline` module.
-  text += line;
+  text += line + '\n';
 });
 
 rl.on('close', () => {
