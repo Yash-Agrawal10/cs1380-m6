@@ -32,8 +32,18 @@ const path = require('path');
 
 function query(indexFile, args) {
   const queryString = args.join(' ');
-  const processedQueryString = execSync(`echo "${queryString}" | ./c/process.sh | ./c/stem.js`, { encoding: 'utf-8' }).trim();
-  const output = execSync()
+  const processedQueryString = execSync(`echo "${queryString}" | ./c/process.sh | ./c/stem.js | tr "\r\n" " "`, { encoding: 'utf-8' }).trim();
+  fs.readFile(indexFile, 'utf-8', (err, data) => {
+    let output = [];
+    const globalIndexLines = data.split('\n');
+    for (const line of globalIndexLines) {
+      const term = line.split('|')[0].trim();
+      if (term.includes(processedQueryString)) {
+        output.push(line);
+      }
+    }
+    console.log(output.join('\n'));
+  })
 }
 
 const args = process.argv.slice(2); // Get command-line arguments
