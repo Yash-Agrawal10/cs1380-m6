@@ -31,6 +31,9 @@ const path = require('path');
 
 
 function query(indexFile, args) {
+  const queryString = args.join(' ');
+  const processedQueryString = execSync(`echo "${queryString}" | ./c/process.sh | ./c/stem.js`, { encoding: 'utf-8' }).trim();
+  const output = execSync()
 }
 
 const args = process.argv.slice(2); // Get command-line arguments

@@ -22,7 +22,7 @@ const rl = readline.createInterface({
   input: process.stdin,
 });
 
-let text = "";
+let text = '';
 
 rl.on('line', (line) => {
   // 2. Read HTML input from standard input (stdin) line by line using the `readline` module.
@@ -36,10 +36,10 @@ rl.on('close', () => {
   // 4. Find all URLs:
   //  - select all anchor (`<a>`) elements) with an `href` attribute using `querySelectorAll`.
   //  - extract the value of the `href` attribute for each anchor element.
-  const links = Array.from(dom.window.document.querySelectorAll("a[href]")).map(link => link.getAttribute("href"));
+  const links = Array.from(dom.window.document.querySelectorAll('a[href]')).map((link) => link.getAttribute('href'));
 
   // 5. Print each absolute URL to the console, one per line.
-  links.map(link => console.log(new URL(link, baseURL).href));
+  links.map((link) => console.log(new URL(link, baseURL).href));
 });
 
 

@@ -79,7 +79,7 @@ const printMerged = (err, data) => {
 
   // 3. For each line in `localIndexLines`, parse them and add them to the `local` object where keys are terms and values contain `url` and `freq`.
   for (const line of localIndexLines) {
-    const parts = line.split('|').map(part => part.trim());
+    const parts = line.split('|').map((part) => part.trim());
     const term = parts[0];
     const url = parts[2];
     const freq = parseInt(parts[1]);
@@ -89,11 +89,11 @@ const printMerged = (err, data) => {
   // 4. For each line in `globalIndexLines`, parse them and add them to the `global` object where keys are terms and values are arrays of `url` and `freq` objects.
   // Use the .trim() method to remove leading and trailing whitespace from a string.
   for (const line of globalIndexLines) {
-    const parts = line.split('|').map(part => part.trim());
+    const parts = line.split('|').map((part) => part.trim());
     const term = parts[0];
     const rest = parts[1].split(' ');
-    let urlfs = [];
-    for (let i = 0; i < rest.length; i += 2){
+    const urlfs = [];
+    for (let i = 0; i < rest.length; i += 2) {
       const url = rest[i];
       const freq = parseInt(rest[i + 1]);
       urlfs.push({url, freq});
@@ -111,8 +111,7 @@ const printMerged = (err, data) => {
     if (global.hasOwnProperty(key)) {
       global[key].push(value);
       global[key].sort(compare);
-    }
-    else {
+    } else {
       global[key] = [value];
     }
   }
@@ -120,9 +119,9 @@ const printMerged = (err, data) => {
   // 6. Print the merged index to the console in the same format as the global index file:
   //    - Each line contains a term, followed by a pipe (`|`), followed by space-separated pairs of `url` and `freq`.
   for (const [key, value] of Object.entries(global)) {
-    let line = key + " |";
+    let line = key + ' |';
     for (const {url, freq} of value) {
-      line += " " + url + " " + freq;
+      line += ' ' + url + ' ' + freq;
     }
     console.log(line);
   }
