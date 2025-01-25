@@ -48,16 +48,20 @@ const rl = readline.createInterface({
 });
 
 // 1. Read the incoming local index data from standard input (stdin) line by line.
-const localIndex = '';
+let localIndex = '';
 rl.on('line', (line) => {
+  localIndex += line + '\n';
 });
 
 rl.on('close', () => {
   // 2. Read the global index name/location, using process.argv
   // and call printMerged as a callback
+  const globalIndexPath = process.argv[2];
+  fs.readFile(globalIndexPath, 'utf-8', printMerged);
 });
 
 const printMerged = (err, data) => {
+  // console.log("printing merged");
   if (err) {
     console.error('Error reading file:', err);
     return;
@@ -75,12 +79,25 @@ const printMerged = (err, data) => {
 
   // 3. For each line in `localIndexLines`, parse them and add them to the `local` object where keys are terms and values contain `url` and `freq`.
   for (const line of localIndexLines) {
+    const parts = line.split('|').map(part => part.trim());
+    const term = parts[0];
+    const url = parts[2];
+    const freq = parseInt(parts[1]);
     local[term] = {url, freq};
   }
 
   // 4. For each line in `globalIndexLines`, parse them and add them to the `global` object where keys are terms and values are arrays of `url` and `freq` objects.
   // Use the .trim() method to remove leading and trailing whitespace from a string.
   for (const line of globalIndexLines) {
+    const parts = line.split('|').map(part => part.trim());
+    const term = parts[0];
+    const rest = parts[1].split(' ');
+    let urlfs = [];
+    for (let i = 0; i < rest.length; i += 2){
+      const url = rest[i];
+      const freq = parseInt(rest[i + 1]);
+      urlfs.push({url, freq});
+    }
     global[term] = urlfs; // Array of {url, freq} objects
   }
 
@@ -90,6 +107,23 @@ const printMerged = (err, data) => {
   //     - Sort the array by `freq` in descending order.
   // - If the term does not exist in the global index:
   //     - Add it as a new entry with the local index's data.
+  for (const [key, value] of Object.entries(local)) {
+    if (global.hasOwnProperty(key)) {
+      global[key].push(value);
+      global[key].sort(compare);
+    }
+    else {
+      global[key] = [value];
+    }
+  }
+
   // 6. Print the merged index to the console in the same format as the global index file:
   //    - Each line contains a term, followed by a pipe (`|`), followed by space-separated pairs of `url` and `freq`.
+  for (const [key, value] of Object.entries(global)) {
+    let line = key + " |";
+    for (const {url, freq} of value) {
+      line += " " + url + " " + freq;
+    }
+    console.log(line);
+  }
 };
