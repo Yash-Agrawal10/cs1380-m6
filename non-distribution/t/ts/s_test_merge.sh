@@ -68,7 +68,8 @@ run_test "$local_index" "$global_index_prev" "$global_index_post" "Sort 2";
 # New
 local_index="test | 5 | url1"
 global_index_prev="test2 | url2 8"
-global_index_post='test2 | url2 8 test | url1 5'
+global_index_post='test2 | url2 8
+test | url1 5'
 run_test "$local_index" "$global_index_prev" "$global_index_post" "New"; 
 
 exit $result
