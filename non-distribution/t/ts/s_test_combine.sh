@@ -49,8 +49,11 @@ output_data=$'test1\ntest2\ntest1 test2'
 run_test "$input_data" "$output_data" "Two Words"; 
 
 # Repeat word
-input_data=$'test\ntest'
-output_data=$'test\ntest\ntest test'
+input_data='test
+test'
+output_data='test
+test
+test test'
 run_test "$input_data" "$output_data" "Repeat Word"; 
 
 exit $result
