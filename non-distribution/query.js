@@ -37,9 +37,15 @@ function query(indexFile, args) {
   const processPath = path.resolve('./c/process.sh');
   const stemPath = path.resolve('./c/stem.js');
 
-  const processedQuery = execSync(`echo "${queryString}" | ${processPath}`, {encoding: 'utf-8'});
-  const stemmedQuery = execSync(`echo "${processedQuery}" | ${stemPath}`, {encoding: 'utf-8'});
-  const finalQuery = stemmedQuery.replace(/[\r\n]+/g, ' ').trim();
+  let finalQuery = "";
+  try {
+    const processedQuery = execSync(`echo "${queryString}" | ${processPath}`, {encoding: 'utf-8'});
+    const stemmedQuery = execSync(`echo "${processedQuery}" | ${stemPath}`, {encoding: 'utf-8'});
+    finalQuery = stemmedQuery.replace(/[\r\n]+/g, ' ').trim();
+  } catch (err) {
+    console.error('Error processing query:', err.message);
+    process.exit(1);
+  }
   fs.readFile(indexFilePath, 'utf-8', (err, data) => {
     if (err) {
       console.log('Error reading file: ', err);
