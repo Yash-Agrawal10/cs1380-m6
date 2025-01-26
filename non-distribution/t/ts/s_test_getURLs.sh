@@ -20,7 +20,7 @@ run_test() {
     processed_input=$(echo "$input_data" | c/getURLs.js $url | sort)
     processed_output=$(echo "$output_data" | sort)
 
-    if $DIFF <(echo "$processed_input") <(echo "$processed_output") >&2;
+    if $DIFF <(echo "$processed_input") <(echo "$processed_output") > /dev/null;
     then
         echo "$title success"
         return 0

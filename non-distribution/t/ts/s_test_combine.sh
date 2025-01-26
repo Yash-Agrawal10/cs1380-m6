@@ -18,7 +18,7 @@ run_test() {
     processed_input=$(echo "$input_data" | c/combine.sh | sed 's/\t*$//' | sed 's/\s/ /g' | sort | uniq)
     processed_output=$(echo "$output_data" | sed 's/\t*$//' | sed 's/\s/ /g' | sort | uniq)
 
-    if $DIFF <(echo "$processed_input") <(echo "$processed_output") >&2;
+    if $DIFF <(echo "$processed_input") <(echo "$processed_output") > /dev/null;
     then
         echo "$title success"
         return 0
