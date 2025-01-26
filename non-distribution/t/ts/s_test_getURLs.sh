@@ -41,7 +41,8 @@ output_data=""
 run_test "$input_data" "$output_data" "Empty Case"; 
 
 # Simple text
-input_data='<!DOCTYPE html>
+input_data=$(cat <<"EOF"
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Should Not Appear</title>
@@ -50,12 +51,14 @@ input_data='<!DOCTYPE html>
     <p>Should Not Appear</p>
 </body>
 </html>
-'
+EOF
+)
 output_data=''
 run_test "$input_data" "$output_data" "Simple text"; 
 
 # Relative URL
-input_data='<!DOCTYPE html>
+input_data=$(cat <<"EOF"
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Should Not Appear</title>
@@ -64,12 +67,14 @@ input_data='<!DOCTYPE html>
     <a href='test'>Testing Link</a>
 </body>
 </html>
-'
+EOF
+)
 output_data="$url/test"
 run_test "$input_data" "$output_data" "Relative URL"; 
 
 # Absolute URL
-input_data='<!DOCTYPE html>
+input_data=$(cat <<"EOF"
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Should Not Appear</title>
@@ -78,7 +83,8 @@ input_data='<!DOCTYPE html>
     <a href='https://different'>Testing Link</a>
 </body>
 </html>
-'
+EOF
+)
 output_data="https://different/"
 run_test "$input_data" "$output_data" "Absolute URL"; 
 

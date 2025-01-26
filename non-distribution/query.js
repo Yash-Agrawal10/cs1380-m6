@@ -37,7 +37,7 @@ function query(indexFile, args) {
   const processPath = path.resolve('./c/process.sh');
   const stemPath = path.resolve('./c/stem.js');
 
-  let finalQuery = "";
+  let finalQuery = '';
   try {
     const processedQuery = execSync(`echo "${queryString}" | ${processPath}`, {encoding: 'utf-8'});
     const stemmedQuery = execSync(`echo "${processedQuery}" | ${stemPath}`, {encoding: 'utf-8'});

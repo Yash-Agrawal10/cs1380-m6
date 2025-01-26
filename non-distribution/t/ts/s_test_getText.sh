@@ -11,9 +11,9 @@ DIFF=${DIFF:-diff}
 # Setup
 result=0
 run_test() {
-    local input_data="$1";
-    local output_data="$2";
-    local title="$3";
+    local input_data="$1"
+    local output_data="$2"
+    local title="$3"
 
     processed_input=$(echo "$input_data" | c/getText.js | sort)
     processed_output=$(echo "$output_data" | sort)
@@ -36,10 +36,11 @@ run_test() {
 # Empty case
 input_data=""
 output_data=""
-run_test "$input_data" "$output_data" "Empty Case"; 
+run_test "$input_data" "$output_data" "Empty Case"
 
 # Simple text
-input_data='<!DOCTYPE html>
+input_data=$(cat <<"EOF"
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Should Not Appear</title>
@@ -48,12 +49,14 @@ input_data='<!DOCTYPE html>
     <p>Should Appear</p>
 </body>
 </html>
-'
+EOF
+)
 output_data='Should Appear'
-run_test "$input_data" "$output_data" "Simple text"; 
+run_test "$input_data" "$output_data" "Simple text"
 
 # Caps
-input_data='<!DOCTYPE html>
+input_data=$(cat <<"EOF"
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Should Not Appear</title>
@@ -62,12 +65,14 @@ input_data='<!DOCTYPE html>
     <h1>Should Appear</h1>
 </body>
 </html>
-'
+EOF
+)
 output_data='SHOULD APPEAR'
-run_test "$input_data" "$output_data" "Caps"; 
+run_test "$input_data" "$output_data" "Caps"
 
 # Link
-input_data='<!DOCTYPE html>
+input_data=$(cat <<"EOF"
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Should Not Appear</title>
@@ -76,8 +81,9 @@ input_data='<!DOCTYPE html>
     <a href='test'>Testing Link</a>
 </body>
 </html>
-'
+EOF
+)
 output_data='Testing Link [test]'
-run_test "$input_data" "$output_data" "Link"; 
+run_test "$input_data" "$output_data" "Link"
 
 exit $result
