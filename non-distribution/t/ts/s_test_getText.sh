@@ -16,7 +16,7 @@ run_test() {
     local title="$3";
 
     processed_input=$(echo "$input_data" | c/getText.js | sort)
-    processed_output=$(sort "$output_data")
+    processed_output=$(echo "$output_data" | sort)
 
     if $DIFF <(echo "$processed_input") <(echo "$processed_output") >&2;
     then
@@ -39,7 +39,45 @@ output_data=""
 run_test "$input_data" "$output_data" "Empty Case"; 
 
 # Simple text
-input_data=$'<!DOCTYPE html>
-<html lang="en">'
+input_data='<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Should Not Appear</title>
+</head>
+<body>
+    <p>Should Appear</p>
+</body>
+</html>
+'
+output_data='Should Appear'
+run_test "$input_data" "$output_data" "Simple text"; 
+
+# Caps
+input_data='<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Should Not Appear</title>
+</head>
+<body>
+    <h1>Should Appear</h1>
+</body>
+</html>
+'
+output_data='SHOULD APPEAR'
+run_test "$input_data" "$output_data" "Caps"; 
+
+# Link
+input_data='<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Should Not Appear</title>
+</head>
+<body>
+    <a href='test'>Testing Link</a>
+</body>
+</html>
+'
+output_data='Testing Link [test]'
+run_test "$input_data" "$output_data" "Link"; 
 
 exit $result
