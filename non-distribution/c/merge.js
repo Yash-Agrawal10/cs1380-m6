@@ -31,6 +31,7 @@ merge into the NEW global index:
 Remember to error gracefully, particularly when reading the global index file.
 */
 
+const {assert} = require('console');
 const fs = require('fs');
 const readline = require('readline');
 // The `compare` function can be used for sorting.
@@ -61,18 +62,14 @@ rl.on('close', () => {
 });
 
 const printMerged = (err, data) => {
-  // console.log("printing merged");
   if (err) {
     console.error('Error reading file:', err);
     return;
   }
 
   // Split the data into an array of lines
-  const localIndexLines = localIndex.split('\n');
-  const globalIndexLines = data.split('\n');
-
-  localIndexLines.pop();
-  globalIndexLines.pop();
+  const localIndexLines = localIndex.split('\n').filter((line) => line.trim() !== ''); ;
+  const globalIndexLines = data.split('\n').filter((line) => line.trim() !== ''); ;
 
   const local = {};
   const global = {};
@@ -80,6 +77,7 @@ const printMerged = (err, data) => {
   // 3. For each line in `localIndexLines`, parse them and add them to the `local` object where keys are terms and values contain `url` and `freq`.
   for (const line of localIndexLines) {
     const parts = line.split('|').map((part) => part.trim());
+    assert(parts.length == 3, 'Invalid localIndex format');
     const term = parts[0];
     const url = parts[2];
     const freq = parseInt(parts[1]);
@@ -90,10 +88,12 @@ const printMerged = (err, data) => {
   // Use the .trim() method to remove leading and trailing whitespace from a string.
   for (const line of globalIndexLines) {
     const parts = line.split('|').map((part) => part.trim());
+    assert(parts.length == 2, 'Invalid globalIndex format');
     const term = parts[0];
     const rest = parts[1].split(' ');
     const urlfs = [];
     for (let i = 0; i < rest.length; i += 2) {
+      assert(i + 1 < rest.length, 'Invalid globalIndex format');
       const url = rest[i];
       const freq = parseInt(rest[i + 1]);
       urlfs.push({url, freq});

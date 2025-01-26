@@ -28,23 +28,32 @@ For example, `execSync(`echo "${input}" | ./c/process.sh`, {encoding: 'utf-8'});
 const fs = require('fs');
 const {execSync} = require('child_process');
 const path = require('path');
+const {assert} = require('console');
 
 
 function query(indexFile, args) {
   const queryString = args.join(' ');
+  const indexFilePath = path.resolve(indexFile);
   const processPath = path.resolve('./c/process.sh');
   const stemPath = path.resolve('./c/stem.js');
-  const processedQueryString = execSync(`echo "${queryString}" | ${processPath} | ${stemPath} | tr "\r\n" " "`, {encoding: 'utf-8'}).trim();
-  fs.readFile(indexFile, 'utf-8', (err, data) => {
-    const output = [];
-    const globalIndexLines = data.split('\n');
+
+  const processedQuery = execSync(`echo "${queryString}" | ${processPath}`, {encoding: 'utf-8'});
+  const stemmedQuery = execSync(`echo "${processedQuery}" | ${stemPath}`, {encoding: 'utf-8'});
+  const finalQuery = stemmedQuery.replace(/[\r\n]+/g, ' ').trim();
+  fs.readFile(indexFilePath, 'utf-8', (err, data) => {
+    if (err) {
+      console.log('Error reading file: ', err);
+      return;
+    }
+    const globalIndexLines = data.split('\n').filter((line) => line.trim() !== '');
     for (const line of globalIndexLines) {
-      const term = line.split('|')[0].trim();
-      if (term.includes(processedQueryString)) {
-        output.push(line);
+      const parts = line.split('|');
+      assert(parts.length == 2, 'Invalid globalIndex format');
+      const term = parts[0].trim();
+      if (term.includes(finalQuery)) {
+        console.log(line);
       }
     }
-    console.log(output.join('\n'));
   });
 }
 
@@ -54,5 +63,5 @@ if (args.length < 1) {
   process.exit(1);
 }
 
-const indexFile = path.resolve('d/global-index.txt'); // Path to the global index file
+const indexFile = 'd/global-index.txt'; // Path to the global index file
 query(indexFile, args);
