@@ -2,28 +2,20 @@
 
 cd "$(dirname "$0")/.." || exit 1
 
-MAX_URLS=100
+MAX_URLS=10
 ./p/get-content.sh $MAX_URLS
 
 INDEXED_URLS=0
 START_TIME=$(date +%s)
 
-while read -r url; do
-  if [[ $INDEXED_URLS -ge $MAX_URLS ]]; then
-    break;
-  fi
-
-  echo "[engine] indexing $url">/dev/stderr
-  url=$(cat p/d/url_$INDEXED_URLS.txt)
-  ./index.sh p/d/content_$INDEXED_URLS.txt "$url"
+while [[ $INDEXED_URLS -lt $MAX_URLS ]]; do
+  url=$(cat "p/d/url_$INDEXED_URLS.txt")
+  echo "indexing $url"
+  ./index.sh "p/d/content_$INDEXED_URLS.txt" "$url"
   ((INDEXED_URLS++))
+done
 
-  if  [[ "$(cat d/visited.txt | wc -l)" -ge "$(cat d/urls.txt | wc -l)" ]]; then
-      # stop the engine if it has seen all available URLs
-      break;
-  fi
-
-done < <(tail -f d/urls.txt)
+echo "outside loop"
 
 END_TIME=$(date +%s)
 SECONDS_ELAPSED=$(( END_TIME - START_TIME ))
