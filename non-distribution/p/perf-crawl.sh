@@ -3,7 +3,7 @@
 cd "$(dirname "$0")/.." || exit 1
 
 cat /dev/null > d/visited.txt
-cat "./p/d/crawl_urls.txt" > d/urls.txt
+echo "https://cs.brown.edu/courses/csci1380/sandbox/3/" > d/urls.txt
 
 MAX_URLS=100
 CRAWLED_URLS=0
@@ -15,10 +15,7 @@ while read -r url; do
     break;
   fi
 
-  echo "[engine] crawling $url">/dev/stderr
-  ./crawl.sh "$url" >d/content.txt
-  ((CRAWLED_URLS++))
-  if [[ $CRAWLED_URLS -eq $MAX_URLS ]]; then
+  if [[ $CRAWLED_URLS -ge $MAX_URLS ]]; then
     break;
   fi
 
@@ -26,6 +23,10 @@ while read -r url; do
       # stop the engine if it has seen all available URLs
       break;
   fi
+
+  echo "crawling $url">/dev/stderr
+  ./crawl.sh "$url" >d/content.txt
+  ((CRAWLED_URLS++))
 
 done < <(tail -f d/urls.txt)
 
