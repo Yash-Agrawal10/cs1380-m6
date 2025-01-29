@@ -3,7 +3,7 @@
 cd "$(dirname "$0")/.." || exit 1
 
 cat /dev/null > d/visited.txt
-cat "./p/d/crawl_urls.txt" > d/urls.txt
+echo "https://cs.brown.edu/courses/csci1380/sandbox/4/" > d/urls.txt
 
 URLS=${1:-0}
 if ! [[ "$URLS" =~ ^-?[0-9]+$ ]]; then
@@ -22,15 +22,15 @@ while read -r url; do
     break;
   fi
 
-  echo "[engine] crawling $url">/dev/stderr
-  ./crawl.sh "$url" >"p/d/content_$CRAWLED_URLS.txt"
-  echo "$url" >"p/d/url_$CRAWLED_URLS.txt"
-  ((CRAWLED_URLS++))
-
   if  [[ "$(cat d/visited.txt | wc -l)" -ge "$(cat d/urls.txt | wc -l)" ]]; then
       # stop the engine if it has seen all available URLs
       break;
   fi
+
+  echo "crawling $url">/dev/stderr
+  ./crawl.sh "$url" >"p/d/content_$CRAWLED_URLS.txt"
+  echo "$url" >"p/d/url_$CRAWLED_URLS.txt"
+  ((CRAWLED_URLS++))
 
 done < <(tail -f d/urls.txt)
 
