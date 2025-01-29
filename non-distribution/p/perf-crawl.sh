@@ -5,7 +5,11 @@ cd "$(dirname "$0")/.." || exit 1
 cat /dev/null > d/visited.txt
 echo "https://cs.brown.edu/courses/csci1380/sandbox/3/" > d/urls.txt
 
-MAX_URLS=100
+MAX_URLS=${1:-0}
+if ! [[ "$MAX_URLS" =~ ^-?[0-9]+$ ]]; then
+  echo "Error: Argument is not a valid integer"
+  exit 1
+fi
 CRAWLED_URLS=0
 START_TIME=$(date +%s)
 
@@ -24,7 +28,7 @@ while read -r url; do
       break;
   fi
 
-  echo "crawling $url">/dev/stderr
+  # echo "crawling $url">/dev/stderr
   ./crawl.sh "$url" >d/content.txt
   ((CRAWLED_URLS++))
 
