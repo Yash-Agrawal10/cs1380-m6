@@ -27,7 +27,7 @@ while read -r url; do
       break;
   fi
 
-  echo "crawling $url">/dev/stderr
+  # echo "crawling $url">/dev/stderr
   ./crawl.sh "$url" >"p/d/content_$CRAWLED_URLS.txt"
   echo "$url" >"p/d/url_$CRAWLED_URLS.txt"
   ((CRAWLED_URLS++))

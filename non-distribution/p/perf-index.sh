@@ -15,7 +15,7 @@ START_TIME=$(date +%s)
 while [[ $INDEXED_URLS -lt $MAX_URLS ]]; do
   url=$(cat "p/d/url_$INDEXED_URLS.txt")
   # echo "indexing $url"
-  ./index.sh "p/d/content_$INDEXED_URLS.txt" "$url" < /dev/null
+  ./index.sh "p/d/content_$INDEXED_URLS.txt" "$url"
   ((INDEXED_URLS++))
 done
 
