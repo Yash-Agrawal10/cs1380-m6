@@ -18,7 +18,7 @@ while read -r term; do
     break;
   fi
   # echo "querying for $term"
-  ./query.js "$term"
+  ./query.js "$term" > "./p/d/responses.txt"
   ((COMPLETED_QUERIES++))
 done < "p/d/queries.txt"
 
