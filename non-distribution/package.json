@@ -2,9 +2,9 @@
   "name": "cs1380:m0",
   "version": "1.0.0",
   "author": {
-    "name": "<first last?>",
-    "email": "<email@brown.edu?>",
-    "cslogin": "<cslogin?>"
+    "name": "Yash Agrawal",
+    "email": "yagrawal@brown.edu",
+    "cslogin": "yagrawa1"
   },
   "description": "A set of components for cs1380's search engine.",
   "dependencies": {
@@ -32,10 +32,15 @@
       "ssd-gb": 999
     },
     "throughput": {
-      "dev": [],
-      "aws": [],
+      "dev": ["Crawl - 2.63 urls/sec", "Index - 3.84 urls/sec", "Query - 4.17 queries/sec"],
+      "aws": ["Crawl - 0.694 urls/sec", "Index - 0.961 urls/sec", "Query - 1.136 queries/sec"],
       "gs": []
     },
-    "dloc": -99
+    "latency": {
+      "dev": ["Crawl - 0.38 secs/url", "Index - 0.26 secs/url", "Query - 0.24 secs/query"],
+      "aws": ["Crawl - 1.44 secs/url", "Index - 1.04 secs/url", "Query - 0.88 secs/query"],
+      "gs": []
+    },
+    "dloc": 300
   }
 }
