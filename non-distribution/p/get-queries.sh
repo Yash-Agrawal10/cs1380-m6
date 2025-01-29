@@ -15,7 +15,7 @@ if [[ $URLS -eq 0 ]]; then
   exit 1
 fi
 
-./p/get-content.sh $URLS
+./p/get-content.sh "$URLS"
 
 INDEXED_URLS=0
 

@@ -7,7 +7,7 @@ if ! [[ "$MAX_URLS" =~ ^-?[0-9]+$ ]]; then
   echo "Error: Argument is not a valid integer"
   exit 1
 fi
-./p/get-content.sh $MAX_URLS
+./p/get-content.sh "$MAX_URLS"
 
 INDEXED_URLS=0
 START_TIME=$(date +%s)
