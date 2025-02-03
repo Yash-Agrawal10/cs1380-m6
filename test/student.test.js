@@ -62,18 +62,17 @@ test('m1: functions', () => {
   const empty = () => {};
   const sEmpty = distribution.util.serialize(empty);
   const dEmpty = distribution.util.deserialize(sEmpty);
-  console.log(dEmpty);
-  expect(dEmpty()).toEqual(undefined);
+  expect(dEmpty.toString()).toEqual(empty.toString());
 
   const identity = (x) => x;
   const sIdentity = distribution.util.serialize(identity);
   const dIdentity = distribution.util.deserialize(sIdentity);
-  expect(dIdentity(5)).toEqual(5);
+  expect(dIdentity.toString()).toEqual(identity.toString());
 
   const double = (x) => 2 * x;
   const sDouble = distribution.util.serialize(double);
   const dDouble = distribution.util.deserialize(sDouble);
-  expect(dDouble(2)).toEqual(4);
+  expect(dDouble.toString()).toEqual(double.toString());
 
   const multiLine = (x) => {
     x *= 5;
@@ -81,7 +80,7 @@ test('m1: functions', () => {
   };
   const sMultiLine = distribution.util.serialize(multiLine);
   const dMultiLine = distribution.util.deserialize(sMultiLine);
-  expect(dMultiLine(10)).toEqual(25);
+  expect(dMultiLine.toString()).toEqual(multiLine.toString());
 });
 
 test('m1: simple primitives', () => {

@@ -13,8 +13,45 @@
     10. Serialize native functions
 */
 
-
 function serialize(object) {
+  if (object == null) {
+    console.log("null");
+    return;
+  }
+
+  if (object == undefined) {
+    console.log("undefined");
+    return;
+  }
+
+  if (object instanceof Date) {
+    console.log("date");
+    return;
+  }
+
+  switch (typeof object) {
+    case 'string': 
+      console.log('string');
+      return;
+
+    case 'number': 
+      console.log('number');
+      return;
+
+    case 'boolean': 
+      console.log('boolean');
+      return;
+
+    case 'object': 
+      console.log('object');
+      return;
+
+    case 'array': 
+      console.log('array');
+      return;
+    
+    case ''
+  }
 }
 
 
