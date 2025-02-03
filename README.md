@@ -74,3 +74,26 @@ You can also send messages to other nodes:
 ```js
 distribution.all.comm.send(['sid'], {node: node, service: 'status', method: 'get'}, console.log); // 8cf1c
 ```
+
+
+# M1: Serialization / Deserialization
+
+
+## Summary
+
+> Summarize your implementation, including key challenges you encountered. Remember to update the `report` section of the `package.json` file with the total number of hours it took you to complete each task of M1 (`hours`) and the lines of code per task.
+
+
+My implementation comprises 4 software components (serialization/deserialization, testing, performance, scenarios), totaling about 300 lines of code. Key challenges included carefully handling recursive serialization of objects, developing a sufficient testing suite, and figure out how to best serialize errors.
+
+
+## Correctness & Performance Characterization
+
+
+> Describe how you characterized the correctness and performance of your implementation
+
+
+*Correctness*: I wrote about 25 tests; these tests take 0.249 seconds to execute. This includes basic primitives, nested objects, arrays with various types, errors, dates, and more.
+
+
+*Performance*: The latency of various subsystems is described in the `"latency"` portion of package.json. The characteristics of my development machines are summarized in the `"dev"` portion of package.json.

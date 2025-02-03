@@ -19,6 +19,30 @@
     "build": "./scripts/publish.sh",
     "lint": "eslint --ignore-path .gitignore --config .eslintrc . --fix"
   },
+  "report": {
+    "M1": {
+      "hours": 8,
+      "loc": {
+        "T1": 130,
+        "T2": 50,
+        "T3": 30,
+        "T4": 50,
+        "T5": 40
+      },
+      "latency": {
+        "local": {
+          "T2": "79.7 ms",
+          "T3": "69.7 ms",
+          "T4": "26.0 ms"
+        },
+        "cloud": {
+          "T2": "31.4 ms",
+          "T3": "24.7 ms",
+          "T4": "12.9 ms"
+        }
+      }
+    }
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
