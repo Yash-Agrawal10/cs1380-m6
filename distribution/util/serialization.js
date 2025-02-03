@@ -13,15 +13,19 @@
     10. Serialize native functions
 */
 
+function serializeHelper(type, value) {
+  const serializedObject = { type, value };
+  const serializedString = JSON.stringify(serializedObject);
+  return serializedString;
+}
+
 function serialize(object) {
-  if (object == null) {
-    console.log("null");
-    return;
+  if (object === null) {
+    return serializeHelper("null", "null");
   }
 
-  if (object == undefined) {
-    console.log("undefined");
-    return;
+  if (object === undefined) {
+    return serializeHelper("undefined", "undefined");
   }
 
   if (object instanceof Date) {
@@ -30,17 +34,16 @@ function serialize(object) {
   }
 
   switch (typeof object) {
+    // Send as itself
     case 'string': 
-      console.log('string');
-      return;
+      return serializeHelper("string", object);
 
+    // Apply to string
     case 'number': 
-      console.log('number');
-      return;
+      return serializeHelper("number", object.toString());
 
     case 'boolean': 
-      console.log('boolean');
-      return;
+      return serializeHelper("boolean", object.toString());
 
     case 'object': 
       console.log('object');
@@ -50,12 +53,56 @@ function serialize(object) {
       console.log('array');
       return;
     
-    case ''
+    default:
+      return;
   }
 }
 
 
 function deserialize(string) {
+  const object = JSON.parse(string);
+  if (!object.hasOwnProperty("type") || !object.hasOwnProperty("value")) {
+      console.log("Invalid String");
+      return;
+  }
+
+  switch (object.type) {
+    case "null":
+      if (object.value != 'null') {
+        console.log("Invalid String");
+        return;
+      }
+      return null;
+
+    case "undefined":
+      if (object.value != 'undefined') {
+        console.log("Invalid String");
+        return;
+      }
+      return undefined;
+
+    case "string":
+      return object.value;
+
+    case "number":
+      const num = Number(object.value);
+      if (num == NaN && object.value != "NaN") {
+        console.log("Invalid String");
+        return;
+      }
+      return num;
+
+    case "boolean":
+      if (object.value != 'true' && object.value != 'false') {
+        console.log("Invalid String");
+        return;
+      }
+      return (object.value == 'true');
+
+    default:
+      console.log("Invalid String");
+      return;
+  }
 }
 
 module.exports = {
