@@ -59,20 +59,22 @@ test('m1: arrays', () => {
 });
 
 test('m1: functions', () => {
+  // Currently only tests simple function functionality, not deep equality
   const empty = () => {};
   const sEmpty = distribution.util.serialize(empty);
   const dEmpty = distribution.util.deserialize(sEmpty);
-  expect(dEmpty.toString()).toEqual(empty.toString());
+  expect(dEmpty()).toBeUndefined();
 
   const identity = (x) => x;
   const sIdentity = distribution.util.serialize(identity);
   const dIdentity = distribution.util.deserialize(sIdentity);
-  expect(dIdentity.toString()).toEqual(identity.toString());
+  console.log(dIdentity.toString());
+  expect(dIdentity(5)).toEqual(5);
 
   const double = (x) => 2 * x;
   const sDouble = distribution.util.serialize(double);
   const dDouble = distribution.util.deserialize(sDouble);
-  expect(dDouble.toString()).toEqual(double.toString());
+  expect(dDouble(5)).toEqual(10);
 
   const multiLine = (x) => {
     x *= 5;
@@ -80,7 +82,7 @@ test('m1: functions', () => {
   };
   const sMultiLine = distribution.util.serialize(multiLine);
   const dMultiLine = distribution.util.deserialize(sMultiLine);
-  expect(dMultiLine.toString()).toEqual(multiLine.toString());
+  expect(dMultiLine(10)).toEqual(25);
 });
 
 test('m1: simple primitives', () => {

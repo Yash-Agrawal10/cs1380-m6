@@ -45,6 +45,10 @@ function serialize(object) {
     case 'boolean': 
       return serializeHelper("boolean", object.toString());
 
+    // Temporary to string (functions)
+    case 'function':
+      return serializeHelper("function", object.toString());
+
     case 'object': 
       console.log('object');
       return;
@@ -98,6 +102,15 @@ function deserialize(string) {
         return;
       }
       return (object.value == 'true');
+
+    case "function":
+      try {
+        const fn = new Function('return ' + object.value)();
+        return fn;
+      } catch (err) {
+        console.log("Invalid String: ", err);
+        return;
+      }
 
     default:
       console.log("Invalid String");
