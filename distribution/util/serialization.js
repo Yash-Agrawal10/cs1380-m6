@@ -29,8 +29,21 @@ function serialize(object) {
   }
 
   if (object instanceof Date) {
-    console.log("date");
-    return;
+    return serializeHelper("date", object.toISOString());
+  }
+
+  if (object instanceof Error) {
+    const value = {
+      name: object.name,
+      message: object.message,
+      stack: object.stack
+    };
+    return serializeHelper("error", JSON.stringify(value));
+  }
+
+  if (Array.isArray(object)) {
+    const arrayValue = object.map(serialize);
+    return serializeHelper("array", JSON.stringify(arrayValue));
   }
 
   switch (typeof object) {
@@ -49,13 +62,13 @@ function serialize(object) {
     case 'function':
       return serializeHelper("function", object.toString());
 
+    // Objects
     case 'object': 
-      console.log('object');
-      return;
-
-    case 'array': 
-      console.log('array');
-      return;
+      const objectValue = {};
+      Object.keys(object).forEach((key) => {
+        objectValue[key] = serialize(object[key]);
+      });
+      return serializeHelper("object", JSON.stringify(objectValue));
     
     default:
       return;
@@ -90,7 +103,7 @@ function deserialize(string) {
 
     case "number":
       const num = Number(object.value);
-      if (num == NaN && object.value != "NaN") {
+      if (Number.isNaN(num) && object.value != "NaN") {
         console.log("Invalid String");
         return;
       }
@@ -111,6 +124,29 @@ function deserialize(string) {
         console.log("Invalid String: ", err);
         return;
       }
+
+    case "object":
+      const objectValue = JSON.parse(object.value);
+      const obj = {};
+      Object.keys(objectValue).forEach((key) => {
+        obj[key] = deserialize(objectValue[key]);
+      });
+      return obj;
+
+    case "array":
+      const arrayValue = JSON.parse(object.value);
+      const array = arrayValue.map(deserialize);
+      return array;
+
+    case "date":
+      return new Date(object.value);
+
+    case "error":
+      const errorValue = JSON.parse(object.value);
+      const error = new Error(errorValue.message);
+      error.name = errorValue.name;
+      error.stack = errorValue.stack;
+      return error;
 
     default:
       console.log("Invalid String");

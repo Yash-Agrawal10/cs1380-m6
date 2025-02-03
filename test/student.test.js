@@ -14,6 +14,30 @@ test('m1: sample test', () => {
   expect(deserialized).toEqual(object);
 });
 
+test('m1: dates', () => {
+  const now = new Date(Date.now());
+  const sNow = distribution.util.serialize(now);
+  const dNow = distribution.util.deserialize(sNow);
+  expect(dNow).toEqual(now);
+
+  const zero = new Date(0);
+  const sZero = distribution.util.serialize(zero);
+  const dZero = distribution.util.deserialize(sZero);
+  expect(dZero).toEqual(zero);
+})
+
+test('m1: errors', () => {
+  const empty = new Error();
+  const sEmpty = distribution.util.serialize(empty);
+  const dEmpty = distribution.util.deserialize(sEmpty);
+  expect(dEmpty).toEqual(empty);
+
+  const messaage = new Error("message");
+  const sMessaage = distribution.util.serialize(messaage);
+  const dMessaage = distribution.util.deserialize(sMessaage);
+  expect(dMessaage).toEqual(messaage);
+})
+
 test('m1: objects', () => {
   const empty = {};
   const sEmpty = distribution.util.serialize(empty);
@@ -44,6 +68,7 @@ test('m1: objects', () => {
 test('m1: arrays', () => {
   const empty = [];
   const sEmpty = distribution.util.serialize(empty);
+  console.log(sEmpty);
   const dEmpty = distribution.util.deserialize(sEmpty);
   expect(dEmpty).toEqual(empty);
 
@@ -68,7 +93,6 @@ test('m1: functions', () => {
   const identity = (x) => x;
   const sIdentity = distribution.util.serialize(identity);
   const dIdentity = distribution.util.deserialize(sIdentity);
-  console.log(dIdentity.toString());
   expect(dIdentity(5)).toEqual(5);
 
   const double = (x) => 2 * x;
