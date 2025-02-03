@@ -6,6 +6,12 @@ const distribution = require('../config.js');
 
 // M1 Test Cases
 
+const serializeAndDeserialize = (object) => {
+  const serialized = distribution.util.serialize(object);
+  const deserialized = distribution.util.deserialize(serialized);
+  return deserialized;
+}
+
 test('m1: sample test', () => {
   const object = {milestone: 'm1', status: 'complete'};
   const serialized = distribution.util.serialize(object);
@@ -16,42 +22,36 @@ test('m1: sample test', () => {
 
 test('m1: dates', () => {
   const now = new Date(Date.now());
-  const sNow = distribution.util.serialize(now);
-  const dNow = distribution.util.deserialize(sNow);
-  expect(dNow).toEqual(now);
+  const myNow = serializeAndDeserialize(now);
+  expect(myNow).toEqual(now);
 
   const zero = new Date(0);
-  const sZero = distribution.util.serialize(zero);
-  const dZero = distribution.util.deserialize(sZero);
-  expect(dZero).toEqual(zero);
+  const myZero = serializeAndDeserialize(zero);
+  expect(myZero).toEqual(zero);
 })
 
 test('m1: errors', () => {
   const empty = new Error();
-  const sEmpty = distribution.util.serialize(empty);
-  const dEmpty = distribution.util.deserialize(sEmpty);
-  expect(dEmpty).toEqual(empty);
+  const myEmpty = serializeAndDeserialize(empty);
+  expect(myEmpty).toEqual(empty);
 
-  const messaage = new Error("message");
-  const sMessaage = distribution.util.serialize(messaage);
-  const dMessaage = distribution.util.deserialize(sMessaage);
-  expect(dMessaage).toEqual(messaage);
+  const message = new Error("message");
+  const myMessage = serializeAndDeserialize(message);
+  expect(myMessage).toEqual(message);
 })
 
 test('m1: objects', () => {
   const empty = {};
-  const sEmpty = distribution.util.serialize(empty);
-  const dEmpty = distribution.util.deserialize(sEmpty);
-  expect(dEmpty).toEqual(empty);
+  const myEmpty = serializeAndDeserialize(empty);
+  expect(myEmpty).toEqual(empty);
 
   const flat = {
     num: 1, 
     str: "string",
     arr: [1, 2, 3],
   };
-  const sFlat = distribution.util.serialize(flat);
-  const dFlat = distribution.util.deserialize(sFlat);
-  expect(dFlat).toEqual(flat);
+  const myFlat = serializeAndDeserialize(flat);
+  expect(myFlat).toEqual(flat);
 
   const rec = {
     l1: {
@@ -60,129 +60,104 @@ test('m1: objects', () => {
       }
     }
   };
-  const sRec = distribution.util.serialize(rec);
-  const dRec = distribution.util.deserialize(sRec);
-  expect(dRec).toEqual(rec);
+  const myRec = serializeAndDeserialize(rec);
+  expect(myRec).toEqual(rec);
 });
 
 test('m1: arrays', () => {
   const empty = [];
-  const sEmpty = distribution.util.serialize(empty);
-  console.log(sEmpty);
-  const dEmpty = distribution.util.deserialize(sEmpty);
-  expect(dEmpty).toEqual(empty);
+  const myEmpty = serializeAndDeserialize(empty);
+  expect(myEmpty).toEqual(empty);
 
   const nums = [1, 2, 3];
-  const sNums = distribution.util.serialize(nums);
-  const dNums = distribution.util.deserialize(sNums);
-  expect(dNums).toEqual(nums);
+  const myNums = serializeAndDeserialize(nums);
+  expect(myNums).toEqual(nums);
 
   const strings = ["a", "bc", "def"];
-  const sStrings = distribution.util.serialize(strings);
-  const dStrings = distribution.util.deserialize(sStrings);
-  expect(dStrings).toEqual(strings);
+  const myStrings = serializeAndDeserialize(strings);
+  expect(myStrings).toEqual(strings);
+
+  const mixed = [1, "a", {test: 'test!'}];
+  const myMixed = serializeAndDeserialize(mixed);
+  expect(myMixed).toEqual(mixed);
 });
 
 test('m1: functions', () => {
   // Currently only tests simple function functionality, not deep equality
   const empty = () => {};
-  const sEmpty = distribution.util.serialize(empty);
-  const dEmpty = distribution.util.deserialize(sEmpty);
-  expect(dEmpty()).toBeUndefined();
+  const myEmpty = serializeAndDeserialize(empty);
+  expect(myEmpty()).toBeUndefined();
 
   const identity = (x) => x;
-  const sIdentity = distribution.util.serialize(identity);
-  const dIdentity = distribution.util.deserialize(sIdentity);
-  expect(dIdentity(5)).toEqual(5);
+  const myIdentity = serializeAndDeserialize(identity);
+  expect(myIdentity(5)).toEqual(5);
 
   const double = (x) => 2 * x;
-  const sDouble = distribution.util.serialize(double);
-  const dDouble = distribution.util.deserialize(sDouble);
-  expect(dDouble(5)).toEqual(10);
+  const myDouble = serializeAndDeserialize(double);
+  expect(myDouble(5)).toEqual(10);
 
   const multiLine = (x) => {
     x *= 5;
     return x / 2;
   };
-  const sMultiLine = distribution.util.serialize(multiLine);
-  const dMultiLine = distribution.util.deserialize(sMultiLine);
-  expect(dMultiLine(10)).toEqual(25);
+  const myMultiLine = serializeAndDeserialize(multiLine);
+  expect(myMultiLine(10)).toEqual(25);
 });
 
 test('m1: simple primitives', () => {
-  const t = true;
-  const sT = distribution.util.serialize(t);
-  const dT = distribution.util.deserialize(sT);
-  expect(dT).toEqual(t);
+  const myTrue = serializeAndDeserialize(true);
+  expect(myTrue).toEqual(true);
 
-  const f = false;
-  const sF = distribution.util.serialize(f);
-  const dF = distribution.util.deserialize(sF);
-  expect(dF).toEqual(f);
+  const myFalse = serializeAndDeserialize(false);
+  expect(myFalse).toEqual(false);
 
-  const n = null;
-  const sN = distribution.util.serialize(n);
-  const dN = distribution.util.deserialize(sN);
-  expect(dN).toEqual(n);
+  const myNull = serializeAndDeserialize(null);
+  expect(myNull).toEqual(null);
 
-  const u = undefined;
-  const sU = distribution.util.serialize(u);
-  const dU = distribution.util.deserialize(sU);
-  expect(dU).toEqual(u);
+  const myUndefined = serializeAndDeserialize(undefined);
+  expect(myUndefined).toEqual(undefined);
 });
 
 test('m1: strings', () => {
   const empty = "";
-  const sEmpty = distribution.util.serialize(empty);
-  const dEmpty = distribution.util.deserialize(sEmpty);
-  expect(dEmpty).toEqual(empty);
+  const myEmpty = serializeAndDeserialize(empty);
+  expect(myEmpty).toEqual(empty);
 
   const lower = "test";
-  const sLower = distribution.util.serialize(lower);
-  const dLower = distribution.util.deserialize(sLower);
-  expect(dLower).toEqual(lower);
+  const myLower = serializeAndDeserialize(lower);
+  expect(myLower).toEqual(lower);
 
   const upper = "test";
-  const sUpper = distribution.util.serialize(upper);
-  const dUpper = distribution.util.deserialize(sUpper);
-  expect(dUpper).toEqual(upper);
+  const myUpper = serializeAndDeserialize(upper);
+  expect(myUpper).toEqual(upper);
 
   const num = "123";
-  const sNum = distribution.util.serialize(num);
-  const dNum = distribution.util.deserialize(sNum);
-  expect(dNum).toEqual(num);
+  const myNum = serializeAndDeserialize(num);
+  expect(myNum).toEqual(num);
 
   const random = "  wasdWASD123!@#  ";
-  const sRandom = distribution.util.serialize(random);
-  const dRandom = distribution.util.deserialize(sRandom);
-  expect(dRandom).toEqual(random);
+  const myRandom = serializeAndDeserialize(random);
+  expect(myRandom).toEqual(random);
 });
 
 test('m1: numbers', () => {
   const singleDigit = 1;
-  const sSingleDigit = distribution.util.serialize(singleDigit);
-  const dSingleDigit = distribution.util.deserialize(sSingleDigit);
-  expect(dSingleDigit).toEqual(singleDigit);
+  const mySingleDigit = serializeAndDeserialize(singleDigit);
+  expect(mySingleDigit).toEqual(singleDigit);
 
   const multiDigit = 100;
-  const sMultiDigit = distribution.util.serialize(multiDigit);
-  const dMultiDigit = distribution.util.deserialize(sMultiDigit);
-  expect(dMultiDigit).toEqual(multiDigit);
+  const myMultiDigit = serializeAndDeserialize(multiDigit);
+  expect(myMultiDigit).toEqual(multiDigit);
 
   const decimal = 10.23;
-  const sDecimal = distribution.util.serialize(decimal);
-  const dDecimal = distribution.util.deserialize(sDecimal);
-  expect(dDecimal).toEqual(decimal);
+  const myDecimal = serializeAndDeserialize(decimal);
+  expect(myDecimal).toEqual(decimal);
 
-  const nan = NaN;
-  const sNan = distribution.util.serialize(nan);
-  const dNan = distribution.util.deserialize(sNan);
-  expect(dNan).toEqual(nan);
+  const myNaN = serializeAndDeserialize(NaN);
+  expect(myNaN).toEqual(NaN);
 
-  const infinity = Infinity;
-  const sInfinity = distribution.util.serialize(infinity);
-  const dInfinity = distribution.util.deserialize(sInfinity);
-  expect(dInfinity).toEqual(infinity);
+  const myInfinity = serializeAndDeserialize(Infinity);
+  expect(myInfinity).toEqual(Infinity);
 });
 
 // M2 Test Cases
