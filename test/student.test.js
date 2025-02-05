@@ -8,6 +8,9 @@ const distribution = require('../config.js');
 
 const serializeAndDeserialize = (object) => {
   const serialized = distribution.util.serialize(object);
+  if (serialized instanceof Error) {
+    return Error("Serialization failed");
+  }
   const deserialized = distribution.util.deserialize(serialized);
   return deserialized;
 }

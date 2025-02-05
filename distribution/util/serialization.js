@@ -71,7 +71,7 @@ function serialize(object) {
       return serializeHelper("object", JSON.stringify(objectValue));
     
     default:
-      return;
+      return Error("Datatype not supported");
   }
 }
 
