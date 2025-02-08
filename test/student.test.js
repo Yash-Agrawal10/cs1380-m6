@@ -392,6 +392,74 @@ describe('m2', () => {
       })
     })
   })
+
+  test('m2: comm.send(routes.rem) stateless', (done) => {
+    const helloWorld = () => {
+      return 'Hello World!';
+    }
+    const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
+    const service = {
+      helloWorld: helloWorldRPC
+    };
+
+    const remotePut = {node: node, service: 'routes', method: 'put'};
+    const remoteRem = {node: node, service: 'routes', method: 'rem'};
+    const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
+    distribution.local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
+      distribution.local.comm.send(['helloWorld'], remoteRem, (e, v) => {
+        distribution.local.comm.send([], remoteGet, (e, v) => {
+          try {
+            expect(v).toBeFalsy();
+            expect(e instanceof Error).toBeTruthy();
+            done();
+          } catch (error) {
+            done(error);
+          }
+        })
+      })
+    })
+  })
+
+  test('m2: comm.send(routes.rem) stateful', (done) => {
+    const message = 'Hello World!';
+    const helloWorld = () => {
+      return message;
+    }
+    const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
+    const service = {
+      helloWorld: helloWorldRPC
+    };
+
+    const remotePut = {node: node, service: 'routes', method: 'put'};
+    const remoteRem = {node: node, service: 'routes', method: 'rem'};
+    const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
+    distribution.local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
+      distribution.local.comm.send(['helloWorld'], remoteRem, (e, v) => {
+        distribution.local.comm.send([], remoteGet, (e, v) => {
+          try {
+            expect(v).toBeFalsy();
+            expect(e instanceof Error).toBeTruthy();
+            done();
+          } catch (error) {
+            done(error);
+          }
+        })
+      })
+    })
+  })
+
+  test('m2: comm.send(routes.rem) non-existent service', (done) => {
+    const remoteRem = {node: node, service: 'routes', method: 'rem'};
+    distribution.local.comm.send(['helloWorld'], remoteRem, (e, v) => {
+      try {
+        expect(e).toBeFalsy();
+        expect(v).toBeFalsy();
+        done();
+      } catch (error) {
+        done(error);
+      }
+    })
+  })
 })
 
 // M3 Test Cases
