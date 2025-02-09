@@ -149,8 +149,9 @@ function deserialize(string) {
       return error;
 
     default:
+      // Currently ambiguous if deserializing this specific error, may fix later
       console.log("Invalid String");
-      return;
+      return new Error('Deserialization failed');
   }
 }
 
