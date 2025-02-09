@@ -10,43 +10,53 @@ global.moreStatus = {
 };
 
 status.get = function(configuration, callback) {
-  callback = callback || function() { };
   // TODO: implement remaining local status items
+  
+  // Handle missing parameters
+  if (typeof configuration != 'string') {
+    configuration = "";
+  }
+  if (typeof callback != 'function') {
+    callback = console.log;
+  }
+
+  // Update state
   global.moreStatus.counts++;
-  if (configuration === 'nid') {
-    callback(null, global.moreStatus.nid);
-    return;
-  }
 
-  if (configuration === 'sid') {
-    callback(null, global.moreStatus.sid);
-    return;
-  }
+  // Get requested value
+  switch (configuration) {
+    case 'nid':
+      callback(null, global.moreStatus.nid);
+      break;
 
-  if (configuration === 'ip') {
-    callback(null, global.nodeConfig.ip);
-    return;
-  }
+    case 'sid':
+      callback(null, global.moreStatus.sid);
+      break;
 
-  if (configuration === 'port') {
-    callback(null, global.nodeConfig.port);
-    return;
-  }
+    case 'ip':
+      callback(null, global.nodeConfig.ip);
+      break;
 
-  if (configuration === 'counts') {
-    callback(null, global.moreStatus.counts);
-    return;
-  }
+    case 'port':
+      callback(null, global.nodeConfig.port);
+      break;
 
-  if (configuration === 'heapTotal') {
-    callback(null, process.memoryUsage().heapTotal);
-    return;
+    case 'counts':
+      callback(null, global.moreStatus.counts);
+      break;
+
+    case 'heapTotal':
+      callback(null, process.memoryUsage().heapTotal);
+      break;
+
+    case 'heapUsed':
+      callback(null, process.memoryUsage().heapUsed);
+      break;
+
+    default:
+      callback(new Error('Status key not found'), null);
+      break;
   }
-  if (configuration === 'heapUsed') {
-    callback(null, process.memoryUsage().heapUsed);
-    return;
-  }
-  callback(new Error('Status key not found'));
 };
 
 
