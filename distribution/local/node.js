@@ -44,7 +44,7 @@ const start = function(callback) {
       return;
     }
     const [gid, serviceName, methodName] = path;
-
+    gid;  // Avoid linting for now
     /*
 
       A common pattern in handling HTTP requests in Node.js is to have a
@@ -74,61 +74,52 @@ const start = function(callback) {
     // Write some code...
     // Handle request
     req.on('end', () => {
-      // Debugging
-      console.log(`Incoming Request, Path: ${path}, Body: ${body}`);
+      // Basic response setup
+      res.setHeader('Content-Type', 'application/json');
 
       // Deserialize arguments
       const argString = body;
       const args = deserialize(argString);
       if ((args instanceof Error && args.message == 'Deserialization failed') || !Array.isArray(args)) {
-        console.log('Invalid serialized args');
         res.statusCode = 422;
-        res.setHeader('Content-Type', 'application/json');
-        const message = { error: 'Invalid Serialized Arguments'};
-        res.end(serialize(message));
+        const body = new Error('Invalid Serialized Arguments');
+        res.end(serialize(body));
         return;
       }
 
+      // Debugging
+      console.log(`Incoming Request, Path: ${path}, args: ${args}`);
+
       // Make call to service/method
-      const cb = (error, service) => {
-        if (error) {
-          console.log('Service not found');
+      const getServiceCallback = (getServiceError, service) => {
+        if (getServiceError) {
           res.statusCode = 404;
-          res.setHeader('Content-Type', 'application/json');
-          const message = { error: 'Service not found'};
-          res.end(serialize(message));
+          const body = new Error('Service not found');
+          res.end(serialize(body));
           return;
         }
 
         if (!service[methodName]) {
-          console.log('Method not found');
           res.statusCode = 404;
-          res.setHeader('Content-Type', 'application/json');
-          const message = { error: 'Method not found'};
-          res.end(serialize(message));
+          const body = new Error('Method not found');
+          res.end(serialize(body));
           return;
         }
 
-        console.log(`Service: ${serviceName}, method name: ${methodName}`);
-        const serviceCallback = (e, v) => {
-          if (e) {
-            console.log('Internal Error');
+        const serviceCallback = (serviceError, value) => {
+          if (serviceError) {
             res.statusCode = 500;
-            res.setHeader('Content-Type', 'application/json');
             const body = new Error('Internal Error');
-            console.log('Internal Error');
             res.end(serialize(body));
             return;
           } else {
             res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            console.log('Returning Properly');
-            res.end(serialize(v));
+            res.end(serialize(value));
           }
         }
-        const rc = service[methodName](...args, serviceCallback);
+        service[methodName](...args, serviceCallback);
       };
-      routes.get(serviceName, cb);
+      routes.get(serviceName, getServiceCallback);
     })
 
   });

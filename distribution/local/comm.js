@@ -51,17 +51,17 @@ function send(message, remote, callback) {
         });
 
         res.on('end', () => {
-            console.log(`BODY: ${body}`);
-            const rc = deserialize(body);
-            console.log(`RC: ${rc}`);
+            const data = deserialize(body);
+            // Debugging
+            console.log(`Received response with body ${data}`);
             if (res.statusCode >= 200 || res.statusCode < 300) {
-                if (rc instanceof Error) {
-                    callback(rc, null);
+                if (data instanceof Error) {
+                    callback(data, null);
                 } else {
-                    callback(null, rc);
+                    callback(null, data);
                 }
             } else {
-                const message = `Request failed with status code ${req.statusCode}: ${body}`;
+                const message = `Request failed with status code ${req.statusCode}: ${data}`;
                 callback(new Error(message), null);
             }
         })

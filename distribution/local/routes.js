@@ -61,13 +61,8 @@ function rem(configuration, callback) {
     }
 
     // Remove service from map
-    if (serviceMap.hasOwnProperty(configuration)) {
-        delete serviceMap[configuration];
-        callback(null, service);
-    }
-    else {
-        callback(new Error('Service not found'), null);
-    }     
+    delete serviceMap[configuration];
+    callback(null, null);
 };
 
 module.exports = {get, put, rem};
