@@ -2,6 +2,8 @@ const http = require('http');
 const url = require('url');
 const log = require('../util/log');
 
+const { serialize, deserialize } = require('../util/serialization');
+const routes = require('./routes');
 
 /*
     The start function will be called to start your node.
@@ -15,7 +17,14 @@ const start = function(callback) {
     /* Your server will be listening for PUT requests. */
 
     // Write some code...
-
+    // Handle wrong method
+    if (req.method != 'PUT') {
+      res.statusCode = 405;
+      res.setHeader('Content-Type', 'application/json');
+      const message = { error: 'Only PUT methods allowed'};
+      res.end(serialize(message));
+      return;
+    }
 
     /*
       The path of the http request will determine the service to be used.
@@ -24,7 +33,17 @@ const start = function(callback) {
 
 
     // Write some code...
-
+    // Parse path for service/method names
+    const parsedURL = url.parse(req.url);
+    const path = parsedURL.pathname.split('/').filter(Boolean);
+    if (path.length != 2) {
+      res.statusCode = 404;
+      res.setHeader('Content-Type', 'application/json');
+      const message = { error: 'Invalid Path Length'};
+      res.end(serialize(message));
+      return;
+    }
+    const [serviceName, methodName] = path;
 
     /*
 
@@ -39,20 +58,67 @@ const start = function(callback) {
       format.
 
       Our nodes expect data in JSON format.
-  */
+
+    */
 
     // Write some code...
+    // Collect request
+    let body = '';
 
+    req.on('data', (chunk) => {
+      body += chunk;
+    });
 
-      /* Here, you can handle the service requests. */
+    /* Here, you can handle the service requests. */
 
-      // Write some code...
+    // Write some code...
+    // Handle request
+    req.on('end', () => {
+      // Deserialize arguments
+      const argString = body;
+      const args = deserialize(argString);
+      if ((args instanceof Error && args.message == 'Deserialization failed') || !Array.isArray(args)) {
+        res.statusCode = 422;
+        res.setHeader('Content-Type', 'application/json');
+        const message = { error: 'Invalid Serialized Arguments'};
+        res.end(serialize(message));
+        return;
+      }
 
-      const serviceName = service;
+      // Make call to service/method
+      const cb = (error, service) => {
+        if (error) {
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+          const message = { error: 'Service not found'};
+          res.end(serialize(message));
+          return;
+        }
 
+        if (!service[methodName]) {
+          res.statusCode = 404;
+          res.setHeader('Content-Type', 'application/json');
+          const message = { error: 'Method not found'};
+          res.end(serialize(message));
+          return;
+        }
 
-
-        // Write some code...
+        try {
+          const rc = service[methodName](...args);
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(serialize(rc));
+          return;
+        } catch (error) {
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json');
+          const message = { error: `Internal Error: ${error.message}`};
+          res.end(serialize(message));
+          return;
+        }
+      };
+      routes.get(serviceName, cb);
+    })
 
   });
 
