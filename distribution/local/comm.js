@@ -18,19 +18,22 @@ const { serialize } = require('../util/serialization');
  * @return {void}
  */
 function send(message, remote, callback) {
+    // Handle parameters
+    message = message || [];
     callback = callback || function() { };
+    // No default for remote, might change later
+    if (!Array.isArray(message) || typeof callback != 'function' || typeof remote != 'object') {
+        callback(new Error('Invalid parameters'), null);
+        return;
+    }
 
+    // Set up message
     const serializedArgs = serialize(message);
-    const ip = remote.node.ip;
-    const port = remote.node.port;
-    const gid = 'local';
-    const service = remote.service;
-    const method = remote.method;
-    const path = `/${gid}/${service}/${method}`;
-
+    // first path arg is 'gid', only local for now
+    const path = `/local/${remote.service}/${remote.method}`;
     const options = {
-        hostname: ip,
-        port: port,
+        hostname: remote.node.ip,
+        port: remote.node.port,
         path: path,
         method: 'PUT',
         headers: {
@@ -39,25 +42,28 @@ function send(message, remote, callback) {
         }
     };
 
+    // Create request (might need updates for error handling)
     const req = http.request(options, (res) => {
-        let data = '';
-        res.on('data', (chunk) => {
-            data += chunk;
-        });
-        res.on('end', () => {
-            try {
-                const parsedData = JSON.parse(data);
-                callback(null, parsedData);
-            } catch (error) {
-                return callback(error, null);
-            }
-        })
+        let body = '';
+
+        if (res.statusCode >= 200 || res.statusCode < 300) {
+            res.on('data', (chunk) => {
+                body += chunk;
+            });
+    
+            res.on('end', () => {
+                callback(null, body);
+            })
+        }
+        else {
+            callback(new Error(`Invalid Status Code: ${res.statusCode}`), null);
+        }
     })
 
-    req.on('error', (error) => {
-        callback(error, null);
+    // Send request
+    req.on('error', (e) => {
+        callback(e, null);
     })
-
     req.write(serializedArgs);
     req.end();
 }
