@@ -331,8 +331,8 @@ describe('m2', () => {
 
     const remotePut = {node: node, service: 'routes', method: 'put'};
     const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
-    distribution.local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
-      distribution.local.comm.send([], remoteGet, (e, v) => {
+    local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
+      local.comm.send([], remoteGet, (e, v) => {
         try {
           expect(e).toBeFalsy();
           expect(v).toEqual('Hello World!');
@@ -355,8 +355,8 @@ describe('m2', () => {
 
     const remotePut = {node: node, service: 'routes', method: 'put'};
     const remoteGet = {node: node, service: 'helloWorld', method: 'hello'}
-    distribution.local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
-      distribution.local.comm.send([], remoteGet, (e, v) => {
+    local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
+      local.comm.send([], remoteGet, (e, v) => {
         try {
           expect(v).toBeFalsy();
           expect(e instanceof Error).toBeTruthy();
@@ -380,8 +380,8 @@ describe('m2', () => {
 
     const remotePut = {node: node, service: 'routes', method: 'put'};
     const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
-    distribution.local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
-      distribution.local.comm.send([], remoteGet, (e, v) => {
+    local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
+      local.comm.send([], remoteGet, (e, v) => {
         try {
           expect(e).toBeFalsy();
           expect(v).toEqual(message);
@@ -405,9 +405,9 @@ describe('m2', () => {
     const remotePut = {node: node, service: 'routes', method: 'put'};
     const remoteRem = {node: node, service: 'routes', method: 'rem'};
     const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
-    distribution.local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
-      distribution.local.comm.send(['helloWorld'], remoteRem, (e, v) => {
-        distribution.local.comm.send([], remoteGet, (e, v) => {
+    local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
+      local.comm.send(['helloWorld'], remoteRem, (e, v) => {
+        local.comm.send([], remoteGet, (e, v) => {
           try {
             expect(v).toBeFalsy();
             expect(e instanceof Error).toBeTruthy();
@@ -433,9 +433,9 @@ describe('m2', () => {
     const remotePut = {node: node, service: 'routes', method: 'put'};
     const remoteRem = {node: node, service: 'routes', method: 'rem'};
     const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
-    distribution.local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
-      distribution.local.comm.send(['helloWorld'], remoteRem, (e, v) => {
-        distribution.local.comm.send([], remoteGet, (e, v) => {
+    local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
+      local.comm.send(['helloWorld'], remoteRem, (e, v) => {
+        local.comm.send([], remoteGet, (e, v) => {
           try {
             expect(v).toBeFalsy();
             expect(e instanceof Error).toBeTruthy();
@@ -450,7 +450,7 @@ describe('m2', () => {
 
   test('m2: comm.send(routes.rem) non-existent service', (done) => {
     const remoteRem = {node: node, service: 'routes', method: 'rem'};
-    distribution.local.comm.send(['helloWorld'], remoteRem, (e, v) => {
+    local.comm.send(['helloWorld'], remoteRem, (e, v) => {
       try {
         expect(e).toBeFalsy();
         expect(v).toBeFalsy();
