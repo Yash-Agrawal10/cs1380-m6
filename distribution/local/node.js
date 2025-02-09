@@ -36,14 +36,14 @@ const start = function(callback) {
     // Parse path for service/method names
     const parsedURL = url.parse(req.url);
     const path = parsedURL.pathname.split('/').filter(Boolean);
-    if (path.length != 2) {
+    if (path.length != 3) {
       res.statusCode = 404;
       res.setHeader('Content-Type', 'application/json');
       const message = { error: 'Invalid Path Length'};
       res.end(serialize(message));
       return;
     }
-    const [serviceName, methodName] = path;
+    const [gid, serviceName, methodName] = path;
 
     /*
 
@@ -74,10 +74,14 @@ const start = function(callback) {
     // Write some code...
     // Handle request
     req.on('end', () => {
+      // Debugging
+      console.log(`Incoming Request, Path: ${path}, Body: ${body}`);
+
       // Deserialize arguments
       const argString = body;
       const args = deserialize(argString);
       if ((args instanceof Error && args.message == 'Deserialization failed') || !Array.isArray(args)) {
+        console.log('Invalid serialized args');
         res.statusCode = 422;
         res.setHeader('Content-Type', 'application/json');
         const message = { error: 'Invalid Serialized Arguments'};
@@ -88,6 +92,7 @@ const start = function(callback) {
       // Make call to service/method
       const cb = (error, service) => {
         if (error) {
+          console.log('Service not found');
           res.statusCode = 404;
           res.setHeader('Content-Type', 'application/json');
           const message = { error: 'Service not found'};
@@ -96,6 +101,7 @@ const start = function(callback) {
         }
 
         if (!service[methodName]) {
+          console.log('Method not found');
           res.statusCode = 404;
           res.setHeader('Content-Type', 'application/json');
           const message = { error: 'Method not found'};
@@ -103,19 +109,24 @@ const start = function(callback) {
           return;
         }
 
-        try {
-          const rc = service[methodName](...args);
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'application/json');
-          res.end(serialize(rc));
-          return;
-        } catch (error) {
-          res.statusCode = 500;
-          res.setHeader('Content-Type', 'application/json');
-          const message = { error: `Internal Error: ${error.message}`};
-          res.end(serialize(message));
-          return;
+        console.log(`Service: ${serviceName}, method name: ${methodName}`);
+        const serviceCallback = (e, v) => {
+          if (e) {
+            console.log('Internal Error');
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            const body = new Error('Internal Error');
+            console.log('Internal Error');
+            res.end(serialize(body));
+            return;
+          } else {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            console.log('Returning Properly');
+            res.end(serialize(v));
+          }
         }
+        const rc = service[methodName](...args, serviceCallback);
       };
       routes.get(serviceName, cb);
     })

@@ -51,11 +51,16 @@ function send(message, remote, callback) {
         });
 
         res.on('end', () => {
-            // Currently do not deserialize body, may change this
-            if (res.statusCode >= 200 || res.statusCode < 300) {    
-                callback(null, body);
-            }
-            else {
+            console.log(`BODY: ${body}`);
+            const rc = deserialize(body);
+            console.log(`RC: ${rc}`);
+            if (res.statusCode >= 200 || res.statusCode < 300) {
+                if (rc instanceof Error) {
+                    callback(rc, null);
+                } else {
+                    callback(null, rc);
+                }
+            } else {
                 const message = `Request failed with status code ${req.statusCode}: ${body}`;
                 callback(new Error(message), null);
             }
