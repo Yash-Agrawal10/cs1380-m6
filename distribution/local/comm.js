@@ -2,7 +2,7 @@
 /** @typedef {import("../types").Node} Node */
 
 const http = require('node:http');
-const { serialize } = require('../util/serialization');
+const { serialize, deserialize } = require('../util/serialization');
 
 /**
  * @typedef {Object} Target
@@ -51,6 +51,7 @@ function send(message, remote, callback) {
         });
 
         res.on('end', () => {
+            // Currently do not deserialize body, may change this
             if (res.statusCode >= 200 || res.statusCode < 300) {    
                 callback(null, body);
             }
