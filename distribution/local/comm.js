@@ -42,22 +42,23 @@ function send(message, remote, callback) {
         }
     };
 
-    // Create request (might need updates for error handling)
+    // Create request
     const req = http.request(options, (res) => {
         let body = '';
 
-        if (res.statusCode >= 200 || res.statusCode < 300) {
-            res.on('data', (chunk) => {
-                body += chunk;
-            });
-    
-            res.on('end', () => {
+        res.on('data', (chunk) => {
+            body += chunk;
+        });
+
+        res.on('end', () => {
+            if (res.statusCode >= 200 || res.statusCode < 300) {    
                 callback(null, body);
-            })
-        }
-        else {
-            callback(new Error(`Invalid Status Code: ${res.statusCode}`), null);
-        }
+            }
+            else {
+                const message = `Request failed with status code ${req.statusCode}: ${body}`;
+                callback(new Error(message), null);
+            }
+        })
     })
 
     // Send request
