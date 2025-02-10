@@ -53,7 +53,7 @@ function send(message, remote, callback) {
         res.on('end', () => {
             const data = deserialize(body);
             // Debugging
-            console.log(`Received response with body ${data}`);
+            // console.log(`Received response with body ${data}`);
             if (res.statusCode >= 200 || res.statusCode < 300) {
                 if (data instanceof Error) {
                     callback(data, null);

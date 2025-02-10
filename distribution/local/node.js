@@ -88,7 +88,7 @@ const start = function(callback) {
       }
 
       // Debugging
-      console.log(`Incoming Request, Path: ${path}, args: ${args}`);
+      // console.log(`Incoming Request, Path: ${path}, args: ${args}`);
 
       // Make call to service/method
       const getServiceCallback = (getServiceError, service) => {

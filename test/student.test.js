@@ -6,6 +6,7 @@ const distribution = require('../config.js');
 const local = distribution.local;
 const util = distribution.util;
 const id = distribution.util.id;
+const config = distribution.node.config;
 
 // M1 Test Cases
 
@@ -170,7 +171,159 @@ describe('m1', () => {
 
 // M2 Test Cases
 
-describe('m2', () => {
+describe('m2: status', () => {
+  test('m2: status.get nid', () => {
+    local.status.get('nid', (error, nid) => {
+      expect(error).toBeFalsy();
+      expect(nid).toEqual(id.getNID(config));
+    });
+  });
+
+  test('m2: status.get sid', () => {
+    local.status.get('sid', (error, sid) => {
+      expect(error).toBeFalsy();
+      expect(sid).toEqual(id.getSID(config));
+    });
+  });
+
+  test('m2: status.get ip', () => {
+    local.status.get('ip', (error, ip) => {
+      expect(error).toBeFalsy();
+      expect(ip).toEqual(global.nodeConfig.ip);
+    });
+  });
+
+  test('m2: status.get port', () => {
+    local.status.get('port', (error, port) => {
+      expect(error).toBeFalsy();
+      expect(port).toEqual(global.nodeConfig.port);
+    });
+  });
+
+  test('m2: status.get counts', () => {
+    local.status.get('counts', (error, counts) => {
+      expect(error).toBeFalsy();
+      expect(typeof counts).toEqual('number');
+    });
+  });
+
+  test('m2: status.get heapTotal', () => {
+    local.status.get('heapTotal', (error, counts) => {
+      expect(error).toBeFalsy();
+      expect(typeof counts).toEqual('number');
+    });
+  });
+
+  test('m2: status.get heapUsed', () => {
+    local.status.get('heapUsed', (error, counts) => {
+      expect(error).toBeFalsy();
+      expect(typeof counts).toEqual('number');
+    });
+  });
+
+  test('m2: status.get invalid config', () => {
+    local.status.get('invalid', (error, value) => {
+      expect(error).toBeTruthy();
+      expect(value).toBeFalsy();
+    });
+  });
+});
+
+describe('m2: routes', () => {
+  test('m2: routes.get status', () => {
+    local.routes.get('status', (error, service) => {
+      expect(error).toBeFalsy();
+      expect(typeof service).toEqual('object');
+      expect(typeof service.get).toEqual('function');
+    })
+  });
+
+  test('m2: routes.get invalid', () => {
+    local.routes.get('invalid', (error, service) => {
+      expect(error).toBeTruthy();
+      expect(service).toBeFalsy();
+    })
+  });
+
+  test('m2: routes.put', () => {
+    const helloWorld = (callback) => {
+      callback(null, "Hello World!");
+    }
+
+    const helloWorldService = {
+      helloWorld: helloWorld
+    };
+
+    local.routes.put(helloWorldService, 'helloWorld', (error, config) => {
+      expect(error).toBeFalsy();
+      expect(config).toEqual('helloWorld');
+    })
+  });
+
+  test('m2: routes.get(routes.put))', () => {
+    const helloWorld = (callback) => {
+      callback(null, "Hello World!");
+    }
+
+    const helloWorldService = {
+      helloWorld: helloWorld
+    };
+
+    local.routes.put(helloWorldService, 'helloWorld', (error, config) => {
+      local.routes.get('helloWorld', (err, service) => {
+        expect(err).toBeFalsy();
+        expect(typeof service).toEqual('object');
+        service.helloWorld((err, val) => {
+          expect(err).toBeFalsy();
+          expect(val).toEqual('Hello World!');
+        });
+      });
+    });
+  });
+
+  test('m2: routes.rem(routes.put)', () => {
+    const helloWorld = () => {
+      callback(null, "Hello World!");
+    }
+    const helloWorldService = {
+      helloWorld: helloWorld
+    };
+    local.routes.put(helloWorldService, 'helloWorld');
+    
+    local.routes.rem('helloWorld', (error, value) => {
+      expect(error).toBeFalsy();
+      expect(typeof value).toEqual('object');
+    });
+  });
+
+  test('m2: routes.get(routes.rem(routes.put))', () => {
+    const helloWorld = () => {
+      callback(null, "Hello World!");
+    }
+    const helloWorldService = {
+      helloWorld: helloWorld
+    };
+    local.routes.put(helloWorldService, 'helloWorld');
+
+    local.routes.rem('helloWorld', (error, value) => {
+      expect(error).toBeFalsy();
+      expect(typeof value).toEqual('object');
+      local.routes.get('helloWorld', (err, service) => {
+        expect(err).toBeTruthy();
+        expect(service).toBeFalsy();
+      })
+    })
+  });
+
+  test('m2: routes.rem invalid', () => {
+    local.routes.rem('invalid', (error, value) => {
+      expect(error).toBeFalsy();
+      expect(value).toBeFalsy();
+    })
+  });
+})
+
+describe('m2: comm', () => {
   let localServer = null;
   let node = null;
 
@@ -187,112 +340,40 @@ describe('m2', () => {
     done();
   });
 
-  test('m2: comm.send(routes.get(status.get)) nid', (done) => {
-    const remote = {node: node, service: 'status', method: 'get'};
-    local.comm.send(['nid'], remote, (e, v) => {
-      try {
-        expect(e).toBeFalsy();
-        expect(v).toEqual(id.getNID(node));
-        done();
-      } catch (error) {
-        done(error);
-      }
-    })
-  });
-
-  test('m2: comm.send(routes.get(status.get)) sid', (done) => {
-    const remote = {node: node, service: 'status', method: 'get'};
-    local.comm.send(['sid'], remote, (e, v) => {
-      try {
-        expect(e).toBeFalsy();
-        expect(v).toEqual(id.getSID(node));
-        done();
-      } catch (error) {
-        done(error);
-      }
-    })
-  });
-
-  test('m2: comm.send(routes.get(status.get)) ip', (done) => {
+  test('m2: comm.send(routes.get(status.get))', (done) => {
     const remote = {node: node, service: 'status', method: 'get'};
     local.comm.send(['ip'], remote, (e, v) => {
       try {
         expect(e).toBeFalsy();
-        expect(v).toEqual(global.nodeConfig.ip);
+        expect(v).toEqual(node.ip);
         done();
       } catch (error) {
         done(error);
       }
-    })
+    });
   });
 
-  test('m2: comm.send(routes.get(status.get)) port', (done) => {
-    const remote = {node: node, service: 'status', method: 'get'};
-    local.comm.send(['port'], remote, (e, v) => {
+  test('m2: comm.send(routes.get(routes.put))', (done) => {
+    const helloWorld = (callback) => { callback(null, 'Hello World!') };
+    const helloWorldRPC = {
+      helloWorld: helloWorld
+    };
+    const remote = {node: node, service: 'routes', method: 'put'};
+    local.comm.send([helloWorldRPC, 'helloWorld'], remote, (e, v) => {
       try {
         expect(e).toBeFalsy();
-        expect(v).toEqual(global.nodeConfig.port);
-        done();
+        expect(v).toEqual('helloWorld');
+        const remote2 = {node: node, service: 'helloWorld', method: 'helloWorld'};
+        local.comm.send([], remote2, (err, val) => {
+          expect(err).toBeFalsy();
+          expect(val).toEqual('Hello World!');
+          done();
+        })
       } catch (error) {
         done(error);
       }
-    })
+    });
   });
-
-  test('m2: comm.send(routes.get(status.get)) counts', (done) => {
-    const remote = {node: node, service: 'status', method: 'get'};
-    local.comm.send(['counts'], remote, (e, v) => {
-      try {
-        expect(e).toBeFalsy();
-        expect(typeof v).toEqual('number');
-        expect(v >= 0).toBeTruthy();
-        done();
-      } catch (error) {
-        done(error);
-      }
-    })
-  });
-
-  test('m2: comm.send(routes.get(status.get)) heapTotal', (done) => {
-    const remote = {node: node, service: 'status', method: 'get'};
-    local.comm.send(['heapTotal'], remote, (e, v) => {
-      try {
-        expect(e).toBeFalsy();
-        expect(typeof v).toEqual('number');
-        expect(v >= 0).toBeTruthy();
-        done();
-      } catch (error) {
-        done(error);
-      }
-    })
-  });
-
-  test('m2: comm.send(routes.get(status.get)) heapUsed', (done) => {
-    const remote = {node: node, service: 'status', method: 'get'};
-    local.comm.send(['heapUsed'], remote, (e, v) => {
-      try {
-        expect(e).toBeFalsy();
-        expect(typeof v).toEqual('number');
-        expect(v >= 0).toBeTruthy();
-        done();
-      } catch (error) {
-        done(error);
-      }
-    })
-  });
-
-  test('m2: comm.send(routes.get(status.get)) invalid config', (done) => {
-    const remote = {node: node, service: 'status', method: 'get'};
-    local.comm.send(['invalid'], remote, (e, v) => {
-      try {
-        expect(v).toBeFalsy();
-        expect(e instanceof Error).toBeTruthy();
-        done();
-      } catch (error) {
-        done(error);
-      }
-    })
-  })
 
   test('m2: comm.send(routes.get) invalid service', (done) => {
     const remote = {node: node, service: 'invalid', method: 'get'};
@@ -304,8 +385,8 @@ describe('m2', () => {
       } catch (error) {
         done(error);
       }
-    })
-  })
+    });
+  });
 
   test('m2: comm.send(routes.get) invalid method', (done) => {
     const remote = {node: node, service: 'status', method: 'invalid'};
@@ -317,61 +398,31 @@ describe('m2', () => {
       } catch (error) {
         done(error);
       }
-    })
-  })
+    });
+  });
+});
 
-  test('m2: comm.send(routes.put) stateless', (done) => {
-    const helloWorld = () => {
-      return 'Hello World!';
-    }
-    const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
-    const service = {
-      helloWorld: helloWorldRPC
-    };
+describe('m2: rpc', () => {
+  let localServer = null;
+  let node = null;
 
-    const remotePut = {node: node, service: 'routes', method: 'put'};
-    const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
-    local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
-      local.comm.send([], remoteGet, (e, v) => {
-        try {
-          expect(e).toBeFalsy();
-          expect(v).toEqual('Hello World!');
-          done();
-        } catch (error) {
-          done(error);
-        }
-      })
-    })
-  })
+  beforeAll((done) => {
+    distribution.node.start((server) => {
+      localServer = server;
+      node = distribution.node.config;
+      done();
+    });
+  });
 
-  test('m2: comm.send(routes.put) stateless invalid method', (done) => {
-    const helloWorld = () => {
-      return 'Hello World!';
-    }
-    const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
-    const service = {
-      helloWorld: helloWorldRPC
-    };
-
-    const remotePut = {node: node, service: 'routes', method: 'put'};
-    const remoteGet = {node: node, service: 'helloWorld', method: 'hello'}
-    local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
-      local.comm.send([], remoteGet, (e, v) => {
-        try {
-          expect(v).toBeFalsy();
-          expect(e instanceof Error).toBeTruthy();
-          done();
-        } catch (error) {
-          done(error);
-        }
-      })
-    })
-  })
+  afterAll((done) => {
+    localServer.close();
+    done();
+  });
 
   test('m2: comm.send(routes.put) stateful', (done) => {
     const message = 'Hello World!';
     const helloWorld = () => {
-      return message;
+      callback(null, message);
     }
     const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
     const service = {
@@ -391,11 +442,11 @@ describe('m2', () => {
         }
       })
     })
-  })
+  });
 
-  test('m2: comm.send(routes.rem) stateless', (done) => {
+  test('m2: comm.send(routes.put) stateless', (done) => {
     const helloWorld = () => {
-      return 'Hello World!';
+      callback(null, "Hello World!");
     }
     const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
     const service = {
@@ -403,63 +454,19 @@ describe('m2', () => {
     };
 
     const remotePut = {node: node, service: 'routes', method: 'put'};
-    const remoteRem = {node: node, service: 'routes', method: 'rem'};
     const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
     local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
-      local.comm.send(['helloWorld'], remoteRem, (e, v) => {
-        local.comm.send([], remoteGet, (e, v) => {
-          try {
-            expect(v).toBeFalsy();
-            expect(e instanceof Error).toBeTruthy();
-            done();
-          } catch (error) {
-            done(error);
-          }
-        })
+      local.comm.send([], remoteGet, (e, v) => {
+        try {
+          expect(e).toBeFalsy();
+          expect(v).toEqual('Hello World!');
+          done();
+        } catch (error) {
+          done(error);
+        }
       })
-    })
-  })
-
-  test('m2: comm.send(routes.rem) stateful', (done) => {
-    const message = 'Hello World!';
-    const helloWorld = () => {
-      return message;
-    }
-    const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
-    const service = {
-      helloWorld: helloWorldRPC
-    };
-
-    const remotePut = {node: node, service: 'routes', method: 'put'};
-    const remoteRem = {node: node, service: 'routes', method: 'rem'};
-    const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
-    local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
-      local.comm.send(['helloWorld'], remoteRem, (e, v) => {
-        local.comm.send([], remoteGet, (e, v) => {
-          try {
-            expect(v).toBeFalsy();
-            expect(e instanceof Error).toBeTruthy();
-            done();
-          } catch (error) {
-            done(error);
-          }
-        })
-      })
-    })
-  })
-
-  test('m2: comm.send(routes.rem) non-existent service', (done) => {
-    const remoteRem = {node: node, service: 'routes', method: 'rem'};
-    local.comm.send(['helloWorld'], remoteRem, (e, v) => {
-      try {
-        expect(e).toBeFalsy();
-        expect(v).toBeFalsy();
-        done();
-      } catch (error) {
-        done(error);
-      }
-    })
-  })
+    });
+  });
 })
 
 // M3 Test Cases

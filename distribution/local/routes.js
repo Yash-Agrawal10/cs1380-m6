@@ -41,7 +41,6 @@ function put(service, configuration, callback) {
         callback(new Error('Invalid parameters'), null);
         return;
     }
-
     // Put service in serviceMap
     serviceMap[configuration] = service;
     callback(null, configuration);
@@ -61,8 +60,9 @@ function rem(configuration, callback) {
     }
 
     // Remove service from map
+    const service = serviceMap[configuration];
     delete serviceMap[configuration];
-    callback(null, null);
+    callback(null, service);
 };
 
 module.exports = {get, put, rem};
