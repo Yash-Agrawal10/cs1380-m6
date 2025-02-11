@@ -32,8 +32,9 @@ afterAll((done) => {
 
 // Tests
 
-describe('m2: status - student test', () => {
-  test('m2: status.get nid', () => {
+describe('m2: status', () => {
+  // m2: status.get nid - student test
+  test('(1 pts) student test', () => {
     local.status.get('nid', (error, nid) => {
       expect(error).toBeFalsy();
       expect(nid).toEqual(id.getNID(config));
@@ -315,8 +316,3 @@ describe('m2: rpc', () => {
     });
   });
 });
-
-// test('(1 pts) student test', (done) => {
-//   // Fill out this test case...
-//   done(new Error('Not implemented'));
-// });
