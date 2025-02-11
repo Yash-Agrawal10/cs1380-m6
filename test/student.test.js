@@ -419,35 +419,8 @@ describe('m2: rpc', () => {
     done();
   });
 
-  test('m2: comm.send(routes.put) stateful', (done) => {
-    const message = 'Hello World!';
-    const helloWorld = () => {
-      callback(null, message);
-    }
-    const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
-    const service = {
-      helloWorld: helloWorldRPC
-    };
-
-    const remotePut = {node: node, service: 'routes', method: 'put'};
-    const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
-    local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
-      local.comm.send([], remoteGet, (e, v) => {
-        try {
-          expect(e).toBeFalsy();
-          expect(v).toEqual(message);
-          done();
-        } catch (error) {
-          done(error);
-        }
-      })
-    })
-  });
-
   test('m2: comm.send(routes.put) stateless', (done) => {
-    const helloWorld = () => {
-      callback(null, "Hello World!");
-    }
+    const helloWorld = () => { return 'Hello World!'}
     const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
     const service = {
       helloWorld: helloWorldRPC
@@ -466,6 +439,29 @@ describe('m2: rpc', () => {
         }
       })
     });
+  });
+
+  test('m2: comm.send(routes.put) stateful', (done) => {
+    const message = 'Hello World!';
+    const helloWorld = () => { return message }
+    const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
+    const service = {
+      helloWorld: helloWorldRPC
+    };
+
+    const remotePut = {node: node, service: 'routes', method: 'put'};
+    const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
+    local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
+      local.comm.send([], remoteGet, (e, v) => {
+        try {
+          expect(e).toBeFalsy();
+          expect(v).toEqual(message);
+          done();
+        } catch (error) {
+          done(error);
+        }
+      })
+    })
   });
 })
 
