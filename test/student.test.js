@@ -109,7 +109,6 @@ describe('m1', () => {
   });
   
   test('m1: functions', () => {
-    // Currently only tests simple function functionality, not deep equality
     const empty = () => {};
     const myEmpty = serializeAndDeserialize(empty);
     expect(myEmpty()).toBeUndefined();
@@ -405,6 +404,20 @@ describe('m2: comm', () => {
 });
 
 describe('m2: rpc', () => {
+  test('m2: rpc is created and can send message to itself', (done) => {
+    const helloWorld = () => { return 'Hello World!'}
+    const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
+    helloWorldRPC((err, value) => {
+      try {
+        expect(err).toBeFalsy();
+        expect(value).toEqual('Hello World!');
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  })
+
   test('m2: comm.send(routes.put) stateless', (done) => {
     const helloWorld = () => { return 'Hello World!'}
     const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
