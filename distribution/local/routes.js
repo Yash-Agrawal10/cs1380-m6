@@ -16,8 +16,14 @@ function get(configuration, callback) {
         return;
     }
 
+    // Handle RPC case
+    if (configuration == 'rpc') {
+        const service = global.toLocal();
+        callback(null, service);
+    }
+
     // Get and return service
-    if (serviceMap.hasOwnProperty(configuration)) {
+    else if (serviceMap.hasOwnProperty(configuration)) {
         const service = serviceMap[configuration];
         callback(null, service);
     }

@@ -8,6 +8,24 @@ const util = distribution.util;
 const id = distribution.util.id;
 const config = distribution.node.config;
 
+// Test infrastructure
+
+let localServer = null;
+let node = null;
+
+beforeAll((done) => {
+  distribution.node.start((server) => {
+    localServer = server;
+    node = distribution.node.config;
+    done();
+  });
+});
+
+afterAll((done) => {
+  localServer.close();
+  done();
+});
+
 // M1 Test Cases
 
 const serializeAndDeserialize = (object) => {
@@ -438,21 +456,3 @@ describe('m2: rpc', () => {
 // M4 Test Cases
 
 // M5 Test Cases
-
-// Test infrastructure
-
-let localServer = null;
-let node = null;
-
-beforeAll((done) => {
-  distribution.node.start((server) => {
-    localServer = server;
-    node = distribution.node.config;
-    done();
-  });
-});
-
-afterAll((done) => {
-  localServer.close();
-  done();
-});
