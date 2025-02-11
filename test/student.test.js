@@ -324,22 +324,6 @@ describe('m2: routes', () => {
 })
 
 describe('m2: comm', () => {
-  let localServer = null;
-  let node = null;
-
-  beforeAll((done) => {
-    distribution.node.start((server) => {
-      localServer = server;
-      node = distribution.node.config;
-      done();
-    });
-  });
-
-  afterAll((done) => {
-    localServer.close();
-    done();
-  });
-
   test('m2: comm.send(routes.get(status.get))', (done) => {
     const remote = {node: node, service: 'status', method: 'get'};
     local.comm.send(['ip'], remote, (e, v) => {
@@ -403,22 +387,6 @@ describe('m2: comm', () => {
 });
 
 describe('m2: rpc', () => {
-  let localServer = null;
-  let node = null;
-
-  beforeAll((done) => {
-    distribution.node.start((server) => {
-      localServer = server;
-      node = distribution.node.config;
-      done();
-    });
-  });
-
-  afterAll((done) => {
-    localServer.close();
-    done();
-  });
-
   test('m2: comm.send(routes.put) stateless', (done) => {
     const helloWorld = () => { return 'Hello World!'}
     const helloWorldRPC = util.wire.createRPC(util.wire.toAsync(helloWorld));
@@ -427,7 +395,7 @@ describe('m2: rpc', () => {
     };
 
     const remotePut = {node: node, service: 'routes', method: 'put'};
-    const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'}
+    const remoteGet = {node: node, service: 'helloWorld', method: 'helloWorld'};
     local.comm.send([service, 'helloWorld'], remotePut, (e, v) => {
       local.comm.send([], remoteGet, (e, v) => {
         try {
@@ -470,3 +438,21 @@ describe('m2: rpc', () => {
 // M4 Test Cases
 
 // M5 Test Cases
+
+// Test infrastructure
+
+let localServer = null;
+let node = null;
+
+beforeAll((done) => {
+  distribution.node.start((server) => {
+    localServer = server;
+    node = distribution.node.config;
+    done();
+  });
+});
+
+afterAll((done) => {
+  localServer.close();
+  done();
+});
