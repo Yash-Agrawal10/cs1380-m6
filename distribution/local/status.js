@@ -11,9 +11,9 @@ global.moreStatus = {
 
 status.get = function(configuration, callback) {
   // TODO: implement remaining local status items
-  
+
   // Handle parameters
-  configuration = configuration || "";
+  configuration = configuration || '';
   callback = callback || console.log;
   if (typeof configuration != 'string' || typeof callback != 'function') {
     callback(new Error('Invalid parameters'), null);

@@ -8,22 +8,21 @@ const serviceMap = {};
  * @return {void}
  */
 function get(configuration, callback) {
-    // Handle parameters
-    configuration = configuration || "";
-    callback = callback || function() { };
-    if (typeof configuration != 'string' || typeof callback != 'function') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-    }
+  // Handle parameters
+  configuration = configuration || '';
+  callback = callback || function() { };
+  if (typeof configuration != 'string' || typeof callback != 'function') {
+    callback(new Error('Invalid parameters'), null);
+    return;
+  }
 
-    // Get and return service
-    else if (serviceMap.hasOwnProperty(configuration)) {
-        const service = serviceMap[configuration];
-        callback(null, service);
-    }
-    else {
-        callback(new Error('Service not found'), null);
-    }    
+  // Get and return service
+  else if (serviceMap.hasOwnProperty(configuration)) {
+    const service = serviceMap[configuration];
+    callback(null, service);
+  } else {
+    callback(new Error('Service not found'), null);
+  }
 }
 
 /**
@@ -33,17 +32,17 @@ function get(configuration, callback) {
  * @return {void}
  */
 function put(service, configuration, callback) {
-    // Handle parameters
-    service = service || {};
-    configuration = configuration || "";
-    callback = callback || function() { };
-    if (typeof service != 'object' || typeof configuration != 'string' || typeof callback != 'function') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-    }
-    // Put service in serviceMap
-    serviceMap[configuration] = service;
-    callback(null, configuration);
+  // Handle parameters
+  service = service || {};
+  configuration = configuration || '';
+  callback = callback || function() { };
+  if (typeof service != 'object' || typeof configuration != 'string' || typeof callback != 'function') {
+    callback(new Error('Invalid parameters'), null);
+    return;
+  }
+  // Put service in serviceMap
+  serviceMap[configuration] = service;
+  callback(null, configuration);
 }
 
 /**
@@ -51,18 +50,18 @@ function put(service, configuration, callback) {
  * @param {Callback} callback
  */
 function rem(configuration, callback) {
-    // Handle parameters
-    configuration = configuration || "";
-    callback = callback || function() { };
-    if (typeof configuration != 'string' || typeof callback != 'function') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-    }
+  // Handle parameters
+  configuration = configuration || '';
+  callback = callback || function() { };
+  if (typeof configuration != 'string' || typeof callback != 'function') {
+    callback(new Error('Invalid parameters'), null);
+    return;
+  }
 
-    // Remove service from map
-    const service = serviceMap[configuration];
-    delete serviceMap[configuration];
-    callback(null, service);
+  // Remove service from map
+  const service = serviceMap[configuration];
+  delete serviceMap[configuration];
+  callback(null, service);
 };
 
 module.exports = {get, put, rem};

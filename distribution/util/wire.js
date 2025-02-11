@@ -4,7 +4,7 @@ const comm = require('../local/comm');
 
 function createRPC(func) {
   // Write some code...
-  let hash = "";
+  let hash = '';
   while (true) {
     const randomInput = crypto.randomBytes(32).toString('hex');
     hash = crypto.createHash('sha256').update(randomInput).digest('hex');
@@ -19,16 +19,16 @@ function createRPC(func) {
     const callback = args[args.length - 1];
 
     // Make call to remote node (serialization/deserialization is internal)
-    const remote = {node: __NODE_INFO__, service: 'rpc', method: "__HASH__"};
+    const remote = {node: __NODE_INFO__, service: 'rpc', method: '__HASH__'};
     console.log(global.distribution.local.comm.send);
     global.distribution.local.comm.send(args, remote, callback);
   }
 
   // Serialize and replace node/hash information
-  const serializedStub = stub.toString();;
+  const serializedStub = stub.toString(); ;
   const stubWithReplacements = serializedStub.
-  replace("__NODE_INFO__", `{ip: "${global.nodeConfig.ip}", port: ${global.nodeConfig.port}}`).
-  replace("__HASH__", hash);
+      replace('__NODE_INFO__', `{ip: "${global.nodeConfig.ip}", port: ${global.nodeConfig.port}}`).
+      replace('__HASH__', hash);
 
   // Return function
   const deserializedStub = new Function('return ' + stubWithReplacements)();

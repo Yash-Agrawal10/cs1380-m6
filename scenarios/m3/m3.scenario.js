@@ -21,10 +21,10 @@ test('(5 pts) (scenario) create group', (done) => {
 
   // Use distribution.local.groups.put to add groupA to the local node
   // Note: The groupA.status.get call should be inside the put method's callback.
-    distribution.groupA.status.get('nid', (e, v) => {
-      expect(Object.values(v)).toEqual(expect.arrayContaining(nids));
-      done();
-    });
+  distribution.groupA.status.get('nid', (e, v) => {
+    expect(Object.values(v)).toEqual(expect.arrayContaining(nids));
+    done();
+  });
 });
 
 test('(5 pts) (scenario) dynamic group membership', (done) => {
@@ -45,15 +45,15 @@ test('(5 pts) (scenario) dynamic group membership', (done) => {
   distribution.local.groups.put(config, initialNodes, (e, v) => {
     // Add a new node dynamically to the group
 
-      distribution.groupB.status.get('nid', (e, v) => {
-        try {
-          expect(Object.values(v)).toEqual(expect.arrayContaining(
-              allNodes.map((node) => id.getNID(node))));
-          done();
-        } catch (error) {
-          done(error);
-        }
-      });
+    distribution.groupB.status.get('nid', (e, v) => {
+      try {
+        expect(Object.values(v)).toEqual(expect.arrayContaining(
+            allNodes.map((node) => id.getNID(node))));
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
   });
 });
 
@@ -73,21 +73,21 @@ test('(5 pts) (scenario) group relativity', (done) => {
     distribution.groupC.groups.put(config, groupC, (e, v) => {
       // Modify the local 'view' of the group...
 
-        distribution.groupC.groups.get('groupC', (e, v) => {
-          const n1View = v[id.getSID(n1)];
-          const n2View = v[id.getSID(n2)];
-          try {
-            expect(Object.keys(n2View)).toEqual(expect.arrayContaining(
-                [id.getSID(n1), id.getSID(n2)],
-            ));
-            expect(Object.keys(n1View)).toEqual(expect.arrayContaining(
-                [id.getSID(n2)],
-            ));
-            done();
-          } catch (error) {
-            done(error);
-          }
-        });
+      distribution.groupC.groups.get('groupC', (e, v) => {
+        const n1View = v[id.getSID(n1)];
+        const n2View = v[id.getSID(n2)];
+        try {
+          expect(Object.keys(n2View)).toEqual(expect.arrayContaining(
+              [id.getSID(n1), id.getSID(n2)],
+          ));
+          expect(Object.keys(n1View)).toEqual(expect.arrayContaining(
+              [id.getSID(n2)],
+          ));
+          done();
+        } catch (error) {
+          done(error);
+        }
+      });
     });
   });
 });
@@ -109,10 +109,10 @@ test('(5 pts) (scenario) use the gossip service', (done) => {
   const groupD = {};
 
   // How many nodes are expected to receive the new group membership?
-  let nExpected = 0;
+  const nExpected = 0;
 
   // Experiment with the subset function used in the gossip service...
-  let config = {gid: 'groupD', subset: (lst) => '?'};
+  const config = {gid: 'groupD', subset: (lst) => '?'};
 
   // Instantiated groupD
   distribution.local.groups.put(config, groupD, (e, v) => {
@@ -128,7 +128,7 @@ test('(5 pts) (scenario) use the gossip service', (done) => {
         // Adding a new node to 'newgroup' using the gossip service
         distribution.groupD.gossip.send(message, remote, (e, v) => {
           // Experiment with the time delay between adding the new node to 'newgroup' and checking the group membership in groupD...
-          let delay = 0;
+          const delay = 0;
           setTimeout(() => {
             distribution.groupD.groups.get('newgroup', (e, v) => {
               let count = 0;

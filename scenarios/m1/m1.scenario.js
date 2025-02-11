@@ -6,7 +6,7 @@ test('(3 pts) (scenario) 40 bytes object', () => {
           Come up with a JavaScript object, which when serialized,
           will result in a string that is 40 bytes in size.
       */
-  let object = "This  object";
+  const object = 'This  object';
   const serialized = util.serialize(object);
   expect(serialized.length).toBe(40);
 });
@@ -15,7 +15,7 @@ test('(3 pts) (scenario) object fix', () => {
   /* Modify the following object so that when serialized,
            results in the expected string. */
 
-  let object = {a: 'jcarb', b: 1, c: (a, b) => a + b};
+  const object = {a: 'jcarb', b: 1, c: (a, b) => a + b};
 
   // eslint-disable-next-line
     const serializedObject = '{"type":"object","value":{"a":"{\\"type\\":\\"string\\",\\"value\\":\\"jcarb\\"}","b":"{\\"type\\":\\"number\\",\\"value\\":\\"1\\"}","c":"{\\"type\\":\\"function\\",\\"value\\":\\"(a, b) => a + b\\"}"}}';
@@ -28,7 +28,7 @@ test('(3 pts) (scenario) string deserialized into target object', () => {
           {a: 1, b: "two", c: false}
       */
 
-  let string = '{"type":"object","value":{"a":"{\\"type\\":\\"number\\",\\"value\\":\\"1\\"}","b":"{\\"type\\":\\"string\\",\\"value\\":\\"two\\"}","c":"{\\"type\\":\\"boolean\\",\\"value\\":\\"false\\"}"}}';
+  const string = '{"type":"object","value":{"a":"{\\"type\\":\\"number\\",\\"value\\":\\"1\\"}","b":"{\\"type\\":\\"string\\",\\"value\\":\\"two\\"}","c":"{\\"type\\":\\"boolean\\",\\"value\\":\\"false\\"}"}}';
 
 
   const object = {a: 1, b: 'two', c: false};
@@ -39,17 +39,17 @@ test('(3 pts) (scenario) string deserialized into target object', () => {
 test('(3 pts) (scenario) object with all supported data types', () => {
 /* Come up with an object that uses all valid (serializable)
     built-in data types supported by the serialization library. */
-  let object = {
+  const object = {
     array: [1, 2, 3],
     date: new Date(0),
-    error: Error("My error"),
+    error: Error('My error'),
     object: {},
     boolean: true,
     function: (x) => x,
     null: null,
     number: 1,
-    string: "string",
-    undefined: undefined
+    string: 'string',
+    undefined: undefined,
   };
 
   const setTypes = new Set();
@@ -85,7 +85,7 @@ test('(3 pts) (scenario) object with all supported data types', () => {
 test('(3 pts) (scenario) malformed serialized string', () => {
 /* Come up with a string that is not a valid serialized object. */
 
-  let malformedSerializedString = '{"type":"random","value": }';
+  const malformedSerializedString = '{"type":"random","value": }';
 
 
   expect(() => {

@@ -2,7 +2,7 @@ const http = require('http');
 const url = require('url');
 const log = require('../util/log');
 
-const { serialize, deserialize } = require('../util/serialization');
+const {serialize, deserialize} = require('../util/serialization');
 const routes = require('./routes');
 
 /*
@@ -21,7 +21,7 @@ const start = function(callback) {
     if (req.method != 'PUT') {
       res.statusCode = 405;
       res.setHeader('Content-Type', 'application/json');
-      const message = { error: 'Only PUT methods allowed'};
+      const message = {error: 'Only PUT methods allowed'};
       res.end(serialize(message));
       return;
     }
@@ -39,12 +39,12 @@ const start = function(callback) {
     if (path.length != 3) {
       res.statusCode = 404;
       res.setHeader('Content-Type', 'application/json');
-      const message = { error: 'Invalid Path Length'};
+      const message = {error: 'Invalid Path Length'};
       res.end(serialize(message));
       return;
     }
     const [gid, serviceName, methodName] = path;
-    gid;  // Avoid linting for now
+    gid; // Avoid linting for now
     /*
 
       A common pattern in handling HTTP requests in Node.js is to have a
@@ -69,7 +69,7 @@ const start = function(callback) {
       body += chunk;
     });
 
-      /* Here, you can handle the service requests.
+    /* Here, you can handle the service requests.
       Use the local routes service to get the service you need to call.
       You need to call the service with the method and arguments provided in the request.
       Then, you need to serialize the result and send it back to the caller.
@@ -105,7 +105,7 @@ const start = function(callback) {
           res.statusCode = 200;
           res.end(serialize(value));
         }
-      }
+      };
 
       // Handle rpc method
       if (serviceName == 'rpc') {
@@ -139,8 +139,7 @@ const start = function(callback) {
         service[methodName](...args, serviceCallback);
       };
       routes.get(serviceName, getServiceCallback);
-    })
-
+    });
   });
 
 

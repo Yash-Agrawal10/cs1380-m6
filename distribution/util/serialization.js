@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /*
     Checklist:
 
@@ -19,8 +18,6 @@ function serializeHelper(type, value) {
   const serializedString = JSON.stringify(serializedObject);
   return serializedString;
 }
-=======
->>>>>>> 4718cede30d07298624f9789558a32028fe00214
 
 function serialize(object) {
   if (object === null) {
