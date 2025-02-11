@@ -1,5 +1,6 @@
 const log = require('../util/log');
 const crypto = require('node:crypto');
+const comm = require('../local/comm');
 
 global.toLocal = {};
 
@@ -21,7 +22,8 @@ function createRPC(func) {
 
     // Make call to remote node (serialization/deserialization is internal)
     const remote = {node: __NODE_INFO__, service: 'rpc', method: "__HASH__"};
-    local.comm.send(args, remote, callback);
+    console.log(global.distribution.local.comm.send);
+    global.distribution.local.comm.send(args, remote, callback);
   }
 
   // Serialize and replace node/hash information

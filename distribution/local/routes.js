@@ -18,7 +18,7 @@ function get(configuration, callback) {
 
     // Handle RPC case
     if (configuration == 'rpc') {
-        const service = global.toLocal();
+        const service = global.toLocal;
         callback(null, service);
     }
 

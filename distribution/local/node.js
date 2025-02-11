@@ -117,6 +117,7 @@ const start = function(callback) {
             res.end(serialize(value));
           }
         }
+        console.log(service[methodName].toString());
         service[methodName](...args, serviceCallback);
       };
       routes.get(serviceName, getServiceCallback);
