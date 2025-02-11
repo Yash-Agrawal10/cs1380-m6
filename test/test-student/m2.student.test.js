@@ -34,7 +34,7 @@ afterAll((done) => {
 
 describe('m2: status', () => {
   // m2: status.get nid - student test
-  test('(1 pts) student test', () => {
+  test('(1 pts) student tes - status.get nid', () => {
     local.status.get('nid', (error, nid) => {
       expect(error).toBeFalsy();
       expect(nid).toEqual(id.getNID(config));
