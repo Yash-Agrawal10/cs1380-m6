@@ -69,7 +69,11 @@ const start = function(callback) {
       body += chunk;
     });
 
-    /* Here, you can handle the service requests. */
+      /* Here, you can handle the service requests.
+      Use the local routes service to get the service you need to call.
+      You need to call the service with the method and arguments provided in the request.
+      Then, you need to serialize the result and send it back to the caller.
+      */
 
     // Write some code...
     // Handle request
@@ -139,8 +143,6 @@ const start = function(callback) {
 
   });
 
-
-  // Write some code...
 
   /*
     Your server will be listening on the port and ip specified in the config
