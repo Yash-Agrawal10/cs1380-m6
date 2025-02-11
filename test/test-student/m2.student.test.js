@@ -41,7 +41,7 @@ describe('m2: status', () => {
     });
   });
 
-  test('m2: status.get sid - student test', () => {
+  test('m2: status.get sid - (1 pts) student test', () => {
     local.status.get('sid', (error, sid) => {
       expect(error).toBeFalsy();
       expect(sid).toEqual(id.getSID(config));
