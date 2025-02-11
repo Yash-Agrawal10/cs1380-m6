@@ -6,7 +6,7 @@
     Imporant: Do not modify any of the test headers (i.e., the test('header', ...) part). Doing so will result in grading penalties.
 */
 
-const distribution = require('../config.js');
+const distribution = require('../../config.js');
 const local = distribution.local;
 const util = distribution.util;
 const id = distribution.util.id;
@@ -316,7 +316,7 @@ describe('m2: rpc', () => {
   });
 });
 
-test('(1 pts) student test', (done) => {
-  // Fill out this test case...
-  done(new Error('Not implemented'));
-});
+// test('(1 pts) student test', (done) => {
+//   // Fill out this test case...
+//   done(new Error('Not implemented'));
+// });
