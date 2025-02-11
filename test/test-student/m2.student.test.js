@@ -33,57 +33,56 @@ afterAll((done) => {
 // Tests
 
 describe('m2: status', () => {
-  // m2: status.get nid - student test
-  test('(1 pts) student tes - status.get nid', () => {
+  test('(1 pts) student test - status.get nid', () => {
     local.status.get('nid', (error, nid) => {
       expect(error).toBeFalsy();
       expect(nid).toEqual(id.getNID(config));
     });
   });
 
-  test('m2: status.get sid - (1 pts) student test', () => {
+  test('(1 pts) student test - m2: status.get sid', () => {
     local.status.get('sid', (error, sid) => {
       expect(error).toBeFalsy();
       expect(sid).toEqual(id.getSID(config));
     });
   });
 
-  test('m2: status.get ip - student test', () => {
+  test('(1 pts) student test - m2: status.get ip', () => {
     local.status.get('ip', (error, ip) => {
       expect(error).toBeFalsy();
       expect(ip).toEqual(global.nodeConfig.ip);
     });
   });
 
-  test('m2: status.get port - student test', () => {
+  test('(1 pts) student test - m2: status.get port', () => {
     local.status.get('port', (error, port) => {
       expect(error).toBeFalsy();
       expect(port).toEqual(global.nodeConfig.port);
     });
   });
 
-  test('m2: status.get counts - student test', () => {
+  test('(1 pts) student test - m2: status.get counts', () => {
     local.status.get('counts', (error, counts) => {
       expect(error).toBeFalsy();
       expect(typeof counts).toEqual('number');
     });
   });
 
-  test('m2: status.get heapTotal - student test', () => {
+  test('(1 pts) student test - m2: status.get heapTotal', () => {
     local.status.get('heapTotal', (error, counts) => {
       expect(error).toBeFalsy();
       expect(typeof counts).toEqual('number');
     });
   });
 
-  test('m2: status.get heapUsed - student test', () => {
+  test('(1 pts) student test - m2: status.get heapUsed', () => {
     local.status.get('heapUsed', (error, counts) => {
       expect(error).toBeFalsy();
       expect(typeof counts).toEqual('number');
     });
   });
 
-  test('m2: status.get invalid config - student test', () => {
+  test('(1 pts) student test - m2: status.get invalid config', () => {
     local.status.get('invalid', (error, value) => {
       expect(error).toBeTruthy();
       expect(value).toBeFalsy();
@@ -91,8 +90,8 @@ describe('m2: status', () => {
   });
 });
 
-describe('m2: routes', () => {
-  test('m2: routes.get status - student test', () => {
+describe('(1 pts) student test - m2: routes', () => {
+  test('(1 pts) student test - m2: routes.get status', () => {
     local.routes.get('status', (error, service) => {
       expect(error).toBeFalsy();
       expect(typeof service).toEqual('object');
@@ -100,14 +99,14 @@ describe('m2: routes', () => {
     });
   });
 
-  test('m2: routes.get invalid - student test', () => {
+  test('(1 pts) student test - m2: routes.get invalid', () => {
     local.routes.get('invalid', (error, service) => {
       expect(error).toBeTruthy();
       expect(service).toBeFalsy();
     });
   });
 
-  test('m2: routes.put - student test', () => {
+  test('(1 pts) student test - m2: routes.put', () => {
     const helloWorld = (callback) => {
       callback(null, 'Hello World!');
     };
@@ -122,7 +121,7 @@ describe('m2: routes', () => {
     });
   });
 
-  test('m2: routes.get(routes.put)) - student test', () => {
+  test('(1 pts) student test - m2: routes.get(routes.put))', () => {
     const helloWorld = (callback) => {
       callback(null, 'Hello World!');
     };
@@ -143,7 +142,7 @@ describe('m2: routes', () => {
     });
   });
 
-  test('m2: routes.rem(routes.put) - student test', () => {
+  test('(1 pts) student test - m2: routes.rem(routes.put)', () => {
     const helloWorld = (callback) => {
       callback(null, 'Hello World!');
     };
@@ -158,7 +157,7 @@ describe('m2: routes', () => {
     });
   });
 
-  test('m2: routes.get(routes.rem(routes.put)) - student test', () => {
+  test('(1 pts) student test - m2: routes.get(routes.rem(routes.put))', () => {
     const helloWorld = (callback) => {
       callback(null, 'Hello World!');
     };
@@ -177,7 +176,7 @@ describe('m2: routes', () => {
     });
   });
 
-  test('m2: routes.rem invalid - student test', () => {
+  test('(1 pts) student test - m2: routes.rem invalid', () => {
     local.routes.rem('invalid', (error, value) => {
       expect(error).toBeFalsy();
       expect(value).toBeFalsy();
@@ -185,8 +184,8 @@ describe('m2: routes', () => {
   });
 });
 
-describe('m2: comm', () => {
-  test('m2: comm.send(routes.get(status.get)) - student test', (done) => {
+describe('(1 pts) student test - m2: comm', () => {
+  test('(1 pts) student test - m2: comm.send(routes.get(status.get))', (done) => {
     const remote = {node: node, service: 'status', method: 'get'};
     local.comm.send(['ip'], remote, (e, v) => {
       try {
@@ -199,7 +198,7 @@ describe('m2: comm', () => {
     });
   });
 
-  test('m2: comm.send(routes.get(routes.put)) - student test', (done) => {
+  test('(1 pts) student test - m2: comm.send(routes.get(routes.put))', (done) => {
     const helloWorld = (callback) => {
       callback(null, 'Hello World!');
     };
@@ -223,7 +222,7 @@ describe('m2: comm', () => {
     });
   });
 
-  test('m2: comm.send(routes.get) invalid service - student test', (done) => {
+  test('(1 pts) student test - m2: comm.send(routes.get) invalid service', (done) => {
     const remote = {node: node, service: 'invalid', method: 'get'};
     local.comm.send(['counts'], remote, (e, v) => {
       try {
@@ -236,7 +235,7 @@ describe('m2: comm', () => {
     });
   });
 
-  test('m2: comm.send(routes.get) invalid method - student test', (done) => {
+  test('(1 pts) student test - m2: comm.send(routes.get) invalid method', (done) => {
     const remote = {node: node, service: 'status', method: 'invalid'};
     local.comm.send(['counts'], remote, (e, v) => {
       try {
@@ -250,8 +249,8 @@ describe('m2: comm', () => {
   });
 });
 
-describe('m2: rpc', () => {
-  test('m2: rpc is created and can send message to itself - student test', (done) => {
+describe('(1 pts) student test - m2: rpc', () => {
+  test('(1 pts) student test - m2: rpc is created and can send message to itself', (done) => {
     const helloWorld = () => {
       return 'Hello World!';
     };
@@ -267,7 +266,7 @@ describe('m2: rpc', () => {
     });
   });
 
-  test('m2: comm.send(routes.put) stateless - student test', (done) => {
+  test('(1 pts) student test - m2: comm.send(routes.put) stateless', (done) => {
     const helloWorld = () => {
       return 'Hello World!';
     };
@@ -291,7 +290,7 @@ describe('m2: rpc', () => {
     });
   });
 
-  test('m2: comm.send(routes.put) stateful - student test', (done) => {
+  test('(1 pts) student test - m2: comm.send(routes.put) stateful', (done) => {
     const message = 'Hello World!';
     const helloWorld = () => {
       return message;
