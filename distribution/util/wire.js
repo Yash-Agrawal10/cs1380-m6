@@ -2,16 +2,14 @@ const log = require('../util/log');
 const crypto = require('node:crypto');
 const comm = require('../local/comm');
 
-global.toLocal = {};
-
 function createRPC(func) {
   // Write some code...
   let hash = "";
   while (true) {
     const randomInput = crypto.randomBytes(32).toString('hex');
     hash = crypto.createHash('sha256').update(randomInput).digest('hex');
-    if (!global.toLocal.hasOwnProperty(hash)) {
-      global.toLocal[hash] = func;
+    if (!global.rpcMap.has(hash)) {
+      global.rpcMap.set(hash, func);
       break;
     }
   }

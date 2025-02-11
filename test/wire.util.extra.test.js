@@ -1,7 +1,7 @@
 const distribution = require('../config.js');
 const local = distribution.local;
 
-test('(25 pts) rpc', (done) => {
+test.only('(25 pts) rpc', (done) => {
   let n = 0;
 
   function addOne() {

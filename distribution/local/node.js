@@ -90,6 +90,33 @@ const start = function(callback) {
       // Debugging
       // console.log(`Incoming Request, Path: ${path}, args: ${args}`);
 
+      // Create service callback
+      const serviceCallback = (serviceError, value) => {
+        if (serviceError) {
+          res.statusCode = 500;
+          const body = new Error('Internal Error');
+          res.end(serialize(body));
+          return;
+        } else {
+          res.statusCode = 200;
+          res.end(serialize(value));
+        }
+      }
+
+      // Handle rpc method
+      if (serviceName == 'rpc') {
+        if (global.rpcMap.has(methodName)) {
+          const method = global.rpcMap.get(methodName);
+          method(...args, serviceCallback);
+          return;
+        } else {
+          res.statusCode = 404;
+          const body = new Error('RPC method not found');
+          res.end(serialize(body));
+          return;
+        }
+      }
+
       // Make call to service/method
       const getServiceCallback = (getServiceError, service) => {
         if (getServiceError) {
@@ -105,19 +132,6 @@ const start = function(callback) {
           res.end(serialize(body));
           return;
         }
-
-        const serviceCallback = (serviceError, value) => {
-          if (serviceError) {
-            res.statusCode = 500;
-            const body = new Error('Internal Error');
-            res.end(serialize(body));
-            return;
-          } else {
-            res.statusCode = 200;
-            res.end(serialize(value));
-          }
-        }
-        console.log(service[methodName].toString());
         service[methodName](...args, serviceCallback);
       };
       routes.get(serviceName, getServiceCallback);

@@ -51,6 +51,9 @@ distribution.util = require('./distribution/util/util.js');
 distribution.local = require('./distribution/local/local.js');
 distribution.node = require('./distribution/local/node.js');
 
+// Student global state
+global.rpcMap = new Map();
+
 for (const key in distribution.local) {
   distribution.local.routes.put(distribution.local[key], key);
 }
