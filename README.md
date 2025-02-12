@@ -102,3 +102,32 @@ My implementation comprises 4 software components (serialization/deserialization
 
 
 *Performance*: The latency of various subsystems is described in the `"latency"` portion of package.json. The characteristics of my development machines are summarized in the `"dev"` portion of package.json.
+
+
+# M2: Actors and Remote Procedure Calls (RPC)
+
+
+## Summary
+
+> Summarize your implementation, including key challenges you encountered. Remember to update the `report` section of the `package.json` file with the total number of hours it took you to complete each task of M2 (`hours`) and the lines of code per task.
+
+
+My implementation comprises 5 software components, totaling around 500 lines of code. Key challenges included figuring out how to properly serialize RPC functions to handle local function pointers still running in the environment the function was sent to, and learning how to manage requests and responses in JavaScript.
+
+
+## Correctness & Performance Characterization
+
+> Describe how you characterized the correctness and performance of your implementation
+
+
+*Correctness*: I wrote 22 tests; these tests take 0.338 to execute.
+
+
+*Performance*: I characterized the performance of comm and RPC by sending 1000 service requests in a tight loop. Average throughput and latency is recorded in `package.json`.
+
+
+## Key Feature
+
+> How would you explain the implementation of `createRPC` to someone who has no background in computer science — i.e., with the minimum jargon possible?
+
+If you want your computer to do something with some data on another computer, you need them to communicate. That communication can be a lot of work, and oftentimes you don't want it to make simple tasks seem complicated. createRPC handles this problem exactly. It takes a function another computer can run, and returns a way for your computer to ask it to run it. It handles all the complicated communication internally.

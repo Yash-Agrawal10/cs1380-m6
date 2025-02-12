@@ -41,6 +41,24 @@
           "T4": "12.9 ms"
         }
       }
+    },
+    "M2": {
+      "hours": 15,
+      "loc": {
+        "T1": 100,
+        "T2": 20,
+        "T3": 40,
+        "T4": 50,
+        "T5": 50
+      },
+      "throughput": {
+        "local": "493.275 items/second",
+        "cloud": ""
+      },
+      "latency": {
+        "local": "2.02 ms/item",
+        "cloud": ""
+      }
     }
   },
   "author": "",
