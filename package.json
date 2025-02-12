@@ -53,11 +53,11 @@
       },
       "throughput": {
         "local": "493.275 items/second",
-        "cloud": ""
+        "cloud": "1195.196 items/second"
       },
       "latency": {
         "local": "2.02 ms/item",
-        "cloud": ""
+        "cloud": "0.837 ms/item"
       }
     }
   },
