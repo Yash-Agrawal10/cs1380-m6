@@ -10,6 +10,16 @@ function routes(config) {
    * @param {Callback} callback
    */
   function put(service, name, callback = () => { }) {
+    // Handle parameters
+    service = service || {};
+    name = name || '';
+    callback = callback || function() { };
+    if (typeof service != 'object' || typeof name != 'string' || typeof callback != 'function') {
+      callback(new Error('Invalid parameters'), null);
+      return;
+    }
+
+    global.distribution[context.gid].comm.send([service, name], {service: 'routes', method: 'put'}, callback);
   }
 
   /**
@@ -18,6 +28,15 @@ function routes(config) {
    * @param {Callback} callback
    */
   function rem(service, name, callback = () => { }) {
+    // Handle parameters
+    name = name || '';
+    callback = callback || function() { };
+    if (typeof name != 'string' || typeof callback != 'function') {
+      callback(new Error('Invalid parameters'), null);
+      return;
+    }
+
+    global.distribution[context.gid].comm.send([name], {service: 'routes', method: 'rem'}, callback);
   }
 
   return {put, rem};
