@@ -91,7 +91,7 @@ test('(1 pts) student test - local comm gids', (done) => {
     distribution.local.comm.send(message, remote, (e, v) => {
       try {
         expect(Object.keys(e)).toEqual([id.getSID(n1)]);
-        expect(v).toEqual([]);
+        expect(Object.keys(v)).toEqual([]);
         done();
       } catch (err) {
         done(err);
