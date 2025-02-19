@@ -1,7 +1,5 @@
 /** @typedef {import("../types").Callback} Callback */
 
-const serviceMap = new Map();
-
 /**
  * @param {string} configuration
  * @param {Callback} callback
@@ -26,13 +24,12 @@ function get(configuration, callback) {
   }
 
   // Get and return service
-  if (gid == 'local') {
-    if (serviceMap.has(serviceName)) {
-      const service = serviceMap.get(serviceName);
-      callback(null, service);
-    } else {
-      callback(new Error('Service not found'), null);
-    }
+  const serviceMap = global.distribution[gid];
+  if (serviceMap.hasOwnProperty(serviceName)) {
+    const service = serviceMap[serviceName];
+    callback(null, service);
+  } else {
+    callback(new Error('Service not found'), null);
   }
 }
 
@@ -52,7 +49,8 @@ function put(service, configuration, callback) {
     return;
   }
   // Put service in serviceMap
-  serviceMap.set(configuration, service);
+  const serviceMap = global.distribution['local'];
+  serviceMap[configuration] = service;
   callback(null, configuration);
 }
 
@@ -70,8 +68,9 @@ function rem(configuration, callback) {
   }
 
   // Remove service from map
-  const service = serviceMap.get(configuration);
-  serviceMap.delete(configuration);
+  const serviceMap = global.distribution['local'];
+  const service = serviceMap[configuration];
+  delete serviceMap[configuration];
   callback(null, service);
 };
 
