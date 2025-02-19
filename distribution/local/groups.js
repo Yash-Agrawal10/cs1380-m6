@@ -30,6 +30,24 @@ groups.put = function(config, group, callback) {
     callback(new Error('Invalid parameters'), null);
     return;
   }
+
+  // Populate distribution.gid
+  global.distribution[config] = {};
+  global.distribution[config].status =
+      require('../all/status')({gid: config});
+  global.distribution[config].comm =
+      require('../all/comm')({gid: config});
+  global.distribution[config].gossip =
+      require('../all/gossip')({gid: config});
+  global.distribution[config].groups =
+      require('../all/groups')({gid: config});
+  global.distribution[config].routes =
+      require('../all/routes')({gid: config});
+  global.distribution[config].mem =
+      require('../all/mem')({gid: config});
+  global.distribution[config].store =
+      require('../all/store')({gid: config});
+
   // Put group in local map
   namesToNodes.set(config, group);
   callback(null, group);
