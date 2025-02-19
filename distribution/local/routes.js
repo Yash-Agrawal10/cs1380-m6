@@ -1,6 +1,6 @@
 /** @typedef {import("../types").Callback} Callback */
 
-const serviceMap = {};
+const serviceMap = new Map();
 
 /**
  * @param {string} configuration
@@ -11,17 +11,28 @@ function get(configuration, callback) {
   // Handle parameters
   configuration = configuration || '';
   callback = callback || function() { };
-  if (typeof configuration != 'string' || typeof callback != 'function') {
+  if ((typeof configuration != 'string' && typeof configuration != 'object') || typeof callback != 'function') {
     callback(new Error('Invalid parameters'), null);
     return;
   }
+  let gid;
+  let serviceName;
+  if (typeof configuration == 'object') {
+    gid = configuration.gid || 'local';
+    serviceName = configuration.service;
+  } else {
+    gid = 'local';
+    serviceName = configuration;
+  }
 
   // Get and return service
-  else if (serviceMap.hasOwnProperty(configuration)) {
-    const service = serviceMap[configuration];
-    callback(null, service);
-  } else {
-    callback(new Error('Service not found'), null);
+  if (gid == 'local') {
+    if (serviceMap.has(serviceName)) {
+      const service = serviceMap.get(serviceName);
+      callback(null, service);
+    } else {
+      callback(new Error('Service not found'), null);
+    }
   }
 }
 
@@ -41,7 +52,7 @@ function put(service, configuration, callback) {
     return;
   }
   // Put service in serviceMap
-  serviceMap[configuration] = service;
+  serviceMap.set(configuration, service);
   callback(null, configuration);
 }
 
@@ -59,8 +70,8 @@ function rem(configuration, callback) {
   }
 
   // Remove service from map
-  const service = serviceMap[configuration];
-  delete serviceMap[configuration];
+  const service = serviceMap.get(configuration);
+  serviceMap.delete(configuration);
   callback(null, service);
 };
 

@@ -29,8 +29,8 @@ function send(message, remote, callback) {
 
   // Set up message
   const serializedArgs = serialize(message);
-  // first path arg is 'gid', only local for now
-  const path = `/local/${remote.service}/${remote.method}`;
+  const gid = remote.gid || 'local';
+  const path = `/${gid}/${remote.service}/${remote.method}`;
   const options = {
     hostname: remote.node.ip,
     port: remote.node.port,

@@ -44,7 +44,6 @@ const start = function(callback) {
       return;
     }
     const [gid, serviceName, methodName] = path;
-    gid; // Avoid linting for now
     /*
 
       A common pattern in handling HTTP requests in Node.js is to have a
@@ -138,7 +137,7 @@ const start = function(callback) {
         }
         service[methodName](...args, serviceCallback);
       };
-      routes.get(serviceName, getServiceCallback);
+      routes.get({gid: gid, service: serviceName}, getServiceCallback);
     });
   });
 
