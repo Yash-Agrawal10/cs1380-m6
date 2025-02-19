@@ -55,11 +55,9 @@ function send(message, remote, callback) {
       // Debugging
       // console.log(`Received response with body ${data}`);
       if (res.statusCode >= 200 || res.statusCode < 300) {
-        if (data instanceof Error) {
-          callback(data, null);
-        } else {
-          callback(null, data);
-        }
+        const error = data.error;
+        const value = data.value;
+        callback(error, value);
       } else {
         const message = `Request failed with status code ${req.statusCode}: ${data}`;
         callback(new Error(message), null);

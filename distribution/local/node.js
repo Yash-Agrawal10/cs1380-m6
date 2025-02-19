@@ -21,8 +21,11 @@ const start = function(callback) {
     if (req.method != 'PUT') {
       res.statusCode = 405;
       res.setHeader('Content-Type', 'application/json');
-      const message = {error: 'Only PUT methods allowed'};
-      res.end(serialize(message));
+      const body = {
+        'error': new Error('Only PUT methods allowed'), 
+        'value': null
+      };
+      res.end(serialize(body));
       return;
     }
 
@@ -39,8 +42,11 @@ const start = function(callback) {
     if (path.length != 3) {
       res.statusCode = 404;
       res.setHeader('Content-Type', 'application/json');
-      const message = {error: 'Invalid Path Length'};
-      res.end(serialize(message));
+      const body = {
+        'error': new Error('Invalid Path Length'), 
+        'value': null
+      };
+      res.end(serialize(body));
       return;
     }
     const [gid, serviceName, methodName] = path;
@@ -85,7 +91,10 @@ const start = function(callback) {
       const args = deserialize(argString);
       if ((args instanceof Error && args.message == 'Deserialization failed') || !Array.isArray(args)) {
         res.statusCode = 422;
-        const body = new Error('Invalid Serialized Arguments');
+        const body = {
+          'error': new Error('Invalid Serialized Arguments'), 
+          'value': null
+        };
         res.end(serialize(body));
         return;
       }
@@ -95,14 +104,21 @@ const start = function(callback) {
 
       // Create service callback
       const serviceCallback = (serviceError, value) => {
-        if (serviceError) {
+        if (serviceError instanceof Error) {
           res.statusCode = 500;
-          const body = new Error('Internal Error');
+          const body = {
+            'error': new Error('Internal Error'), 
+            'value': null
+          };
           res.end(serialize(body));
           return;
         } else {
           res.statusCode = 200;
-          res.end(serialize(value));
+          const body = {
+            'error': serviceError, 
+            'value': value
+          };
+          res.end(serialize(body));
         }
       };
 
@@ -114,7 +130,10 @@ const start = function(callback) {
           return;
         } else {
           res.statusCode = 404;
-          const body = new Error('RPC method not found');
+          const body = {
+            'error': new Error('RPC method not found'), 
+            'value': null
+          };
           res.end(serialize(body));
           return;
         }
@@ -124,14 +143,20 @@ const start = function(callback) {
       const getServiceCallback = (getServiceError, service) => {
         if (getServiceError) {
           res.statusCode = 404;
-          const body = new Error('Service not found');
+          const body = {
+            'error': new Error('Service not found'), 
+            'value': null
+          };
           res.end(serialize(body));
           return;
         }
 
         if (!service[methodName]) {
           res.statusCode = 404;
-          const body = new Error('Method not found');
+          const body = {
+            'error': new Error('Method not found'), 
+            'value': null
+          };
           res.end(serialize(body));
           return;
         }
