@@ -26,30 +26,40 @@ groups.put = function(config, group, callback) {
   config = config || '';
   callback = callback || function() { };
   group = group || {};
-  if (typeof group != 'object' || typeof config != 'string' || typeof callback != 'function') {
+  if (typeof group != 'object' || (typeof config != 'string' && typeof config != 'object') || typeof callback != 'function') {
     callback(new Error('Invalid parameters'), null);
     return;
   }
+  let gid;
+  if (typeof config == 'string') {
+    gid = config;
+  } else {
+    gid = config.gid;
+    if (!gid) {
+      callback(new Error('Invalid parameters'), null);
+      return;
+    }
+  }
 
   // Populate distribution.gid
-  global.distribution[config] = {};
-  global.distribution[config].status =
-      require('../all/status')({gid: config});
-  global.distribution[config].comm =
-      require('../all/comm')({gid: config});
-  global.distribution[config].gossip =
-      require('../all/gossip')({gid: config});
-  global.distribution[config].groups =
-      require('../all/groups')({gid: config});
-  global.distribution[config].routes =
-      require('../all/routes')({gid: config});
-  global.distribution[config].mem =
-      require('../all/mem')({gid: config});
-  global.distribution[config].store =
-      require('../all/store')({gid: config});
+  global.distribution[gid] = {};
+  global.distribution[gid].status =
+      require('../all/status')({gid: gid});
+  global.distribution[gid].comm =
+      require('../all/comm')({gid: gid});
+  global.distribution[gid].gossip =
+      require('../all/gossip')({gid: gid});
+  global.distribution[gid].groups =
+      require('../all/groups')({gid: gid});
+  global.distribution[gid].routes =
+      require('../all/routes')({gid: gid});
+  global.distribution[gid].mem =
+      require('../all/mem')({gid: gid});
+  global.distribution[gid].store =
+      require('../all/store')({gid: gid});
 
   // Put group in local map
-  namesToNodes.set(config, group);
+  namesToNodes.set(gid, group);
   callback(null, group);
 };
 

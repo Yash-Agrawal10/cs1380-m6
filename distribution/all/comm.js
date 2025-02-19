@@ -2,7 +2,6 @@
 
 const groups = require('../local/groups');
 const id = require('../util/id');
-const { send } = require('../local/comm');
 
 /**
  * NOTE: This Target is slightly different from local.all.Target
@@ -43,7 +42,7 @@ function comm(config) {
 
       This all must be done inside a callback to group.get so that it can access group size/list
     */
-    groups.get(gid, (e, v) => {
+    groups.get(context.gid, (e, v) => {
       // Handle error
       if (e) {
         callback(e, null);
@@ -51,14 +50,14 @@ function comm(config) {
       }
 
       // Create callback
-      const nodes = v;
+      const nodes = Object.values(v);
       const numNodes = nodes.length;
       const cb = (index, errors, values) => {
         if (index == numNodes) {
           callback(errors, values);
         } else {
           const node = nodes[index];
-          send(message, configuration, (e, v) => {
+          global.distribution.local.comm.send(message, {node: node, ...configuration}, (e, v) => {
             const sid = id.getSID(node)
             if (e) {
               errors[sid] = e;
