@@ -15,7 +15,7 @@ status.get = function(configuration, callback) {
 
   // Handle parameters
   configuration = configuration || '';
-  callback = callback || console.log;
+  callback = callback || function () { };
   if (typeof configuration != 'string' || typeof callback != 'function') {
     callback(new Error('Invalid parameters'), null);
     return;

@@ -7,7 +7,7 @@ const status = function(config) {
     get: (configuration, callback) => {
       // Handle parameters
       configuration = configuration || '';
-      callback = callback || console.log;
+      callback = callback || function () { };
       if (typeof configuration != 'string' || typeof callback != 'function') {
         callback(new Error('Invalid parameters'), null);
         return;
@@ -34,7 +34,7 @@ const status = function(config) {
     spawn: (configuration, callback) => {
       // Handle parameters
       configuration = configuration || '';
-      callback = callback || console.log;
+      callback = callback || function () { };
       if (typeof configuration != 'string' || typeof callback != 'function') {
         callback(new Error('Invalid parameters'), null);
         return;
@@ -47,7 +47,7 @@ const status = function(config) {
     stop: (callback) => {
       // Handle parameters
       configuration = configuration || '';
-      callback = callback || console.log;
+      callback = callback || function () { };
       if (typeof configuration != 'string' || typeof callback != 'function') {
         callback(new Error('Invalid parameters'), null);
         return;

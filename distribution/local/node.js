@@ -99,9 +99,6 @@ const start = function(callback) {
         return;
       }
 
-      // Debugging
-      // console.log(`Incoming Request, Path: ${path}, args: ${args}`);
-
       // Create service callback
       const serviceCallback = (serviceError, value) => {
         if (serviceError instanceof Error) {

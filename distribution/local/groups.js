@@ -111,11 +111,8 @@ groups.rem = function(name, node, callback) {
 
   if (namesToNodes.has(name)) {
     const group = namesToNodes.get(name);
-    console.log(group);
     if (group.hasOwnProperty(node)) {
-        console.log(group);
         delete group[node];
-        console.log(group);
         namesToNodes.set(name, group);
         callback(null, group);
     } else {
