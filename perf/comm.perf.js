@@ -1,15 +1,10 @@
 const distribution = require('../config');
-const local = distribution.local;
 
-const node = distribution.node.config;
-const remote = {node: node, service: 'status', method: 'get'};
-const message = ['nid'];
+const config = {ip: '127.0.0.1', port: 8080};
 
 const startTime = performance.now();
 
-const targetCount = 5;
-for (let i = 0; i < targetCount; i++)
-  local.comm.send(message, remote, () => {});
+distribution.local.status.spawn(config, () => console.log('spawned'));
 
 const endTime = performance.now();
 

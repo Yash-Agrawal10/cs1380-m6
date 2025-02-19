@@ -1,7 +1,7 @@
 const distribution = require('../config');
 const local = distribution.local;
 
-const config = {ip: "127.0.0.1", port: 8080};
+const config = {ip: "127.0.0.1", port: 8000};
 const cb = () => console.log("spawned");
 const iterations = 1;
 
