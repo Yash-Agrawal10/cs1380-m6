@@ -46,15 +46,14 @@ const status = function(config) {
 
     stop: (callback) => {
       // Handle parameters
-      configuration = configuration || '';
       callback = callback || function () { };
-      if (typeof configuration != 'string' || typeof callback != 'function') {
+      if (typeof callback != 'function') {
         callback(new Error('Invalid parameters'), null);
         return;
       }
 
       // Call stop on each node
-      global.distribution[context.gid].comm.send([configuration], {service: 'status', method: 'stop'}, callback);
+      global.distribution[context.gid].comm.send([], {service: 'status', method: 'stop'}, callback);
     },
   };
 };
