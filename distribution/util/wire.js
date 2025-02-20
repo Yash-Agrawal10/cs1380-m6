@@ -8,8 +8,8 @@ function createRPC(func) {
   while (true) {
     const randomInput = crypto.randomBytes(32).toString('hex');
     hash = crypto.createHash('sha256').update(randomInput).digest('hex');
-    if (!global.rpcMap.has(hash)) {
-      global.rpcMap.set(hash, func);
+    if (!global.rpcMap.hasOwnProperty(hash)) {
+      global.rpcMap[hash] = func;
       break;
     }
   }

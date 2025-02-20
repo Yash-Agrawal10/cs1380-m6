@@ -119,22 +119,22 @@ const start = function(callback) {
         }
       };
 
-      // Handle rpc method
-      if (serviceName == 'rpc') {
-        if (global.rpcMap.has(methodName)) {
-          const method = global.rpcMap.get(methodName);
-          method(...args, serviceCallback);
-          return;
-        } else {
-          res.statusCode = 404;
-          const body = {
-            'error': new Error('RPC method not found'), 
-            'value': null
-          };
-          res.end(serialize(body));
-          return;
-        }
-      }
+      // // Handle rpc method
+      // if (serviceName == 'rpc') {
+      //   if (global.rpcMap.has(methodName)) {
+      //     const method = global.rpcMap.get(methodName);
+      //     method(...args, serviceCallback);
+      //     return;
+      //   } else {
+      //     res.statusCode = 404;
+      //     const body = {
+      //       'error': new Error('RPC method not found'), 
+      //       'value': null
+      //     };
+      //     res.end(serialize(body));
+      //     return;
+      //   }
+      // }
 
       // Make call to service/method
       const getServiceCallback = (getServiceError, service) => {

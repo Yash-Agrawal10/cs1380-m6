@@ -23,6 +23,12 @@ function get(configuration, callback) {
     serviceName = configuration;
   }
 
+  // Handle rpc
+  if (serviceName == 'rpc') {
+    callback(null, global.rpcMap);
+    return;
+  }
+
   // Get and return service
   const serviceMap = global.distribution[gid];
   if (serviceMap.hasOwnProperty(serviceName)) {
