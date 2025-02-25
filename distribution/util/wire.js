@@ -20,7 +20,6 @@ function createRPC(func) {
 
     // Make call to remote node (serialization/deserialization is internal)
     const remote = {node: __NODE_INFO__, service: 'rpc', method: '__HASH__'};
-    console.log(global.distribution.local.comm.send);
     global.distribution.local.comm.send(args, remote, callback);
   }
 
