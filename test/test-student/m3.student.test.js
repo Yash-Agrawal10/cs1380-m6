@@ -6,10 +6,8 @@
     Imporant: Do not modify any of the test headers (i.e., the test('header', ...) part). Doing so will result in grading penalties.
 */
 
-const { describe } = require('yargs');
 const distribution = require('../../config.js');
 const { local } = require('@brown-ds/distribution');
-const { status } = require('@brown-ds/distribution/distribution/local/local.js');
 const id = distribution.util.id;
 
 // Test infrastructure
