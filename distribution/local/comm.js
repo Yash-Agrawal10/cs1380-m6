@@ -21,11 +21,6 @@ function send(message, remote, callback) {
   // Handle parameters
   message = message || [];
   callback = callback || function() { };
-  // No default for remote, might change later
-  if (!Array.isArray(message) || typeof callback != 'function' || typeof remote != 'object') {
-    callback(new Error('Invalid parameters'), null);
-    return;
-  }
 
   // Set up message
   const serializedArgs = serialize(message);

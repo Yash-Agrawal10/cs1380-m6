@@ -27,10 +27,6 @@ function comm(config) {
     // Handle parameters
     message = message || [];
     callback = callback || function() { };
-    if (!Array.isArray(message) || typeof callback != 'function' || typeof configuration != 'object') {
-      callback(new Error('Invalid parameters'), null);
-      return;
-    }
 
     /*
       Idea - have the callback consume an index and value/error objects to accumulate in, 

@@ -8,10 +8,6 @@ const status = function(config) {
       // Handle parameters
       configuration = configuration || '';
       callback = callback || function () { };
-      if (typeof configuration != 'string' || typeof callback != 'function') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-      }
 
       global.distribution[context.gid].comm.send([configuration], {service: 'status', method: 'get'}, (e, v) => {
         if (e instanceof Error) {
@@ -35,10 +31,6 @@ const status = function(config) {
       // Handle parameters
       configuration = configuration || '';
       callback = callback || function () { };
-      if (typeof configuration != 'string' || typeof callback != 'function') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-      }
 
       // Call spawn on each node
       global.distribution[context.gid].comm.send([configuration], {service: 'status', method: 'spawn'}, callback);
@@ -47,10 +39,6 @@ const status = function(config) {
     stop: (callback) => {
       // Handle parameters
       callback = callback || function () { };
-      if (typeof callback != 'function') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-      }
 
       // Call stop on each node
       global.distribution[context.gid].comm.send([], {service: 'status', method: 'stop'}, callback);

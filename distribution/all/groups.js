@@ -8,19 +8,12 @@ const groups = function(config) {
       config = config || '';
       callback = callback || function() { };
       group = group || {};
-      if (typeof group != 'object' || (typeof config != 'string' && typeof config != 'object') || typeof callback != 'function') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-      }
+
       let gid;
       if (typeof config == 'string') {
         gid = config;
       } else {
         gid = config.gid;
-        if (!gid) {
-          callback(new Error('Invalid parameters'), null);
-          return;
-        }
       }
 
       global.distribution[context.gid].comm.send([config, group], {service: 'groups', method: 'put'}, callback);
@@ -30,10 +23,6 @@ const groups = function(config) {
       // Handle parameters
       name = name || '';
       callback = callback || function() { };
-      if (typeof name != 'string' || typeof callback != 'function') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-      }
 
       global.distribution[context.gid].comm.send([name], {service: 'groups', method: 'del'}, callback);
     },
@@ -42,10 +31,6 @@ const groups = function(config) {
       // Handle parameters
       name = name || '';
       callback = callback || function() { };
-      if (typeof name != 'string' || typeof callback != 'function') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-      }
 
       global.distribution[context.gid].comm.send([name], {service: 'groups', method: 'get'}, callback);
     },
@@ -54,10 +39,6 @@ const groups = function(config) {
       // Handle parameters
       name = name || '';
       callback = callback || function() { };
-      if (typeof name != 'string' || typeof callback != 'function' || typeof node != 'object') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-      }
 
       global.distribution[context.gid].comm.send([name, node], {service: 'groups', method: 'add'}, callback);
     },
@@ -66,10 +47,6 @@ const groups = function(config) {
       // Handle parameters
       name = name || '';
       callback = callback || function() { };
-      if (typeof name != 'string' || typeof callback != 'function' || typeof node != 'string') {
-        callback(new Error('Invalid parameters'), null);
-        return;
-      }
 
       global.distribution[context.gid].comm.send([name, node], {service: 'groups', method: 'rem'}, callback);
     },

@@ -9,10 +9,7 @@ function get(configuration, callback) {
   // Handle parameters
   configuration = configuration || '';
   callback = callback || function() { };
-  if ((typeof configuration != 'string' && typeof configuration != 'object') || typeof callback != 'function') {
-    callback(new Error('Invalid parameters'), null);
-    return;
-  }
+
   let gid;
   let serviceName;
   if (typeof configuration == 'object') {
@@ -50,10 +47,7 @@ function put(service, configuration, callback) {
   service = service || {};
   configuration = configuration || '';
   callback = callback || function() { };
-  if (typeof service != 'object' || typeof configuration != 'string' || typeof callback != 'function') {
-    callback(new Error('Invalid parameters'), null);
-    return;
-  }
+
   // Put service in serviceMap
   const serviceMap = global.distribution['local'];
   serviceMap[configuration] = service;
@@ -68,10 +62,6 @@ function rem(configuration, callback) {
   // Handle parameters
   configuration = configuration || '';
   callback = callback || function() { };
-  if (typeof configuration != 'string' || typeof callback != 'function') {
-    callback(new Error('Invalid parameters'), null);
-    return;
-  }
 
   // Remove service from map
   const serviceMap = global.distribution['local'];

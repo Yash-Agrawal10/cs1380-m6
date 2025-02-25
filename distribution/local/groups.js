@@ -8,10 +8,7 @@ groups.get = function(name, callback) {
   // Handle parameters
   name = name || '';
   callback = callback || function() { };
-  if (typeof name != 'string' || typeof callback != 'function') {
-    callback(new Error('Invalid parameters'), null);
-    return;
-  }
+
   // Get and return group
   if (namesToNodes.has(name)) {
     const group = namesToNodes.get(name);
@@ -26,19 +23,11 @@ groups.put = function(config, group, callback) {
   config = config || '';
   callback = callback || function() { };
   group = group || {};
-  if (typeof group != 'object' || (typeof config != 'string' && typeof config != 'object') || typeof callback != 'function') {
-    callback(new Error('Invalid parameters'), null);
-    return;
-  }
   let gid;
   if (typeof config == 'string') {
     gid = config;
   } else {
     gid = config.gid;
-    if (!gid) {
-      callback(new Error('Invalid parameters'), null);
-      return;
-    }
   }
 
   // Populate distribution.gid
@@ -67,10 +56,7 @@ groups.del = function(name, callback) {
   // Handle parameters
   name = name || '';
   callback = callback || function() { };
-  if (typeof name != 'string' || typeof callback != 'function') {
-    callback(new Error('Invalid parameters'), null);
-    return;
-  }
+
   // Remove service from map
   if (namesToNodes.has(name)) {
     const group = namesToNodes.get(name);
@@ -85,11 +71,8 @@ groups.add = function(name, node, callback) {
   // Handle parameters
   name = name || '';
   callback = callback || function() { };
-  if (typeof name != 'string' || typeof callback != 'function' || typeof node != 'object') {
-    callback(new Error('Invalid parameters'), null);
-    return;
-  }
 
+  // Add node
   if (namesToNodes.has(name)) {
     const group = namesToNodes.get(name);
     group[id.getSID(node)] = node;
@@ -104,10 +87,6 @@ groups.rem = function(name, node, callback) {
   // Handle parameters
   name = name || '';
   callback = callback || function() { };
-  if (typeof name != 'string' || typeof callback != 'function' || typeof node != 'string') {
-    callback(new Error('Invalid parameters'), null);
-    return;
-  }
 
   if (namesToNodes.has(name)) {
     const group = namesToNodes.get(name);
