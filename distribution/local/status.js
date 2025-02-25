@@ -1,8 +1,10 @@
 const log = require('../util/log');
+const { spawn } = require('child_process');
+const path = require('path');
+const { createRPC } = require('../util/wire');
+const { serialize, deserialize } = require('../util/serialization');
 
 const status = {};
-status.spawn = require('@brown-ds/distribution/distribution/local/status').spawn; 
-status.stop = require('@brown-ds/distribution/distribution/local/status').stop; 
 
 global.moreStatus = {
   sid: global.distribution.util.id.getSID(global.nodeConfig),
@@ -63,5 +65,37 @@ status.get = function(configuration, callback) {
 
 status.spawn = require('@brown-ds/distribution/distribution/local/status').spawn; 
 status.stop = require('@brown-ds/distribution/distribution/local/status').stop; 
+
+// status.spawn = function(configuration, callback) {
+//   // Handle Parameters
+//   callback = callback || function() { };
+//   if (typeof callback != 'function' || typeof configuration != 'object') {
+//     // Not sure what to do here
+//     return;
+//   }
+
+//   // Create and add RPC to config
+//   const callbackRPC = createRPC(callback);
+//   if (configuration.onStart) {
+//     function g() {
+//       configuration.onStart();
+//       callbackRPC();
+//     }
+//     configuration.onStart = g;
+//   } else {
+//     configuration.onStart = callbackRPC;
+//   }
+
+//   // Spawn child
+//   const serializedConfig = serialize(configuration);
+//   const scriptPath = path.resolve(__dirname, '../../distribution.js');
+//   console.log(scriptPath);
+//   console.log(serializedConfig);
+//   const child = spawn(scriptPath, ['--config', serializedConfig]);
+// };
+
+// status.stop = function(callback) {
+  
+// };
 
 module.exports = status;

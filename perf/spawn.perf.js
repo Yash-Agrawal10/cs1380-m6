@@ -22,5 +22,5 @@
 // console.log(`Comm latency: ${latency} ms/item`);
 
 const distribution = require('../config');
-const config = {ip: "127.0.0.1", port: 8004};
+const config = {ip: "127.0.0.1", port: 8000};
 distribution.local.status.spawn(config, () => console.log('spawned'));
