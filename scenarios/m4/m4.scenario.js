@@ -91,7 +91,7 @@ const n4 = {ip: '127.0.0.1', port: 9004};
 const n5 = {ip: '127.0.0.1', port: 9005};
 const n6 = {ip: '127.0.0.1', port: 9006};
 
-test.only('(5 pts) (scenario) use mem.reconf', (done) => {
+test('(5 pts) (scenario) use mem.reconf', (done) => {
   /*
   In this scenario, you will use the `mem.reconf` method to reconfigure the placement of items in a group of nodes.
   You will create a group of nodes and place items in them.
@@ -103,6 +103,8 @@ test.only('(5 pts) (scenario) use mem.reconf', (done) => {
   const mygroupGroup = {};
   mygroupGroup[id.getSID(distribution.node.config)] = distribution.node.config; // Adding the current node to the group
   // Add more nodes to the group...
+  const n0 = distribution.node.config;
+  mygroupGroup[id.getSID(n1)] = n1;
   mygroupGroup[id.getSID(n2)] = n2;
   mygroupGroup[id.getSID(n3)] = n3;
 
@@ -130,7 +132,7 @@ test.only('(5 pts) (scenario) use mem.reconf', (done) => {
               const groupCopy = {...mygroupGroup};
 
               // Remove a node from the group...
-              const toRemove = n2;
+              const toRemove = n1;
               distribution.mygroup.groups.rem('mygroup', id.getSID(toRemove), (e, v) => {
                 // We call `reconf()` on the distributed mem service. This will place the items in the remaining group nodes...
                 distribution.mygroup.mem.reconf(groupCopy, (e, v) => {
@@ -157,9 +159,9 @@ test.only('(5 pts) (scenario) use mem.reconf', (done) => {
     ];
 
     const remotes = [
-      {node: n1, service: 'mem', method: 'get'},
-      {node: n1, service: 'mem', method: 'get'},
-      {node: n1, service: 'mem', method: 'get'},
+      {node: n0, service: 'mem', method: 'get'},
+      {node: n0, service: 'mem', method: 'get'},
+      {node: n0, service: 'mem', method: 'get'},
       {node: n3, service: 'mem', method: 'get'},
       {node: n2, service: 'mem', method: 'get'}
     ]
