@@ -1,4 +1,3 @@
-
 function put(state, configuration, callback) {
 };
 

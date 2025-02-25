@@ -8,9 +8,27 @@
 
 const distribution = require('../../config.js');
 
-test('(1 pts) student test', (done) => {
+test.only('(1 pts) student test - local.mem put, get, del, get', (done) => {
   // Fill out this test case...
-  done(new Error('Not implemented'));
+  const key = 'mykey';
+  const value = {value: 'any'};
+  distribution.local.mem.put(value, key, (e0, v0) => {
+    expect(e0).toBeFalsy();
+    expect(v0).toEqual(value);
+    distribution.local.mem.get(key, (e1, v1) => {
+      expect(e1).toBeFalsy();
+      expect(v1).toEqual(value);
+      distribution.local.mem.del(key, (e2, v2) => {
+        expect(e2).toBeFalsy();
+        expect(v2).toEqual(value);
+        distribution.local.mem.get(key, (e3, v3) => {
+          expect(e3).toBeTruthy();
+          expect(v3).toBeFalsy();
+          done();
+        });
+      });
+    });
+  });
 });
 
 
