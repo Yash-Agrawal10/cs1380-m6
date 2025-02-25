@@ -104,7 +104,7 @@ const start = function(callback) {
         if (serviceError instanceof Error) {
           res.statusCode = 500;
           const body = {
-            'error': new Error('Internal Error'), 
+            'error': serviceError, 
             'value': null
           };
           res.end(serialize(body));
