@@ -25,7 +25,7 @@ function mem(config) {
         const nids = nodes.map(node => id.getNID(node));
         const kid = id.getID(configuration);
         const targetNID = context.hash(kid, nids);
-        const targetNode = nodes[nids.indexOf(targetNID)];
+        const targetNode = nodes.filter((node) => id.getNID(node) == targetNID)[0];
         const message = [{key: configuration, gid: context.gid}];
         const remote = {node: targetNode, service: 'mem', method: 'get'};
         send(message, remote, (e1, v1) => {
@@ -41,6 +41,7 @@ function mem(config) {
     put: (state, configuration, callback) => {
       // Handle parameters
       callback = callback || function() { };
+      configuration = configuration || id.getID(state);
 
       groups.get(context.gid, (e0, v0) => {
         if (e0) {
@@ -52,7 +53,7 @@ function mem(config) {
         const nids = nodes.map(node => id.getNID(node));
         const kid = id.getID(configuration);
         const targetNID = context.hash(kid, nids);
-        const targetNode = nodes[nids.indexOf(targetNID)];
+        const targetNode = nodes.filter((node) => id.getNID(node) == targetNID)[0];
         const message = [state, {key: configuration, gid: context.gid}];
         const remote = {node: targetNode, service: 'mem', method: 'put'};
         send(message, remote, (e1, v1) => {
@@ -80,7 +81,7 @@ function mem(config) {
         const nids = nodes.map(node => id.getNID(node));
         const kid = id.getID(configuration);
         const targetNID = context.hash(kid, nids);
-        const targetNode = nodes[nids.indexOf(targetNID)];
+        const targetNode = nodes.filter((node) => id.getNID(node) == targetNID)[0];
         const message = [{key: configuration, gid: context.gid}];
         const remote = {node: targetNode, service: 'mem', method: 'del'};
         send(message, remote, (e1, v1) => {
