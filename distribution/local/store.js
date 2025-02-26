@@ -26,7 +26,8 @@ function put(state, configuration, callback) {
   }
 
   // Determine path and create directory if needed
-  const storePath = path.resolve(__dirname, '../../store', gid);
+  const nid = id.getNID(global.distribution.node.config);
+  const storePath = path.resolve('/usr/src/app/store', nid, gid);
   if (!fs.existsSync(storePath)) {
     fs.mkdirSync(storePath, { recursive: true });
   }
@@ -54,7 +55,8 @@ function get(configuration, callback) {
   }
 
   // Construct path and check it exists
-  const storePath = path.resolve(__dirname, '../../store', gid);
+  const nid = id.getNID(global.distribution.node.config);
+  const storePath = path.resolve('/usr/src/app/store', nid, gid);
   const filePath = path.join(storePath, key);
   if (!fs.existsSync(filePath)) {
     callback(new Error('Object not found'), null);
@@ -81,7 +83,8 @@ function del(configuration, callback) {
   }
 
   // Construct path and check it exists
-  const storePath = path.resolve(__dirname, '../../store', gid);
+  const nid = id.getNID(global.distribution.node.config);
+  const storePath = path.resolve('/usr/src/app/store', nid, gid);
   const filePath = path.join(storePath, key);
   if (!fs.existsSync(filePath)) {
     callback(new Error('Object not found'), null);

@@ -24,10 +24,12 @@ groups.put = function(config, group, callback) {
   callback = callback || function() { };
   group = group || {};
   let gid;
+  let hash;
   if (typeof config == 'string') {
     gid = config;
   } else {
     gid = config.gid;
+    hash = config.hash;
   }
 
   // Populate distribution.gid
@@ -45,7 +47,7 @@ groups.put = function(config, group, callback) {
   global.distribution[gid].mem =
       require('../all/mem')({gid: gid});
   global.distribution[gid].store =
-      require('../all/store')({gid: gid});
+      require('../all/store')({gid: gid, hash: hash});
 
   // Put group in local map
   namesToNodes.set(gid, group);
