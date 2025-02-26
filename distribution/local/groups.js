@@ -10,7 +10,16 @@ groups.get = function(name, callback) {
   callback = callback || function() { };
 
   // Get and return group
-  if (namesToNodes.has(name)) {
+  if (name == 'all') {
+    let allGroup = {};
+    for (const [key, value] of namesToNodes) {
+      allGroup = {
+        ...allGroup, 
+        ...value
+      };
+    }
+    callback(null, allGroup);
+  } else if (namesToNodes.has(name)) {
     const group = namesToNodes.get(name);
     callback(null, group);
   } else {
