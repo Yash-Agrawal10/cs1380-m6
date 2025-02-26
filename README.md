@@ -131,3 +131,32 @@ My implementation comprises 5 software components, totaling around 500 lines of 
 > How would you explain the implementation of `createRPC` to someone who has no background in computer science — i.e., with the minimum jargon possible?
 
 If you want your computer to do something with some data on another computer, you need them to communicate. That communication can be a lot of work, and oftentimes you don't want it to make simple tasks seem complicated. createRPC handles this problem exactly. It takes a function another computer can run, and returns a way for your computer to ask it to run it. It handles all the complicated communication internally.
+
+
+# M4: Distributed Storage
+
+
+## Summary
+
+> Summarize your implementation, including key challenges you encountered
+
+
+Remember to update the `report` section of the `package.json` file with the total number of hours it took you to complete each task of M4 (`hours`) and the lines of code per task.
+
+
+## Correctness & Performance Characterization
+
+> Describe how you characterized the correctness and performance of your implementation
+
+
+*Correctness* -- I wrote 6 tests which take 0.699 seconds to run.
+
+
+*Performance* -- I measured performance on AWS, having 3 EC2 instances act as a group for inserting/retrieving from a persistent store, and another EC2 instace making the queries. Numeric details are in the package.json file.
+
+
+## Key Feature
+
+> Why is the `reconf` method designed to first identify all the keys to be relocated and then relocate individual objects instead of fetching all the objects immediately and then pushing them to their corresponding locations?
+
+This is because the whole point of better hashing algorithms is so that upon reconfiguration, you don't need to move or retrieve every object being stored, but rather a small subset.

@@ -59,6 +59,17 @@
         "local": "2.02 ms/item",
         "cloud": "0.837 ms/item"
       }
+    },
+    "M4": {
+      "hours": 10,
+      "cloud throughput": {
+        "insertion": "0.267 items/ms",
+        "retrieval": "0.308 items/ms"
+      },
+      "cloud latency": {
+        "insertion": "3.74 ms/item",
+        "retrieval": "3.25 ms/item"
+      }
     }
   },
   "author": "",
