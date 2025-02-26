@@ -15,7 +15,6 @@ const routes = require('./routes');
 const start = function(callback) {
   const server = http.createServer((req, res) => {
     /* Your server will be listening for PUT requests. */
-    console.log('Request received: ', req);
 
     // Write some code...
     // Handle wrong method
