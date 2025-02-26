@@ -107,7 +107,7 @@ test('(1 pts) student test - rewrite store.put in all', (done) => {
   });
 });
 
-test.only('(1 pts) student test - consistent hashing', (done) => {
+test('(1 pts) student test - consistent hashing', (done) => {
   // Fill out this test case...
   const key = 'mykey';
   const keyHash = id.getID(key);
