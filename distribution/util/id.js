@@ -55,10 +55,24 @@ function naiveHash(kid, nids) {
 }
 
 function consistentHash(kid, nids) {
+  const kidNum = idToNum(kid);
+  const nidNums = nids.map(nid => idToNum(nid));
+  const allNums = [kidNum, ...nidNums];
+  const sortedNums = [...allNums].sort();
+  const kidIndex = sortedNums.indexOf(kidNum);
+  const selectedNidNum = sortedNums[(kidIndex + 1) % sortedNums.length];
+  const selectedIndex = nidNums.indexOf(selectedNidNum);
+  return nids[selectedIndex];
 }
 
 
 function rendezvousHash(kid, nids) {
+  const combinedIds = nids.map(nid => kid + nid);
+  const hashedIds = combinedIds.map(getID);
+  const sortedIds = [...hashedIds].sort();
+  const selectedHashedId = sortedIds[sortedIds.length - 1];
+  const selectedIndex = hashedIds.indexOf(selectedHashedId);
+  return nids[selectedIndex];
 }
 
 module.exports = {
