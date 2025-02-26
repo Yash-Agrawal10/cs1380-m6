@@ -1,16 +1,14 @@
 const distribution = require('../config');
-// const { serialize } = require('../distribution/util/serialization');
 const id = distribution.util.id;
 
-// // Temp
-// const config = {ip: '127.0.0.1', port: 9001};
-// console.log(serialize(config));
+// Example serialized node to start up other nodes
+// c='{"type":"object","value":"{\"ip\":\"{\\\"type\\\":\\\"string\\\",\\\"value\\\":\\\"127.0.0.1\\\"}\",\"port\":\"{\\\"type\\\":\\\"number\\\",\\\"value\\\":\\\"9000\\\"}\"}"}'
 
 // Create group of self and IPs (assume nodes have been started)
 const mygroup = {};
 for (let i = 2; i < process.argv.length; i++) {
     const ip = process.argv[i];
-    const node = {ip: ip, port: 9001};
+    const node = {ip: ip, port: 9000};
     mygroup[id.getSID(node)] = node;
 }
 
