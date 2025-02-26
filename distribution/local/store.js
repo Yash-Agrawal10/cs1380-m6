@@ -33,7 +33,8 @@ function put(state, configuration, callback) {
   }
 
   // Place object in store
-  const filePath = path.join(storePath, key);
+  const alphaNumKey = key.replace(/[^a-zA-Z0-9]/g, "");
+  const filePath = path.join(storePath, alphaNumKey);
   const serializedState = serialize(state);
   fs.writeFileSync(filePath, serializedState, 'utf8');
 
@@ -57,7 +58,8 @@ function get(configuration, callback) {
   // Construct path and check it exists
   const nid = id.getNID(global.distribution.node.config);
   const storePath = path.resolve('/usr/src/app/store', nid, gid);
-  const filePath = path.join(storePath, key);
+  const alphaNumKey = key.replace(/[^a-zA-Z0-9]/g, "");
+  const filePath = path.join(storePath, alphaNumKey);
   if (!fs.existsSync(filePath)) {
     callback(new Error('Object not found'), null);
     return;
@@ -85,7 +87,8 @@ function del(configuration, callback) {
   // Construct path and check it exists
   const nid = id.getNID(global.distribution.node.config);
   const storePath = path.resolve('/usr/src/app/store', nid, gid);
-  const filePath = path.join(storePath, key);
+  const alphaNumKey = key.replace(/[^a-zA-Z0-9]/g, "");
+  const filePath = path.join(storePath, alphaNumKey);
   if (!fs.existsSync(filePath)) {
     callback(new Error('Object not found'), null);
     return;
