@@ -3,18 +3,20 @@ const distribution = require('../config');
 const id = distribution.util.id;
 
 // Example serialized node to start up other nodes
-// const node = {ip: '127.0.0.1', port: 9000, onStart: () => console.log(global.distribution.node.config)};
+// const node = {ip: '127.0.0.1', port: 1234, onStart: () => console.log(global.distribution.node.config)};
 // console.log(serialize(node));
 
-// c='{"type":"object","value":"{\"ip\":\"{\\\"type\\\":\\\"string\\\",\\\"value\\\":\\\"127.0.0.1\\\"}\",\"port\":\"{\\\"type\\\":\\\"number\\\",\\\"value\\\":\\\"9000\\\"}\",\"onStart\":\"{\\\"type\\\":\\\"function\\\",\\\"value\\\":\\\"() => console.log(global.distribution.node.config)\\\"}\"}"}'
+// c='{"type":"object","value":"{\"ip\":\"{\\\"type\\\":\\\"string\\\",\\\"value\\\":\\\"127.0.0.1\\\"}\",\"port\":\"{\\\"type\\\":\\\"number\\\",\\\"value\\\":\\\"1234\\\"}\",\"onStart\":\"{\\\"type\\\":\\\"function\\\",\\\"value\\\":\\\"() => console.log(global.distribution.node.config)\\\"}\"}"}'
 
-// c='{"type":"object","value":"{\"ip\":\"{\\\"type\\\":\\\"string\\\",\\\"value\\\":\\\"127.0.0.1\\\"}\",\"port\":\"{\\\"type\\\":\\\"number\\\",\\\"value\\\":\\\"9000\\\"}\"}"}'
+// c='{"type":"object","value":"{\"ip\":\"{\\\"type\\\":\\\"string\\\",\\\"value\\\":\\\"127.0.0.1\\\"}\",\"port\":\"{\\\"type\\\":\\\"number\\\",\\\"value\\\":\\\"1234\\\"}\"}"}'
+
+// ./distribution.js --config "$c"
 
 // Create group of self and IPs (assume nodes have been started)
 const mygroup = {};
 for (let i = 2; i < process.argv.length; i++) {
     const ip = process.argv[i];
-    const node = {ip: ip, port: 9000};
+    const node = {ip: ip, port: 1234};
     mygroup[id.getSID(node)] = node;
 }
 
