@@ -1,4 +1,3 @@
-const { getID } = require('@brown-ds/distribution/distribution/util/id.js');
 const distribution = require('../../config.js');
 const id = distribution.util.id;
 
@@ -278,66 +277,63 @@ test('(10 pts) (scenario) all.mr:tfidf', (done) => {
 //   done(new Error('Implement the map and reduce functions'));
 // });
 
-// test.only('(10 pts) (scenario) all.mr:strmatch', (done) => {
-//   const mapper = (key, value) => {
-//     const regex = new RegExp('^4');
-//     const matches = regex.test(value);
-//      return {[value]: matches};
-//   };
+test('(10 pts) (scenario) all.mr:strmatch', (done) => {
+  const mapper = (key, value) => {
+    const regex = new RegExp('^t');
+    const matches = regex.test(value);
+     return {[value]: matches};
+  };
 
-//   const reducer = (key, values) => {
-//     const match = values.some(x => x);
-//     if (match) {
-//       return [key];
-//     } else {
-//       return [];
-//     }
-//   };
+  const reducer = (key, values) => {
+    const match = values.some(x => x);
+    if (match) {
+      return [key];
+    } else {
+      return [];
+    }
+  };
 
-//   const dataset = [
-//     {one: 'x'}, {two: 'y'}, {three: 'z'}, 
-//     {four: 'a'}, {five: 'b'}
-//   ];
+  const dataset = [
+    {one: 'this'}, {two: 'is'}, {three: 'my'}, 
+    {four: 'test'}, {five: 'dataset'}
+  ];
 
-//   const expected = dataset.filter((object) => {
-//     const regex =  new RegExp('^4');
-//     return regex.test(getID(object[Object.keys(object)[0]]));
-//   }).map((object) => object[Object.keys(object)[0]]);
+  const expected = ['this', 'test'];
 
-//   const doMapReduce = (cb) => {
-//     distribution.strmatch.store.get(null, (e, v) => {
-//       try {
-//         expect(v.length).toBe(dataset.length);
-//       } catch (e) {
-//         done(e);
-//       }
+  const doMapReduce = (cb) => {
+    distribution.str.store.get(null, (e, v) => {
+      try {
+        expect(v.length).toBe(dataset.length);
+      } catch (e) {
+        done(e);
+      }
 
-//       distribution.strmatch.mr.exec({keys: v, map: mapper, reduce: reducer}, (e, v) => {
-//         try {
-//           expect(v).toEqual(expect.arrayContaining(expected));
-//           done();
-//         } catch (e) {
-//           done(e);
-//         }
-//       });
-//     });
-//   };
+      distribution.str.mr.exec({keys: v, map: mapper, reduce: reducer}, (e, v) => {
+        try {
+          expect(v).toEqual(expect.arrayContaining(expected));
+          done();
+        } catch (e) {
+          done(e);
+        }
+      });
+    });
+  };
 
-//   let cntr = 0;
+  let cntr = 0;
 
-//   // Send the dataset to the cluster
-//   dataset.forEach((o) => {
-//     const key = Object.keys(o)[0];
-//     const value = o[key];
-//     distribution.strmatch.store.put(value, key, (e, v) => {
-//       cntr++;
-//       // Once the dataset is in place, run the map reduce
-//       if (cntr === dataset.length) {
-//         doMapReduce();
-//       }
-//     });
-//   });
-// });
+  // Send the dataset to the cluster
+  dataset.forEach((o) => {
+    const key = Object.keys(o)[0];
+    const value = o[key];
+    distribution.str.store.put(value, key, (e, v) => {
+      cntr++;
+      // Once the dataset is in place, run the map reduce
+      if (cntr === dataset.length) {
+        doMapReduce();
+      }
+    });
+  });
+});
 
 // test('(10 pts) (scenario) all.mr:ridx', (done) => {
 //     done(new Error('Implement the map and reduce functions'));
@@ -409,7 +405,12 @@ beforeAll((done) => {
               const tfidfConfig = {gid: 'tfidf'};
               distribution.local.groups.put(tfidfConfig, tfidfGroup, (e, v) => {
                 distribution.tfidf.groups.put(tfidfConfig, tfidfGroup, (e, v) => {
-                  done();
+                  const strmatchConfig = {gid: 'str'};
+                  distribution.local.groups.put(strmatchConfig, strmatchGroup, (e, v) => {
+                    distribution.str.groups.put(strmatchConfig, strmatchGroup, (e, v) => {
+                      done();
+                    })
+                  })
                 });
               });
             });
