@@ -248,7 +248,7 @@ test('(10 pts) (scenario) all.mr:tfidf', (done) => {
 
   let cntr = 0;
 
-  // Send the dataset to the cluster
+  // Send the dataset to the cluster    
   dataset.forEach((o) => {
     const key = Object.keys(o)[0];
     const value = o[key];
@@ -409,13 +409,7 @@ beforeAll((done) => {
               const tfidfConfig = {gid: 'tfidf'};
               distribution.local.groups.put(tfidfConfig, tfidfGroup, (e, v) => {
                 distribution.tfidf.groups.put(tfidfConfig, tfidfGroup, (e, v) => {
-                  // Adding group for student-made test
-                  const strmatchConfig = {gid: 'strmatch'};
-                  distribution.local.groups.put(strmatchConfig, strmatchGroup, (e, v) => {
-                    distribution.strmatch.groups.put(strmatchConfig, strmatchGroup, (e, v) => {
-                      done();
-                    });
-                  });
+                  done();
                 });
               });
             });
