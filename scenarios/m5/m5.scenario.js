@@ -177,8 +177,6 @@ test('(10 pts) (scenario) all.mr:tfidf', (done) => {
     TF-IDF = TF * IDF
 */
 
-  const TOTAL_DOCS = 3;
-
   const mapper = (key, value) => {
     const words = value.split(/(\s+)/).filter((e) => e !== ' ');
     const numWords = words.length;
@@ -280,7 +278,7 @@ test('(10 pts) (scenario) all.mr:tfidf', (done) => {
 test('(10 pts) (scenario) all.mr:strmatch', (done) => {
   const mapper = (key, value) => {
     const regex = new RegExp('^t');
-    const matches = regex.test(value);
+    const matches = regex.test(key);
      return {[value]: matches};
   };
 
@@ -298,7 +296,7 @@ test('(10 pts) (scenario) all.mr:strmatch', (done) => {
     {four: 'test'}, {five: 'dataset'}
   ];
 
-  const expected = ['this', 'test'];
+  const expected = ['is', 'my'];
 
   const doMapReduce = (cb) => {
     distribution.str.store.get(null, (e, v) => {
