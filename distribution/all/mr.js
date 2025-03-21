@@ -65,7 +65,7 @@ function mr(config) {
     */
 
     // Worker map function
-    function doMap(keys, group, gid, map, callback) {
+    function doMap(keys, group, gid, map, serviceName, callback) {
       // Handle parameters
       keys = keys || [];
       callback = callback || function() { };
@@ -117,7 +117,8 @@ function mr(config) {
                 }
               }
 
-              // 
+              // Store keys with serviceName- prefix
+              
             }
           });
         });
@@ -140,7 +141,7 @@ function mr(config) {
       global.distribution[context.gid].routes.put(service, serviceName, (e2, v2) => {
         // Call map on workers
         const remote1 = {service: serviceName, method: 'doMap'};
-        const message1 = [keys, v1, context.gid, map];
+        const message1 = [keys, v1, context.gid, map, serviceName];
         global.distribution[context.gid].comm.send(message1, remote1, (e3, v3) => {
           console.log('returned values: ', v3, e3);
           // Temporary -- log the return values
