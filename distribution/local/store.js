@@ -101,4 +101,32 @@ function del(configuration, callback) {
   callback(null, deserializedState);
 }
 
+
+function append(state, configuration, callback) {
+  // Handle parameters
+  if (!Array.isArray(state)) {
+    callback(new Error('Appending non array'), null);
+    return;
+  }
+
+  get(configuration, (e, v) => {
+    if (e) {
+      callback(e, null);
+      return;
+    } else if (!Array.isArray(v)) {
+      callback(new Error('Appending to non array'), null);
+      return;
+    }
+
+    const newState = v.concat(state);
+    put(newState, configuration, (e2, v2) => {
+      if (e2) {
+        callback(e2, null);
+        return;
+      }    
+      callback(null, newState);
+    });
+  });
+}
+
 module.exports = {put, get, del};

@@ -1,7 +1,5 @@
 /** @typedef {import("../types").Callback} Callback */
 
-const id = require('../util/id');
-
 /**
  * Map functions used for mapreduce
  * @callback Mapper
@@ -43,11 +41,10 @@ function mr(config) {
    * @return {void}
    */
   function exec(configuration, cb) {
-    console.log('In exec');
     // Handle parameters
     const keys = configuration.keys || [];
-    const map = configuration.mapper || function(x) {return x};
-    const reduce = configuration.reducer || function(x) {return x};
+    const map = configuration.map || function(x) {return x};
+    const reduce = configuration.reduce || function(x) {return x};
     if (!Array.isArray(keys) || typeof(map) != 'function' || typeof(reduce) != 'function') {
       cb(new Error('Invalid configuration', null));
     }
@@ -78,30 +75,22 @@ function mr(config) {
         callback(new Error('Invalid parameters'), null);
       }
 
-      // Filter for keys this node is responsible for
-      const nids = group.map(node => id.getNID(node));
-      const nodeKeys = keys.filter((key) => {
-        const kid = id.getID(key);
-        const targetNID = context.hash(kid, nids);
-        const targetNode = group.filter((node) => id.getNID(node) == targetNID)[0];
-        return (getNID(targetNode) == getNID(global.distribution.node.config));
-      });
-
       // Perform map operation on these keys
       let counter = 0;
       let output = [];
-      nodeKeys.forEach((key) => {
+      keys.forEach((key) => {
         global.distribution.local.store.get({gid: gid, key: key}, (error, value) => {
           if (error) {
             counter++;
           } else {
             const keyOutput = map(key, value);
-            output.concat(keyOutput);
+            output = output.concat(keyOutput);
             counter++;
           }
 
-          if (counter == nodeKeys.length) {
+          if (counter == keys.length) {
             // Temporary -- send output back to main node
+            // Idea -- store things on various nodes, send back keys they are stored at
             callback(null, output);
           }
         });
@@ -115,16 +104,13 @@ function mr(config) {
 
     // Map-Reduce workflow (ignore error handling for now)
     const service = {doMap, doReduce};
-    const serviceID = getID(configuration);
+    const serviceID = global.distribution.util.id.getID(configuration);
     const serviceName = 'mr-' + serviceID;
 
     // Get local view of group
-    console.log('getting group');
     global.distribution.local.groups.get(context.gid, (e1, v1) => {
-      console.log('got group: ', v1, e1);
       // Instantiate relevant functions on workers
       global.distribution[context.gid].routes.put(service, serviceName, (e2, v2) => {
-        console.log('put routes: ', v2, e2);
         // Call map on workers
         const remote1 = {service: serviceName, method: 'doMap'};
         const message1 = [keys, v1, context.gid, map];
