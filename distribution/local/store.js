@@ -111,8 +111,12 @@ function append(state, configuration, callback) {
 
   get(configuration, (e, v) => {
     if (e) {
-      callback(e, null);
-      return;
+      if (e.message == 'Object not found') {
+        v = [];
+      } else {
+        callback(e, null);
+        return;
+      }
     } else if (!Array.isArray(v)) {
       callback(new Error('Appending to non array'), null);
       return;
@@ -123,7 +127,7 @@ function append(state, configuration, callback) {
       if (e2) {
         callback(e2, null);
         return;
-      }    
+      }
       callback(null, newState);
     });
   });
