@@ -129,4 +129,4 @@ function append(state, configuration, callback) {
   });
 }
 
-module.exports = {put, get, del};
+module.exports = {put, get, del, append};
