@@ -75,24 +75,51 @@ function mr(config) {
         callback(new Error('Invalid parameters'), null);
       }
 
-      // Perform map operation on these keys
-      let counter = 0;
-      let output = [];
-      keys.forEach((key) => {
-        global.distribution.local.store.get({gid: gid, key: key}, (error, value) => {
-          if (error) {
-            counter++;
-          } else {
-            const keyOutput = map(key, value);
-            output = output.concat(keyOutput);
-            counter++;
-          }
+      // Filter for keys node is responsible for
+      global.distribution[gid].store.getNodes(keys, group, (e, v) => {
+        if (e) {
+          callback(e, null);
+          return;
+        }
+        const id = global.distribution.util.id;
+        const nodeKeys = keys.filter((key, index) => (id.getNID(v[index]) == id.getNID(global.nodeConfig)));
+        if (nodeKeys.length == 0) {
+          callback(null, []);
+          return;
+        }
 
-          if (counter == keys.length) {
-            // Temporary -- send output back to main node
-            // Idea -- store things on various nodes, send back keys they are stored at
-            callback(null, output);
-          }
+        // Perform map operation on these keys
+        let counter = 0;
+        let output = [];
+        nodeKeys.forEach((key) => {
+          global.distribution.local.store.get({gid: gid, key: key}, (error, value) => {
+            if (error) {
+              counter++;
+            } else {
+              const keyOutput = map(key, value);
+              output = output.concat(keyOutput);
+              counter++;
+            }
+
+            if (counter == nodeKeys.length) {
+              // Temporary -- send output back to main node
+              callback(null, output);
+              
+              // Map keys to lists of values
+              const keyToValues = new Map();
+              for (let kv of output) {
+                const key = Object.keys(kv)[0];
+                const value = Object.values(kv)[0];
+                if (keyToValues.has(key)) {
+                  keyToValues.set(key, keyToValues.get(key).push(value));
+                } else {
+                  keyToValues.set(key, [value]);
+                }
+              }
+
+              // 
+            }
+          });
         });
       });
     }
