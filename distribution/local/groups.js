@@ -57,6 +57,8 @@ groups.put = function(config, group, callback) {
       require('../all/mem')({gid: gid});
   global.distribution[gid].store =
       require('../all/store')({gid: gid, hash: hash});
+  global.distribution[gid].mr =
+      require('../all/mr')({gid: gid});
 
   // Put group in local map
   namesToNodes.set(gid, group);

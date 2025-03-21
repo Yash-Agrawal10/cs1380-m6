@@ -1,4 +1,4 @@
-const id = require('@brown-ds/distribution/distribution/util/id');
+const id = require('../util/id');
 const groups = require('../local/groups')
 const { send } = require('../local/comm');
 

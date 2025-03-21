@@ -78,6 +78,8 @@ distribution['all'].mem =
     require('./distribution/all/mem')({gid: 'all'});
 distribution['all'].store =
     require('./distribution/all/store')({gid: 'all'});
+distribution['all'].mr =
+    require('./distribution/all/mr')({gid: 'all'});
 
 distribution.node.config = global.nodeConfig;
 module.exports = distribution;
