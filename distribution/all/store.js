@@ -122,32 +122,25 @@ function store(config) {
     });
   }
 
-  function append(state, configuration, callback){
+  function append(state, key, group, callback){
     // Handle parameters
     callback = callback || function() { };
-    configuration = configuration || id.getID(state);
+    key = key || id.getID(state);
 
-    groups.get(context.gid, (e, v) => {
-      if (e) {
-        callback(e, null);
+    getNodes(key, group, (e0, v0) => {
+      if (e0) {
+        callback(e0, null);
         return;
       }
 
-      getNodes(configuration, v, (e0, v0) => {
-        if (e0) {
-          callback(e0, null);
-          return;
+      const message = [state, {key, gid: context.gid}];
+      const remote = {node: v0, service: 'store', method: 'append'};
+      send(message, remote, (e1, v1) => {
+        if (e1) {
+          callback(e1, null);
+        } else {
+          callback(null, v1);
         }
-  
-        const message = [state, {key: configuration, gid: context.gid}];
-        const remote = {node: v0, service: 'store', method: 'append'};
-        send(message, remote, (e1, v1) => {
-          if (e1) {
-            callback(e1, null);
-          } else {
-            callback(null, v1);
-          }
-        });
       });
     });
   }

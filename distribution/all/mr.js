@@ -103,7 +103,8 @@ function mr(config) {
 
             if (counter == nodeKeys.length) {
               // Temporary -- send output back to main node
-              callback(null, output);
+              // callback(null, output);
+              // return;
               
               // Map keys to lists of values
               const keyToValues = new Map();
@@ -118,7 +119,23 @@ function mr(config) {
               }
 
               // Store keys with serviceName- prefix
-              
+              let counter2 = 0;
+              keyToValues.forEach((value, key) => {
+                const usedKey = 'mr-' + serviceName + '-' + key;
+                global.distribution[gid].store.append(value, usedKey, group, (e1, v1) => {
+                  if (e1) {
+                    counter2++;
+                  } else {
+                    counter2++;
+                  }
+
+                  if (counter2 == keyToValues.size) {
+                    const keys = Array.from(keyToValues.keys());
+                    callback(null, keys);
+                    return;
+                  }
+                });
+              });
             }
           });
         });
@@ -127,7 +144,57 @@ function mr(config) {
 
 
     // Worker reduce function
-    function doReduce() {
+    function doReduce(keys, group, gid, reduce, serviceName, callback) {
+      // Handle parameters
+      keys = keys || [];
+      callback = callback || function() { };
+      gid = gid || 'local';
+      reduce = reduce || function () { };
+      if (!Array.isArray(keys) || typeof callback != 'function' || typeof gid != 'string' || typeof reduce != 'function') {
+        callback(new Error('Invalid parameters'), null);
+      }
+
+      // Filter for keys node is resopnsible for
+      const usedKeys = keys.map((key) => 'mr-' + serviceName + '-' + key);
+      global.distribution[gid].store.getNodes(usedKeys, group, (e, v) => {
+        if (e) {
+          callback(e, null);
+          return;
+        }
+
+        // Filter for keys node is repsonsible for
+        const id = global.distribution.util.id;
+        const nodeKeys = keys.filter((key, index) => (id.getNID(v[index]) == id.getNID(global.nodeConfig)));
+        if (nodeKeys.length == 0) {
+          callback(null, []);
+          return;
+        }
+        
+        // Perform reduce operation on these keys
+        let counter = 0;
+        let output = [];
+        nodeKeys.forEach((key) => {
+          const usedKey = 'mr-' + serviceName + '-' + key;
+          // console.log('getting key ' + usedKey + '\n');
+          global.distribution.local.store.get({gid: gid, key: usedKey}, (error, value) => {
+            if (error) {
+              // console.log(error);
+              counter++;
+            } else {
+              const keyOutput = reduce(key, value);
+              // console.log(keyOutput);
+              output = output.concat(keyOutput);
+              counter++;
+            }
+
+            if (counter == nodeKeys.length) {
+              // Send output back to orchestrator
+              callback(null, output);
+              return;
+            }
+          });
+        });
+      });
     }
 
     // Map-Reduce workflow (ignore error handling for now)
@@ -143,9 +210,24 @@ function mr(config) {
         const remote1 = {service: serviceName, method: 'doMap'};
         const message1 = [keys, v1, context.gid, map, serviceName];
         global.distribution[context.gid].comm.send(message1, remote1, (e3, v3) => {
-          console.log('returned values: ', v3, e3);
-          // Temporary -- log the return values
-          cb(new Error('NYI'), null);
+          // Collect keys
+          const keySet = new Set();
+          for (let keyList of Object.values(v3)) {
+            keyList.forEach(el => keySet.add(el));
+          }
+          const keyList = Array.from(keySet);
+
+          // Call reduce on workers
+          const remote2 = {service: serviceName, method: 'doReduce'};
+          const message2 = [keyList, v1, context.gid, reduce, serviceName];
+          global.distribution[context.gid].comm.send(message2, remote2, (e4, v4) => {
+            // v4 -- mapping from NID to list of outputs, need to concatenate
+            let output = [];
+            for (let values of Object.values(v4)) {
+              output = output.concat(values);
+            }
+            cb(null, output);
+          });
         });
       });
     });
