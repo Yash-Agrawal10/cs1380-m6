@@ -123,7 +123,6 @@ function append(state, configuration, callback) {
     }
 
     const newState = v.concat(state);
-    console.log(configuration, state, v, newState, '\n');
     put(newState, configuration, (e2, v2) => {
       if (e2) {
         callback(e2, null);

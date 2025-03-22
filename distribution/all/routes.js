@@ -23,7 +23,7 @@ function routes(config) {
    * @param {string} name
    * @param {Callback} callback
    */
-  function rem(service, name, callback = () => { }) {
+  function rem(name, callback = () => { }) {
     // Handle parameters
     name = name || '';
     callback = callback || function() { };

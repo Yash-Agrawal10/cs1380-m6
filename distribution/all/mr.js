@@ -172,19 +172,21 @@ function mr(config) {
         nodeKeys.forEach((key) => {
           const usedKey = 'mr-' + serviceName + '-' + key;
           global.distribution.local.store.get({gid: gid, key: usedKey}, (error, value) => {
-            if (error) {
-              counter++;
-            } else {
-              const keyOutput = reduce(key, value);
-              output = output.concat(keyOutput);
-              counter++;
-            }
-
-            if (counter == nodeKeys.length) {
-              // Send output back to orchestrator
-              callback(null, output);
-              return;
-            }
+            global.distribution.local.store.del({gid: gid, key: usedKey}, (error2, value2) => {
+              if (error) {
+                counter++;
+              } else {
+                const keyOutput = reduce(key, value);
+                output = output.concat(keyOutput);
+                counter++;
+              }
+  
+              if (counter == nodeKeys.length) {
+                // Send output back to orchestrator
+                callback(null, output);
+                return;
+              }
+            });
           });
         });
       });
@@ -218,7 +220,10 @@ function mr(config) {
             for (let values of Object.values(v4)) {
               output = output.concat(values);
             }
-            cb(null, output);
+            // Cleanup routes
+            global.distribution[context.gid].routes.rem(serviceName, (e5, v5) => {
+              cb(null, output);
+            });
           });
         });
       });
