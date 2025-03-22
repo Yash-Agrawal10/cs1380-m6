@@ -112,7 +112,8 @@ function mr(config) {
                 const key = Object.keys(kv)[0];
                 const value = Object.values(kv)[0];
                 if (keyToValues.has(key)) {
-                  keyToValues.set(key, keyToValues.get(key).push(value));
+                  console.log(keyToValues.get(key));
+                  keyToValues.get(key).push(value);
                 } else {
                   keyToValues.set(key, [value]);
                 }
