@@ -102,17 +102,12 @@ function mr(config) {
             }
 
             if (counter == nodeKeys.length) {
-              // Temporary -- send output back to main node
-              // callback(null, output);
-              // return;
-              
               // Map keys to lists of values
               const keyToValues = new Map();
               for (let kv of output) {
                 const key = Object.keys(kv)[0];
                 const value = Object.values(kv)[0];
                 if (keyToValues.has(key)) {
-                  console.log(keyToValues.get(key));
                   keyToValues.get(key).push(value);
                 } else {
                   keyToValues.set(key, [value]);
@@ -176,14 +171,11 @@ function mr(config) {
         let output = [];
         nodeKeys.forEach((key) => {
           const usedKey = 'mr-' + serviceName + '-' + key;
-          // console.log('getting key ' + usedKey + '\n');
           global.distribution.local.store.get({gid: gid, key: usedKey}, (error, value) => {
             if (error) {
-              // console.log(error);
               counter++;
             } else {
               const keyOutput = reduce(key, value);
-              // console.log(keyOutput);
               output = output.concat(keyOutput);
               counter++;
             }
@@ -222,7 +214,6 @@ function mr(config) {
           const remote2 = {service: serviceName, method: 'doReduce'};
           const message2 = [keyList, v1, context.gid, reduce, serviceName];
           global.distribution[context.gid].comm.send(message2, remote2, (e4, v4) => {
-            // v4 -- mapping from NID to list of outputs, need to concatenate
             let output = [];
             for (let values of Object.values(v4)) {
               output = output.concat(values);
