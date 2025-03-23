@@ -10,13 +10,31 @@ const distribution = require('../../config.js');
 
 test('(1 pts) student test', (done) => {
   // Fill out this test case...
-  done(new Error('Not implemented'));
+  distribution.local.store.del('new', () => {
+    distribution.local.store.append(['test'], 'new', () => {
+      distribution.local.store.get('new', (e, v) => {
+        expect(e).toBeFalsy();
+        expect(v).toEqual(['test']);
+        done();
+      });
+    });
+  });
 });
 
 
 test('(1 pts) student test', (done) => {
   // Fill out this test case...
-  done(new Error('Not implemented'));
+  distribution.local.store.del('new', () => {
+    distribution.local.store.put(['testing'], 'new', () => {
+      distribution.local.store.append(['test'], 'new', () => {
+        distribution.local.store.get('new', (e, v) => {
+          expect(e).toBeFalsy();
+          expect(v).toEqual(['testing', 'test']);
+          done();
+        });
+      });
+    });
+  });
 });
 
 
