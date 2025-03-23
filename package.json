@@ -70,6 +70,11 @@
         "insertion": "3.74 ms/item",
         "retrieval": "3.25 ms/item"
       }
+    }, 
+    "M5": {
+      "hours": 10,
+      "throughput": "1.32 items/ms",
+      "latency": "0.756 ms/item"
     }
   },
   "author": "",

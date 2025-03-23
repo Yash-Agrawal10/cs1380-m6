@@ -180,7 +180,7 @@ My implementation comprises three new software components, totaling 300 added li
 *Correctness*: I wrote 3 cases testing 3 different suggested workflows for map-reduce.
 
 
-*Performance*: My map-reduce can sustain 1.32 characters/second, with an average latency of 0.756 seconds per character.
+*Performance*: My map-reduce can sustain 1.32 characters/ms, with an average latency of 0.756 ms per character.
 
 
 ## Key Feature
