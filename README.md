@@ -160,3 +160,31 @@ Remember to update the `report` section of the `package.json` file with the tota
 > Why is the `reconf` method designed to first identify all the keys to be relocated and then relocate individual objects instead of fetching all the objects immediately and then pushing them to their corresponding locations?
 
 This is because the whole point of better hashing algorithms is so that upon reconfiguration, you don't need to move or retrieve every object being stored, but rather a small subset.
+
+# M5: Distributed Execution Engine
+
+
+## Summary
+
+> Summarize your implementation, including key challenges you encountered. Remember to update the `report` section of the `package.json` file with the total number of hours it took you to complete each task of M5 (`hours`) and the lines of code per task.
+
+
+My implementation comprises three new software components, totaling 300 added lines of code over the previous implementation. Key challenges included resolving race conditions in store using append and ensuring that each worker didn't need to manually check if they had each item which required implementing a way to check what node was responsible for what data.
+
+
+## Correctness & Performance Characterization
+
+> Describe how you characterized the correctness and performance of your implementation
+
+
+*Correctness*: I wrote 3 cases testing 3 different suggested workflows for map-reduce.
+
+
+*Performance*: My map-reduce can sustain 1.32 characters/second, with an average latency of 0.756 seconds per character.
+
+
+## Key Feature
+
+> Which extra features did you implement and how?
+
+I implemented a way for workers to figure out which keys they are responsible for in order to reduce the number of system read calls performed and improve performance. This helped on both the map and reduce ends.
