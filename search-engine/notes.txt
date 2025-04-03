@@ -1,93 +1,3 @@
-IDEA ONE: Combined
-
-Node setup:
-    Single overall orchestrator
-    Single group of workers for both crawling and indexing
-
-Data structures:
-    Single persistent toCrawl list on overall orchestrator
-    Single persistent visited list on overall orchestrator
-    Persistent kv index distributed over workers
-
-Setup:
-    Spawn required nodes
-    Create 'worker' group on all nodes
-    Initialize toCrawl list with seed URLs
-    Initialize empty visited list
-
-Workflow:
-    Orchestrator reads NUM_URL urls from toCrawl list NOT in visited list, and adds them to visited list
-    Crawler map-reduce -- 
-            Map -- 
-            downloads content, returns {url: content}
-            Reduce -- 
-            stores content at identifiable location
-            parses content and returns newurls
-    Orchestrator appends newurls to toCrawl list
-    Orchestrator initializes term set
-    Indexer map-reduce -- 
-        Map -- 
-            gets and deletes content from identifiable location
-            emits {term: url, frequency} pairs
-        Reduce -- 
-            appends {url, frequency} to term key in distributed store
-            returns list of terms
-    Orchestrator sorts lists for each term
-
-Comments:
-    Terms are not sorted during intermediate processing -- 
-        can implement new append_sorted function for store, inserts in correct position
-    Single orchestrator is slow -- 
-        separating is faster
-        need to manage storage and shared data
-
-IDEA TWO: Separated
-
-Node setup: 
-    Independent orchestrators/groups for crawling, querying, indexing
-    Orchestrators/groups are visible to one another to share data
-
-Data structures:
-    Single persistent toCrawl list on the crawl orchestrator
-    Single persistent visited list on the crawl orchestrator
-    Single persistent toIndex list on the indexing orchestrator
-    Persistent kv-cache of downloaded webpage text on index group
-    Peristent kv-cache of index on query group
-
-Setup:
-    Design/choose which nodes are what before hand, manually spawn them
-    Have group setup hardcoded into the files the nodes will be running
-    
-Crawler:
-    1. Read NUM_URLS from toCrawl list (initialized with seed URLs)
-    2. Make map-reduce call to worker group
-        a. Map will download data and return {url: conent}
-        b. Reduce will store data on index group and extract urls, return {url: [new_urls]}
-    3. Write all new urls to toCrawl list
-    4. Write all processed urls to visited AND toIndex on index orchestrator
-    5. Pause when toIndex is too long, terminate when visited is TARGET_URLS
-
-Indexer:
-    1. Read NUM_URLS from toIndex list
-    2. Make map-reduce call to worker group
-        a. Map will emit {token: {freq, url}} items AND delete content consumed
-        b. Reduce will append the value ([{freq, url}]) to index in query group
-
-Queryer:
-    1. Read command line input which consumes a token and num results
-    2. Get sorted {url, freq} list (by freq) corresponding to token
-    3. Return top num_results
-
-IDEA THREE: No map-reduce
-
-Node setup:
-    One node dedicated to managing to-crawl list
-    One node dedicated to managing to-index list
-    Many nodes dedicated to crawling (downloading and indexing content)
-    Many nodes dedicated to indexing (storing crawled data and creating index)
-    Many nodes dedicated to querying (storing and accessing index)
-
-
 IDEA FOUR: Combined map-reduce
 
 Idea:
@@ -115,3 +25,9 @@ Indexer:
 Queryer:
     Many nodes store global index
     When queried, simply get global index and return top results
+
+
+Details:
+
+    Crawler:
+        
