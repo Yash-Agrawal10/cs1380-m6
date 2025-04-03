@@ -103,7 +103,7 @@ function store(config) {
         return;
       }
 
-      getNodes(configuration, (e0, v0) => {
+      getNodes(configuration, v, (e0, v0) => {
         if (e0) {
           callback(e0, null);
           return;

@@ -27,7 +27,10 @@ Queryer:
     When queried, simply get global index and return top results
 
 
+
 Details:
 
     Crawler:
-        
+        Orchestrator -- 
+            1. Define groups for itself
+            2. 
