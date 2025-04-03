@@ -32,5 +32,27 @@ Details:
 
     Crawler:
         Orchestrator -- 
-            1. Define groups for itself
-            2. 
+            1. Define groups/nodes (crawler group, index orchestrator, index group)
+            2. Spawn crawler group (manual or programmatic), tell them to run crawl function
+            3. Initialize seed list if it doens't exist
+            4. Nothing (service crawler group requests, also add used URLs to visited list)
+        Worker -- 
+            1. Pop url(s) to crawl from orchestrator
+            (For each url)
+            2. Fetch HTML data from webpage
+            3. Extract text and store to crawler group (with url as name)
+            4. Extract URLs and have orchestrator append them
+            5. Repeat
+
+    Indexer:
+        Orchestrator -- 
+            1. Get n urls from the toIndex list
+            2. Call map-reduce on index worker group with urls as keys
+            3. Repeat
+        Worker -- 
+            Map - consumes url data, emits {term: {url, frequency}} objects, does n-grams (at some point)
+            Reduce - Append [{url, freq}] to global index (stored on queryers (for now)), sorts it?
+    
+    Queryer:
+        One script that is a command line tool which just queries global index using store.all.get
+        Nodes to store index maybe?
