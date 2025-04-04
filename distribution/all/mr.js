@@ -93,46 +93,51 @@ function mr(config) {
         let output = [];
         nodeKeys.forEach((key) => {
           global.distribution.local.store.get({gid: gid, key: key}, (error, value) => {
-            if (error) {
+            const mapCb = () => {
               counter++;
-            } else {
-              const keyOutput = map(key, value);
-              output = output.concat(keyOutput);
-              counter++;
-            }
-
-            if (counter == nodeKeys.length) {
-              // Map keys to lists of values
-              const keyToValues = new Map();
-              for (let kv of output) {
-                const key = Object.keys(kv)[0];
-                const value = Object.values(kv)[0];
-                if (keyToValues.has(key)) {
-                  keyToValues.get(key).push(value);
-                } else {
-                  keyToValues.set(key, [value]);
-                }
-              }
-
-              // Store keys with serviceName- prefix
-              let counter2 = 0;
-              keyToValues.forEach((value, key) => {
-                const usedKey = 'mr-' + serviceName + '-' + key;
-                global.distribution[gid].store.append(value, usedKey, group, (e1, v1) => {
-                  if (e1) {
-                    counter2++;
+              if (counter == nodeKeys.length) {
+                // Map keys to lists of values
+                const keyToValues = new Map();
+                for (let kv of output) {
+                  const key = Object.keys(kv)[0];
+                  const value = Object.values(kv)[0];
+                  if (keyToValues.has(key)) {
+                    keyToValues.get(key).push(value);
                   } else {
-                    counter2++;
+                    keyToValues.set(key, [value]);
                   }
+                }
 
-                  if (counter2 == keyToValues.size) {
-                    const keys = Array.from(keyToValues.keys());
-                    callback(null, keys);
-                    return;
-                  }
+                // Store keys with serviceName- prefix
+                let counter2 = 0;
+                keyToValues.forEach((value, key) => {
+                  const usedKey = 'mr-' + serviceName + '-' + key;
+                  global.distribution[gid].store.append(value, usedKey, group, (e1, v1) => {
+                    if (e1) {
+                      counter2++;
+                    } else {
+                      counter2++;
+                    }
+
+                    if (counter2 == keyToValues.size) {
+                      const keys = Array.from(keyToValues.keys());
+                      callback(null, keys);
+                      return;
+                    }
+                  });
                 });
-              });
-            }
+              }
+            };
+
+            Promise.resolve(map(key, value))
+            .then((keyOutput) => {
+              output = output.concat(keyOutput);
+              mapCb();
+            })
+            .catch((err) => {
+              console.log(err);
+              mapCb();
+            });
           });
         });
       });
