@@ -99,16 +99,25 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
 
         // Call map-reduce (value is url: [new_urls])
         distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, (e1, v1) => {
+            let allNewURLs = [];
+            let completedURLs = [];
             v1.map((o) => {
-                visited.add(Object.keys(o)[0]);
+                const completedURL = Object.keys(o)[0];
+                visited.add(completedURL);
+                completedURLs.push(completedURL);
                 const newURLs = Object.values(o)[0];
-                toCrawl = toCrawl.concat(newURLs);
+                allNewURLs = allNewURLs.concat(newURLs);
             });
+            toCrawl = toCrawl.concat(allNewURLs);
             // Persist toCrawl and visited
             distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
                 const visitedList = Array.from(visited);
                 distribution.local.store.put(visitedList, 'visited', (e2, v2) => {
-                    crawlStep(toCrawl, visited);
+                    const remote = {node: indexOrchestrator, service: 'store', method: 'append'};
+                    const message = [completedURLs, 'toIndex'];
+                    distribution.local.comm.send(message, remote, (e, v) => {
+                        crawlStep(toCrawl, visited);
+                    });
                 });
             });
         });

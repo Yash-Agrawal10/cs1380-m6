@@ -5,7 +5,7 @@ const id = distribution.util.id;
 
 const crawlGroup = {};
 const indexGroup = {};
-const indexOrchestrator = null;
+let indexOrchestrator = null;
 
 /*
     The local node will be the orchestrator.
@@ -16,6 +16,20 @@ const n1 = {ip: '127.0.0.1', port: 7110};
 const n2 = {ip: '127.0.0.1', port: 7111};
 const n3 = {ip: '127.0.0.1', port: 7112};
 
+function arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) return false;
+  
+    // Sort both arrays and check equality
+    const sortedArr1 = [...arr1].sort();
+    const sortedArr2 = [...arr2].sort();
+  
+    for (let i = 0; i < sortedArr1.length; i++) {
+      if (sortedArr1[i] !== sortedArr2[i]) return false;
+    }
+  
+    return true;
+  }
+
 const checkValid = async (MAX_URLs, visited) => {
     if (!visited || MAX_URLs !== visited.length) {
       return false;
@@ -25,10 +39,26 @@ const checkValid = async (MAX_URLs, visited) => {
   
     for (let url of visited) {
         try {
-            const result = await new Promise((resolve, reject) => {
+            await new Promise((resolve, reject) => {
                 distribution.index.store.get(url, (err, res) => {
-                if (err || res == null) return reject(err || new Error('Not found'));
-                resolve(res);
+                    if (err || res == null) return reject(err || new Error('Not found'));
+                    resolve(res);
+                });
+            });
+        } catch (err) {
+            return false;
+        }
+    }
+
+    const remote = {node: indexOrchestrator, service: 'store', method: 'get'};
+    const message = ['toIndex'];
+    if (visited.length != 0) {
+        try {
+            await new Promise((resolve, reject) => {
+                distribution.local.comm.send(message, remote, (err, res) => {
+                    if (err || res == null) return reject(err || new Error('Not found'));
+                    if (!arraysEqual(visited, res)) return reject(new Error('Lists do not match'));
+                    resolve(res);
                 });
             });
         } catch (err) {
@@ -117,10 +147,12 @@ test('crawl with stop in between', (done) => {
 */
 
 beforeAll((done) => {
+
   crawlGroup[id.getSID(n1)] = n1;
   crawlGroup[id.getSID(n2)] = n2;
 
   indexGroup[id.getSID(n3)] = n3;
+  indexOrchestrator = n3;
 
   const startNodes = (cb) => {
     distribution.local.status.spawn(n1, (e, v) => {
@@ -142,7 +174,11 @@ beforeAll((done) => {
 beforeEach((done) => {
     distribution.local.store.del('toCrawl', () => {
         distribution.local.store.del('visited', () => {
-            done();
+            const remote = {node: indexOrchestrator, service: 'store', method: 'del'};
+            const message = ['toIndex'];
+            distribution.local.comm.send(message, remote, (e, v) => {
+                done();
+            });
         });
     });
 });
