@@ -1,6 +1,6 @@
 const distribution = require('../config');
 
-const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_BATCH) => {
+const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_BATCH, cb) => {
     // Set up toCrawl and visited lists
     const setupLists = (callback) => {
         // Initialize toCrawl list
@@ -68,12 +68,13 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
         // Termination condition
         if (visited.size >= MAX_URLS) {
             console.log('Done crawling!');
+            cb(visited);
             return;
         }
 
         // Get batch
         let batch = [];
-        while (toCrawl.length != 0 && batch.length < URLS_PER_BATCH) {
+        while (toCrawl.length != 0 && batch.length < URLS_PER_BATCH && visited.size + batch.size < MAX_URLS) {
             const url = toCrawl.shift();
             if (!visited.has(url)) {
                 batch.push(url);
@@ -82,6 +83,7 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
 
         if (batch.length == 0) {
             console.log('Out of URLs to crawl');
+            cb(visited);
             return;
         }
 
