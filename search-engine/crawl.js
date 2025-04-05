@@ -27,7 +27,11 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
             distribution.crawl.groups.put('crawl', crawlGroup, (e2, v2) => {
                 // Set up index group on workers
                 distribution.crawl.groups.put('index', indexGroup, (e3, v3) => {
-                    callback();
+                    distribution.local.groups.put('index', indexGroup, (e4, v4) => {
+                        distribution.index.groups.put('index', indexGroup, (e5, v5) => {
+                            callback();
+                        });
+                    });
                 });
             });
         });
@@ -39,6 +43,12 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
         try {
             const response = await fetch(url);
             const text = await response.text();
+            await new Promise((resolve, reject) => {
+                distribution.index.store.put(text, url, (err, res) => {
+                    if (err) return reject(err);
+                    resolve(res);
+                });
+            });
             return [{[url]: text}];
         } catch (err) {
             console.log('Error occurred in mapper: ', err);
