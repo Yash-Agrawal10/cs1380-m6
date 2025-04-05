@@ -66,7 +66,7 @@ function mr(config) {
     */
 
     // Worker map function
-    function doMap(keys, group, gid, map, serviceName, callback) {
+    function doMap(keys, group, gid, map, serviceName, useStore, callback) {
       // Handle parameters
       keys = keys || [];
       callback = callback || function() { };
@@ -92,7 +92,7 @@ function mr(config) {
         // Perform map operation on these keys
         let counter = 0;
         let output = [];
-        const operate = () => {
+        const operate = (key, value) => {
           const mapCb = () => {
             counter++;
             if (counter == nodeKeys.length) {
@@ -140,6 +140,7 @@ function mr(config) {
           });
         }
         nodeKeys.forEach((key) => {
+          // console.log(useStore);
           if (useStore) {
             global.distribution.local.store.get({gid: gid, key: key}, (error, value) => {
               operate(key, value);
@@ -216,7 +217,7 @@ function mr(config) {
       global.distribution[context.gid].routes.put(service, serviceName, (e2, v2) => {
         // Call map on workers
         const remote1 = {service: serviceName, method: 'doMap'};
-        const message1 = [keys, v1, context.gid, map, serviceName];
+        const message1 = [keys, v1, context.gid, map, serviceName, useStore];
         global.distribution[context.gid].comm.send(message1, remote1, (e3, v3) => {
           // Collect keys
           const keySet = new Set();
