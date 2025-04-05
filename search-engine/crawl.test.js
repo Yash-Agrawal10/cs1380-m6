@@ -8,8 +8,8 @@ const id = distribution.util.id;
 const crawlGroup = {};
 const indexGroup = {};
 const indexOrchestrator = null;
-const MAX_URLS = 10;
-const URLS_PER_BATCH = 5;
+const MAX_URLS = 30;
+const URLS_PER_BATCH = 10;
 
 /*
     The local node will be the orchestrator.
@@ -22,8 +22,10 @@ const n3 = {ip: '127.0.0.1', port: 7112};
 
 test('crawl', (done) => {
     crawl(crawlGroup, indexGroup, indexOrchestrator, 
-    seedURLs, MAX_URLS, URLS_PER_BATCH, (visited) => {
+    seedURLs, MAX_URLS, URLS_PER_BATCH, (toCrawl, visited) => {
         try {
+            console.log(toCrawl);
+            console.log(visited);
             expect(visited).toBeTruthy();
             expect(visited.length).toEqual(MAX_URLS);
             done();
@@ -54,9 +56,11 @@ beforeAll((done) => {
 
   distribution.node.start((server) => {
     localServer = server;
-
-    const crawlConfig = {gid: 'crawl'};
-    startNodes(() => done());
+    distribution.local.store.del('toCrawl', () => {
+        distribution.local.store.del('visited', () => {
+            startNodes(() => done());
+        });
+    });
   });
 });
 

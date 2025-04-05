@@ -68,13 +68,13 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
         // Termination condition
         if (visited.size >= MAX_URLS) {
             console.log('Done crawling!');
-            cb(visited);
+            cb(toCrawl, Array.from(visited));
             return;
         }
 
         // Get batch
         let batch = [];
-        while (toCrawl.length != 0 && batch.length < URLS_PER_BATCH && visited.size + batch.size < MAX_URLS) {
+        while (toCrawl.length != 0 && batch.length < URLS_PER_BATCH && visited.size + batch.length < MAX_URLS) {
             const url = toCrawl.shift();
             if (!visited.has(url)) {
                 batch.push(url);
@@ -89,9 +89,11 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
 
         // Call map-reduce (value is url: [new_urls])
         distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, (e1, v1) => {
-            batch.map((url) => visited.add(url));
-            const newURLs = v1.flat();
-            toCrawl.push(...newURLs);
+            v1.map((o) => {
+                visited.add(Object.keys(o)[0]);
+                const newURLs = Object.values(o)[0];
+                toCrawl = toCrawl.concat(newURLs);
+            });
             // Persist toCrawl and visited
             distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
                 const visitedList = Array.from(visited);
