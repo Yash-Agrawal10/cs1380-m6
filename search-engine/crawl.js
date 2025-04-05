@@ -12,7 +12,7 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
                     const visited = v3 || [];
                     distribution.local.store.put(visited, 'visited', (e4, v4) => {
                         const visitedSet = new Set(visited);
-                        callback(toCrawl, visitedSet);
+                         callback(toCrawl, visitedSet);
                     });
                 });
             });

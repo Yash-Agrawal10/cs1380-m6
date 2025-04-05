@@ -1,15 +1,11 @@
 const { crawl } = require('./crawl');
 
-const seedURLs = ['https://www.gutenberg.org/'];
-
 const distribution = require('../config.js');
 const id = distribution.util.id;
 
 const crawlGroup = {};
 const indexGroup = {};
 const indexOrchestrator = null;
-const MAX_URLS = 30;
-const URLS_PER_BATCH = 10;
 
 /*
     The local node will be the orchestrator.
@@ -20,15 +16,83 @@ const n1 = {ip: '127.0.0.1', port: 7110};
 const n2 = {ip: '127.0.0.1', port: 7111};
 const n3 = {ip: '127.0.0.1', port: 7112};
 
-test('crawl', (done) => {
+test('crawl with max 0 urls', (done) => {
+    const seedURLs = ['https://www.gutenberg.org/'];
+    const MAX_URLS = 0;
+    const URLS_PER_BATCH = 10;
+
     crawl(crawlGroup, indexGroup, indexOrchestrator, 
     seedURLs, MAX_URLS, URLS_PER_BATCH, (toCrawl, visited) => {
         try {
-            console.log(toCrawl);
-            console.log(visited);
             expect(visited).toBeTruthy();
             expect(visited.length).toEqual(MAX_URLS);
+            expect(new Set(visited).size).toEqual(visited.length);
             done();
+        } catch (err) {
+            done(err);
+        }
+    });
+});
+
+test('crawl with max 1 url', (done) => {
+    const seedURLs = ['https://www.gutenberg.org/'];
+    const MAX_URLS = 1;
+    const URLS_PER_BATCH = 10;
+
+    crawl(crawlGroup, indexGroup, indexOrchestrator, 
+    seedURLs, MAX_URLS, URLS_PER_BATCH, (toCrawl, visited) => {
+        try {
+            expect(visited).toBeTruthy();
+            expect(visited.length).toEqual(MAX_URLS);
+            expect(new Set(visited).size).toEqual(visited.length);
+            done();
+        } catch (err) {
+            done(err);
+        }
+    });
+});
+
+test('crawl with normal small workload', (done) => {
+    const seedURLs = ['https://www.gutenberg.org/'];
+    const MAX_URLS = 30;
+    const URLS_PER_BATCH = 10;
+
+    crawl(crawlGroup, indexGroup, indexOrchestrator, 
+    seedURLs, MAX_URLS, URLS_PER_BATCH, (toCrawl, visited) => {
+        try {
+            expect(visited).toBeTruthy();
+            expect(visited.length).toEqual(MAX_URLS);
+            expect(new Set(visited).size).toEqual(visited.length);
+            done();
+        } catch (err) {
+            done(err);
+        }
+    });
+});
+
+test('crawl with stop in between', (done) => {
+    const seedURLs = ['https://www.gutenberg.org/'];
+    let MAX_URLS = 15;
+    const URLS_PER_BATCH = 10;
+
+    crawl(crawlGroup, indexGroup, indexOrchestrator, 
+    seedURLs, MAX_URLS, URLS_PER_BATCH, (toCrawl, visited) => {
+        try {
+            expect(visited).toBeTruthy();
+            expect(visited.length).toEqual(MAX_URLS);
+            expect(new Set(visited).size).toEqual(visited.length);
+            MAX_URLS = 30;
+            crawl(crawlGroup, indexGroup, indexOrchestrator, 
+            seedURLs, MAX_URLS, URLS_PER_BATCH, (toCrawl2, visited2) => {
+                try {
+                    expect(visited2).toBeTruthy();
+                    expect(visited2.length).toEqual(MAX_URLS);
+                    expect(new Set(visited2).size).toEqual(visited2.length);
+                    done();
+                } catch (err) {
+                    done(err);
+                }
+            });
         } catch (err) {
             done(err);
         }
@@ -56,12 +120,16 @@ beforeAll((done) => {
 
   distribution.node.start((server) => {
     localServer = server;
+    startNodes(() => done());
+  });
+});
+
+beforeEach((done) => {
     distribution.local.store.del('toCrawl', () => {
         distribution.local.store.del('visited', () => {
-            startNodes(() => done());
+            done();
         });
     });
-  });
 });
 
 afterAll((done) => {
