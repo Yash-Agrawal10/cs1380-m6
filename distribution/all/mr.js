@@ -45,7 +45,10 @@ function mr(config) {
     const keys = configuration.keys || [];
     const map = configuration.map || function(x) {return x};
     const reduce = configuration.reduce || function(x) {return x};
-    const useStore = configuration.useStore || true;
+    let useStore = configuration.useStore;
+    if (useStore == null) {
+      useStore = true;
+    }
     if (!Array.isArray(keys) || typeof(map) != 'function' || typeof(reduce) != 'function') {
       cb(new Error('Invalid configuration', null));
     }
