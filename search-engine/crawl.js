@@ -9,8 +9,11 @@ const crawlGroup = {};
 const indexGroup = {};
 const indexOrchestrator = {};
 
+const MAX_URLS = 5;
+const URLS_PER_BATCH = 3;
+
 // Set up toCrawl and visited lists
-const setupLists = () => {
+const setupLists = (callback) => {
     // Initialize toCrawl list
     distribution.local.store.get('toCrawl', (e1, v1) => {
         const toCrawl = v1 || seedURLs;
@@ -20,7 +23,7 @@ const setupLists = () => {
                 const visited = v3 || [];
                 distribution.local.store.put(visited, 'visited', (e4, v4) => {
                     const visitedSet = new Set(visited);
-                    // Callback
+                    callback(toCrawl, visitedSet);
                 });
             });
         });
@@ -28,14 +31,14 @@ const setupLists = () => {
 }
 
 // Set up groups
-const setupGroups = () => {
+const setupGroups = (callback) => {
     // Set up crawl group on orchestrator
     distribution.local.groups.put('crawl', crawlGroup, (e1, v1) => {
         // Set up crawl group on workers
         distribution.crawl.groups.put('crawl', crawlGroup, (e2, v2) => {
             // Set up index group on workers
             distribution.crawl.groups.put('index', indexGroup, (e3, v3) => {
-                // Callback
+                callback();
             });
         });
     });
@@ -72,42 +75,40 @@ const reducer = (key, values) => {
 };
 
 // Define workflow
-const crawl = () => {
-    const MAX_URLS = 5;
-    const URLS_PER_BATCH = 3;
-    const step = (toCrawl, visited) => {
-        // Termination condition
-        if (visited.size >= MAX_URLS) {
-            console.log('Done crawling!');
-            return;
-        }
+const crawl = (toCrawl, visited) => {
+    // Termination condition
+    if (visited.size >= MAX_URLS) {
+        console.log('Done crawling!');
+        return;
+    }
 
-        // Get batch
-        let batch = [];
-        while (toCrawl.length != 0 && batch.length < URLS_PER_BATCH) {
-            const url = toCrawl.shift();
-            if (!visited.has(url)) {
-                batch.push(url);
-            }
+    // Get batch
+    let batch = [];
+    while (toCrawl.length != 0 && batch.length < URLS_PER_BATCH) {
+        const url = toCrawl.shift();
+        if (!visited.has(url)) {
+            batch.push(url);
         }
+    }
 
-        if (batch.length == 0) {
-            console.log('Out of URLs to crawl');
-            return;
-        }
+    if (batch.length == 0) {
+        console.log('Out of URLs to crawl');
+        return;
+    }
 
-        // Call map-reduce (value is url: [new_urls])
-        distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, (e1, v1) => {
-            batch.map((url) => visited.add(url));
-            const newURLs = v1.flat();
-            toCrawl.push(...newURLs);
-            // Persist toCrawl and visited
-            distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
-                const visitedList = Array.from(visited);
-                distribution.local.store.put(visitedList, 'visited', (e2, v2) => {
-                    step(toCrawl, visited);
-                });
+    // Call map-reduce (value is url: [new_urls])
+    distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, (e1, v1) => {
+        batch.map((url) => visited.add(url));
+        const newURLs = v1.flat();
+        toCrawl.push(...newURLs);
+        // Persist toCrawl and visited
+        distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
+            const visitedList = Array.from(visited);
+            distribution.local.store.put(visitedList, 'visited', (e2, v2) => {
+                crawl(toCrawl, visited);
             });
         });
-    }
+    });
 }
+
+setupGroups(setupLists(crawl));
