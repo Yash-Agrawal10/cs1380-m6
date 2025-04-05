@@ -45,6 +45,7 @@ function mr(config) {
     const keys = configuration.keys || [];
     const map = configuration.map || function(x) {return x};
     const reduce = configuration.reduce || function(x) {return x};
+    const useStore = configuration.useStore || true;
     if (!Array.isArray(keys) || typeof(map) != 'function' || typeof(reduce) != 'function') {
       cb(new Error('Invalid configuration', null));
     }
@@ -91,54 +92,61 @@ function mr(config) {
         // Perform map operation on these keys
         let counter = 0;
         let output = [];
-        nodeKeys.forEach((key) => {
-          global.distribution.local.store.get({gid: gid, key: key}, (error, value) => {
-            const mapCb = () => {
-              counter++;
-              if (counter == nodeKeys.length) {
-                // Map keys to lists of values
-                const keyToValues = new Map();
-                for (let kv of output) {
-                  const key = Object.keys(kv)[0];
-                  const value = Object.values(kv)[0];
-                  if (keyToValues.has(key)) {
-                    keyToValues.get(key).push(value);
-                  } else {
-                    keyToValues.set(key, [value]);
-                  }
+        const operate = () => {
+          const mapCb = () => {
+            counter++;
+            if (counter == nodeKeys.length) {
+              // Map keys to lists of values
+              const keyToValues = new Map();
+              for (let kv of output) {
+                const key = Object.keys(kv)[0];
+                const value = Object.values(kv)[0];
+                if (keyToValues.has(key)) {
+                  keyToValues.get(key).push(value);
+                } else {
+                  keyToValues.set(key, [value]);
                 }
-
-                // Store keys with serviceName- prefix
-                let counter2 = 0;
-                keyToValues.forEach((value, key) => {
-                  const usedKey = 'mr-' + serviceName + '-' + key;
-                  global.distribution[gid].store.append(value, usedKey, group, (e1, v1) => {
-                    if (e1) {
-                      counter2++;
-                    } else {
-                      counter2++;
-                    }
-
-                    if (counter2 == keyToValues.size) {
-                      const keys = Array.from(keyToValues.keys());
-                      callback(null, keys);
-                      return;
-                    }
-                  });
-                });
               }
-            };
 
-            Promise.resolve(map(key, value))
-            .then((keyOutput) => {
-              output = output.concat(keyOutput);
-              mapCb();
-            })
-            .catch((err) => {
-              console.log(err);
-              mapCb();
-            });
+              // Store keys with serviceName- prefix
+              let counter2 = 0;
+              keyToValues.forEach((value, key) => {
+                const usedKey = 'mr-' + serviceName + '-' + key;
+                global.distribution[gid].store.append(value, usedKey, group, (e1, v1) => {
+                  if (e1) {
+                    counter2++;
+                  } else {
+                    counter2++;
+                  }
+
+                  if (counter2 == keyToValues.size) {
+                    const keys = Array.from(keyToValues.keys());
+                    callback(null, keys);
+                    return;
+                  }
+                });
+              });
+            }
+          };
+
+          Promise.resolve(map(key, value))
+          .then((keyOutput) => {
+            output = output.concat(keyOutput);
+            mapCb();
+          })
+          .catch((err) => {
+            console.log(err);
+            mapCb();
           });
+        }
+        nodeKeys.forEach((key) => {
+          if (useStore) {
+            global.distribution.local.store.get({gid: gid, key: key}, (error, value) => {
+              operate(key, value);
+            });
+          } else {
+            operate(key, key);
+          }
         });
       });
     }
