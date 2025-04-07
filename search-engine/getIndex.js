@@ -30,6 +30,7 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
 
     // Define map and reduce functions
     const mapper = async (key, value) => {
+        console.log('in mapper');
         const url = key;
         const text = value;
         try {
@@ -41,7 +42,6 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
             });
             // Process text, counting words and stuff (temp random stuff)
             const output = [{'term1': {url, freq: 1}}];
-            console.log(output);
             return output;
         } catch (err) {
             console.log('Error occurred in index mapper: ', err);
@@ -61,6 +61,7 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
             });
             const newState = state.concat(urlFreqPairs);
             const newSortedState = newState.sort(distribution.util.compare);
+            console.log(state, urlFreqPairs, newState, newSortedState);
             await new Promise((resolve, reject) => {
                 distribution.query.store.put(newSortedState, term, (err, res) => {
                     if (err) return reject(err);
@@ -91,6 +92,7 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
         } else {
             numURLs += batch.length;
         }
+        console.log('batch:', batch);
 
         // Call map-reduce
         distribution.index.mr.exec({keys: batch, map: mapper, reduce: reducer}, (e1, v1) => {

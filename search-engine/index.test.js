@@ -38,11 +38,11 @@ test('index with max 1 url', (done) => {
             index(() => {
                 distribution.query.store.get('term1', (e3, v3) => {
                     console.log(e3, v3);
-                    if (e3) {
-                        done(e3);
-                    } else {
-                        expect(v3).toEqual({url: 'url-one', freq: 1});
-                        done();
+                    try {
+                      expect(v3).toBe([{url: 'url-one', freq: 1}]);
+                      done();
+                    } catch (err) {
+                      done(err);
                     }
                 });
             });
