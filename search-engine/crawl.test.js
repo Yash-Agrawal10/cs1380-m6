@@ -1,4 +1,4 @@
-const { crawl } = require('./crawl');
+const { getCrawl } = require('./crawl');
 
 const distribution = require('../config.js');
 const id = distribution.util.id;
@@ -74,8 +74,10 @@ test('crawl with max 0 urls', (done) => {
     const MAX_URLS = 0;
     const URLS_PER_BATCH = 10;
 
-    crawl(crawlGroup, indexGroup, indexOrchestrator, 
-    seedURLs, MAX_URLS, URLS_PER_BATCH, async (toCrawl, visited) => {
+    const crawl = getCrawl(crawlGroup, indexGroup, indexOrchestrator, 
+        seedURLs, MAX_URLS, URLS_PER_BATCH);
+
+    crawl(async (toCrawl, visited) => {
         try {
             expect(await checkValid(MAX_URLS, visited)).toBeTruthy();
             done();
@@ -90,8 +92,10 @@ test('crawl with max 1 url', (done) => {
     const MAX_URLS = 1;
     const URLS_PER_BATCH = 10;
 
-    crawl(crawlGroup, indexGroup, indexOrchestrator, 
-    seedURLs, MAX_URLS, URLS_PER_BATCH, async (toCrawl, visited) => {
+    const crawl = getCrawl(crawlGroup, indexGroup, indexOrchestrator, 
+        seedURLs, MAX_URLS, URLS_PER_BATCH);
+
+    crawl(async (toCrawl, visited) => {
         try {
             expect(await checkValid(MAX_URLS, visited)).toBeTruthy();
             done();
@@ -106,8 +110,10 @@ test('crawl with normal small workload', (done) => {
     const MAX_URLS = 30;
     const URLS_PER_BATCH = 10;
 
-    crawl(crawlGroup, indexGroup, indexOrchestrator, 
-    seedURLs, MAX_URLS, URLS_PER_BATCH, async (toCrawl, visited) => {
+    const crawl = getCrawl(crawlGroup, indexGroup, indexOrchestrator, 
+        seedURLs, MAX_URLS, URLS_PER_BATCH);
+
+    crawl(async (toCrawl, visited) => {
         try {
             expect(await checkValid(MAX_URLS, visited)).toBeTruthy();
             done();
@@ -122,13 +128,18 @@ test('crawl with stop in between', (done) => {
     let MAX_URLS = 15;
     const URLS_PER_BATCH = 10;
 
-    crawl(crawlGroup, indexGroup, indexOrchestrator, 
-    seedURLs, MAX_URLS, URLS_PER_BATCH, async (toCrawl, visited) => {
+    let crawl = getCrawl(crawlGroup, indexGroup, indexOrchestrator, 
+        seedURLs, MAX_URLS, URLS_PER_BATCH);
+
+    crawl(async (toCrawl, visited) => {
         try {
             expect(await checkValid(MAX_URLS, visited)).toBeTruthy();
             MAX_URLS = 30;
-            crawl(crawlGroup, indexGroup, indexOrchestrator, 
-            seedURLs, MAX_URLS, URLS_PER_BATCH, async (toCrawl2, visited2) => {
+
+            crawl = getCrawl(crawlGroup, indexGroup, indexOrchestrator, 
+                seedURLs, MAX_URLS, URLS_PER_BATCH);
+
+            crawl(async (toCrawl2, visited2) => {
                 try {
                     expect(await checkValid(MAX_URLS, visited2)).toBeTruthy();
                     done();

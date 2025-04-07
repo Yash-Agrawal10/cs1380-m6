@@ -1,6 +1,6 @@
 const distribution = require('../config');
 
-const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_BATCH, cb) => {
+const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_BATCH) => {
     // Set up toCrawl and visited lists
     const setupLists = (callback) => {
         // Initialize toCrawl list
@@ -72,7 +72,7 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
     };
 
     // Define workflow
-    const crawlStep = (toCrawl, visited) => {
+    const crawlStep = (toCrawl, visited, cb) => {
         // Termination condition
         if (visited.size >= MAX_URLS) {
             console.log('Done crawling!');
@@ -91,7 +91,7 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
 
         if (batch.length == 0) {
             console.log('Out of URLs to crawl');
-            cb(visited);
+            cb(toCrawl, visited);
             return;
         }
 
@@ -114,14 +114,14 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
                     const remote = {node: indexOrchestrator, service: 'store', method: 'append'};
                     const message = [completedURLs, 'toIndex'];
                     distribution.local.comm.send(message, remote, (e, v) => {
-                        crawlStep(toCrawl, visited);
+                         crawlStep(toCrawl, visited, cb);
                     });
                 });
             });
         });
     }
 
-    setupGroups(() => setupLists((toCrawl, visited) => crawlStep(toCrawl, visited)));
+    return (cb) => setupGroups(() => setupLists((toCrawl, visited) => crawlStep(toCrawl, visited, cb)));
 }
 
-module.exports = {crawl};
+module.exports = {getCrawl};

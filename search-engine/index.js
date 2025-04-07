@@ -1,6 +1,6 @@
 const distribution = require('../config');
 
-const index = (indexGroup, queryGroup, URLS_PER_BATCH, cb) => {
+const index = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     // Set up toIndex list
     const setupList = (callback) => {
         // Initialize toIndex list
@@ -31,16 +31,17 @@ const index = (indexGroup, queryGroup, URLS_PER_BATCH, cb) => {
     // Define map and reduce functions
     const mapper = async (key, value) => {
         const url = key;
+        const text = value;
         try {
-            const text = await new Promise((resolve, reject) => {
-                distribution.index.store.get(url, (err, res) => {
+            await new Promise((resolve, reject) => {
+                distribution.index.store.del(url, (err, res) => {
                     if (err) return reject(err);
                     resolve(res);
                 });
             });
-
-            // Process text, counting words and stuff
-            // Return [{term: {url, freq}}]
+            // Process text, counting words and stuff (temp random stuff)
+            const output = [{'term1': {url, freq: 1}}, {'term2': {url, freq: 2}}];
+            return output;
         } catch (err) {
             console.log('Error occurred in index mapper: ', err);
             return [];
@@ -51,15 +52,54 @@ const index = (indexGroup, queryGroup, URLS_PER_BATCH, cb) => {
         const term = key;
         const urlFreqPairs = values;
         try {
-            await new Promise((resolve, reject) => {
-                distribution.query.store.append(urlFreqPairs, term, queryGroup, (err, res) => {
+            const state = await new Promise((resolve, reject) => {
+                distribution.query.store.get({key: term, orEmpty: true}, (err, res) => {
                     if (err) return reject(err);
                     resolve(res);
                 });
             });
-            return [{[term]: urlFreqPairs}];
+            const newState = state.concat(urlFreqPairs).sort(distribution.util.compare);
+            await new Promise((resolve, reject) => {
+                distribution.query.store.put(newState, term, (err, res) => {
+                    if (err) return reject(err);
+                    resolve(res);
+                });
+            });
+            return [{[term]: newState}];
         } catch (err) {
             console.log('Error occurred in index reducer');
+            return [];
         }
     }
+
+    let numURLs = 0;
+    const indexStep = (toIndex) => {
+        // Termination condition
+        if (numURLs >= MAX_URLS) {
+            console.log('Indexed max URLs');
+            cb(toIndex);
+            return;
+        }
+
+        // Get batch
+        const batch = toIndex.splice(URLS_PER_BATCH);   
+        if (batch.length == 0) {
+            console.log('Out of URLs to index');
+            cb(toIndex);
+            return;
+        } else {
+            numURLs += batch.length;
+        }
+
+        // Call map-reduce
+        distribution.index.mr.exec({keys: batch, map: mapper, reduce: reducer}, (e1, v1) => {
+            distribution.local.store.put(toIndex, 'toIndex', (e2, v2) => {
+                indexStep(toIndex);
+            });
+        });
+    }
+
+    setupGroups(() => setupList((toIndex) => indexStep(toIndex)));
 }
+
+module.exports = {index};
