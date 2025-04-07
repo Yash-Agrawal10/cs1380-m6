@@ -15,7 +15,12 @@ const n1 = {ip: '127.0.0.1', port: 7110};
 const n2 = {ip: '127.0.0.1', port: 7111};
 const n3 = {ip: '127.0.0.1', port: 7112};
 
+function stringAndSort(arr) {
+  return arr.map((o) => JSON.stringify(o)).sort();
+}
+
 function arraysEqual(arr1, arr2) {
+    console.log(arr1, arr2);
     if (arr1.length !== arr2.length) return false;
 
     // Sort both arrays and check equality
@@ -29,6 +34,10 @@ function arraysEqual(arr1, arr2) {
     return true;
 }
 
+function valid(arr1, arr2) {
+  return arraysEqual(stringAndSort(arr1), stringAndSort(arr2));
+}
+
 test('index with max 1 url', (done) => {
     const MAX_URLS = 1;
     const URLS_PER_BATCH = 5;
@@ -40,10 +49,10 @@ test('index with max 1 url', (done) => {
                 index(() => {
                     distribution.query.store.get('term1', (e, v) => {
                         try {
-                          expect(JSON.stringify(v)).toBe(JSON.stringify([{url: 'url-one', freq: 1}]));
+                          expect(valid(v, [{url: 'url-one', freq: 1}])).toBeTruthy();
                           distribution.query.store.get('term2', (e2, v2) => {
                             try {
-                              expect(JSON.stringify(v2)).toBe(JSON.stringify([{url: 'url-one', freq: 2}]));
+                              expect(valid(v2, [{url: 'url-one', freq: 2}])).toBeTruthy();
                               done();
                             } catch (err) {
                               done(err);
@@ -58,6 +67,42 @@ test('index with max 1 url', (done) => {
             });
         });
     });
+});
+
+test('index with max 2 urls', (done) => {
+  const MAX_URLS = 2;
+  const URLS_PER_BATCH = 5;
+  const index = getIndex(indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH);
+  distribution.local.store.put(['url-one', 'url-two'], 'toIndex', () => {
+      distribution.index.store.put("this is a test", 'url-one', () => {
+        distribution.index.store.put("this is also a test", 'url-two', () => {
+          distribution.query.store.del('term1', () => {
+            distribution.query.store.del('term2', () => {
+              index(() => {
+                  distribution.query.store.get('term1', (e, v) => {
+                      try {
+                        const expected = [{url: 'url-one', freq: 1}, {url: 'url-two', freq: 1}];
+                        console.log(v, expected);
+                        expect(valid(v, expected)).toBeTruthy();
+                        distribution.query.store.get('term2', (e2, v2) => {
+                          try {
+                            const expected2 = [{url: 'url-one', freq: 2}, {url: 'url-two', freq: 2}];
+                            expect(valid(v2, expected2)).toBeTruthy();
+                            done();
+                          } catch (err) {
+                            done(err);
+                          }
+                        });
+                      } catch (err) {
+                        done(err);
+                      }
+                  });
+              });
+            });
+          });
+        });
+      });
+  });
 });
 
 /*
