@@ -1,6 +1,6 @@
 const distribution = require('../config');
 
-const index = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
+const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     // Set up toIndex list
     const setupList = (callback) => {
         // Initialize toIndex list
@@ -73,7 +73,7 @@ const index = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     }
 
     let numURLs = 0;
-    const indexStep = (toIndex) => {
+    const indexStep = (toIndex, cb) => {
         // Termination condition
         if (numURLs >= MAX_URLS) {
             console.log('Indexed max URLs');
@@ -99,7 +99,7 @@ const index = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
         });
     }
 
-    setupGroups(() => setupList((toIndex) => indexStep(toIndex)));
+    return (cb) => setupGroups(() => setupList((toIndex) => indexStep(toIndex, cb)));
 }
 
-module.exports = {index};
+module.exports = {getIndex};

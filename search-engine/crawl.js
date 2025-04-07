@@ -114,7 +114,10 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
                     const remote = {node: indexOrchestrator, service: 'store', method: 'append'};
                     const message = [completedURLs, 'toIndex'];
                     distribution.local.comm.send(message, remote, (e, v) => {
-                         crawlStep(toCrawl, visited, cb);
+                        const remote2 = {node: indexOrchestrator, service: 'index', method: 'index'};
+                        distribution.local.comm.send([], remote2, (e2, v2) => {
+                            crawlStep(toCrawl, visited, cb);
+                        });
                     });
                 });
             });
