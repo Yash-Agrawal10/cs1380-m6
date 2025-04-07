@@ -34,6 +34,19 @@ function store(config) {
   function get(configuration, callback){
     // Handle parameters
     callback = callback || function() { };
+    let key;
+    let orEmpty;
+    if (typeof configuration == 'string') {
+      key = configuration;
+      orEmpty = false;
+    } else if (typeof configuration == 'object') {
+      key = configuration.key || '';
+      if (configuration.orEmpty) {
+        orEmpty = configuration.orEmpty;
+      } else {
+        orEmpty = false;
+      }
+    }
 
     // Get value
     groups.get(context.gid, (e, v) => {
@@ -42,13 +55,13 @@ function store(config) {
         return;
       }
 
-      getNodes(configuration, v, (e0, v0) => {
+      getNodes(key, v, (e0, v0) => {
         if (e0) {
           callback(e0, null);
           return;
         }
   
-        const message = [{key: configuration, gid: context.gid}];
+        const message = [{key, gid: context.gid, orEmpty}];
         const remote = {node: v0, service: 'store', method: 'get'};
         send(message, remote, (e1, v1) => {
           if (e1) {

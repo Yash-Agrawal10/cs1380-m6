@@ -47,12 +47,19 @@ function get(configuration, callback) {
   callback = callback || function() { };
   let gid;
   let key;
+  let orEmpty;
   if (typeof configuration == 'string' || configuration == null) {
       gid = 'local';
       key = configuration;
+      orEmpty = false;
   } else if (typeof configuration == 'object' && configuration != null) {
       gid = configuration.gid || 'local';
       key = configuration.key;
+      if (configuration.orEmpty) {
+        orEmpty = configuration.orEmpty;
+      } else {
+        orEmpty = false;
+      }
   }
 
   // Construct path and check it exists
@@ -61,8 +68,13 @@ function get(configuration, callback) {
   const alphaNumKey = key.replace(/[^a-zA-Z0-9]/g, "");
   const filePath = path.join(storePath, alphaNumKey);
   if (!fs.existsSync(filePath)) {
-    callback(new Error('Object not found'), null);
-    return;
+    if (orEmpty) {
+      callback(null, []);
+      return;
+    } else {
+      callback(new Error('Object not found'), null);
+      return;
+    }
   }
 
   // Return object
@@ -132,5 +144,6 @@ function append(state, configuration, callback) {
     });
   });
 }
+
 
 module.exports = {put, get, del, append};
