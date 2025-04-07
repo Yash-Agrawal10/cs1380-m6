@@ -33,18 +33,28 @@ test('index with max 1 url', (done) => {
     const MAX_URLS = 1;
     const URLS_PER_BATCH = 5;
     const index = getIndex(indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH);
-    distribution.local.store.put(['url-one'], 'toIndex', (e1, v1) => {
-        distribution.index.store.put("this is a test", 'url-one', (e2, v2) => {
-            index(() => {
-                distribution.query.store.get('term1', (e3, v3) => {
-                    console.log(e3, v3);
-                    try {
-                      expect(v3).toBe([{url: 'url-one', freq: 1}]);
-                      done();
-                    } catch (err) {
-                      done(err);
-                    }
+    distribution.local.store.put(['url-one'], 'toIndex', () => {
+        distribution.index.store.put("this is a test", 'url-one', () => {
+            distribution.query.store.del('term1', () => {
+              distribution.query.store.del('term2', () => {
+                index(() => {
+                    distribution.query.store.get('term1', (e, v) => {
+                        try {
+                          expect(JSON.stringify(v)).toBe(JSON.stringify([{url: 'url-one', freq: 1}]));
+                          distribution.query.store.get('term2', (e2, v2) => {
+                            try {
+                              expect(JSON.stringify(v2)).toBe(JSON.stringify([{url: 'url-one', freq: 2}]));
+                              done();
+                            } catch (err) {
+                              done(err);
+                            }
+                          });
+                        } catch (err) {
+                          done(err);
+                        }
+                    });
                 });
+              });
             });
         });
     });

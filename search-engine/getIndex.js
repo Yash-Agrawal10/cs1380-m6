@@ -41,7 +41,7 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
                 });
             });
             // Process text, counting words and stuff (temp random stuff)
-            const output = [{'term1': {url, freq: 1}}];
+            const output = [{'term1': {url, freq: 1}}, {'term2': {url, freq: 2}}];
             return output;
         } catch (err) {
             console.log('Error occurred in index mapper: ', err);
