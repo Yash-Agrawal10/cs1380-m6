@@ -1,16 +1,6 @@
-const distribution = require('../config')
+const { getQuery } = require('./getQuery')
 
-const queryGroup = {};
-
-const query = (term, count, cb) => {
-    distribution.local.groups.put('query', queryGroup, (e1, v1) => {
-        distrubution.query.store.get(term, (e2, v2) => {
-            const results = v2;
-            const output = results.slice(count);
-            cb(output);
-        });
-    });
-}
+const query = getQuery();
 
 const args = process.argv.slice(2);
 const term = args[0];
