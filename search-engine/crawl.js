@@ -25,12 +25,10 @@ const crawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, UR
         distribution.local.groups.put('crawl', crawlGroup, (e1, v1) => {
             // Set up crawl group on workers
             distribution.crawl.groups.put('crawl', crawlGroup, (e2, v2) => {
-                // Set up index group on workers
+                // Set up index group on workers and orchestrator
                 distribution.crawl.groups.put('index', indexGroup, (e3, v3) => {
                     distribution.local.groups.put('index', indexGroup, (e4, v4) => {
-                        distribution.index.groups.put('index', indexGroup, (e5, v5) => {
-                            callback();
-                        });
+                        callback();
                     });
                 });
             });
