@@ -1,4 +1,4 @@
-const { getCrawl } = require('./crawl');
+const { getCrawl } = require('./getCrawl.js');
 
 const distribution = require('../config.js');
 const id = distribution.util.id;
@@ -18,17 +18,17 @@ const n3 = {ip: '127.0.0.1', port: 7112};
 
 function arraysEqual(arr1, arr2) {
     if (arr1.length !== arr2.length) return false;
-  
+
     // Sort both arrays and check equality
     const sortedArr1 = [...arr1].sort();
     const sortedArr2 = [...arr2].sort();
-  
+
     for (let i = 0; i < sortedArr1.length; i++) {
-      if (sortedArr1[i] !== sortedArr2[i]) return false;
+        if (sortedArr1[i] !== sortedArr2[i]) return false;
     }
-  
+
     return true;
-  }
+}
 
 const checkValid = async (MAX_URLs, visited) => {
     if (!visited || MAX_URLs !== visited.length) {
