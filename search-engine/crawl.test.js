@@ -1,6 +1,7 @@
 const { getCrawl } = require('./getCrawl.js');
 
 const distribution = require('../config.js');
+console.log(distribution.node);
 const id = distribution.util.id;
 
 const crawlGroup = {};

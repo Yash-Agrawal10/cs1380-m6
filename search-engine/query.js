@@ -1,6 +1,5 @@
 const { getQuery } = require('./getQuery')
-
-const queryGroup = {};
+const { queryGroup } = require('./searchEngineConfig');
 
 const query = getQuery(queryGroup);
 
