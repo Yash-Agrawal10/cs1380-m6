@@ -30,12 +30,4 @@ function invert(grams, URL) {
     return res
 }
 
-myGrams = [
-    'simpl', 'link',
-    'check', 'stuff',
-    'level', 'check',
-    'stuff', 'level',
-    'right'
-  ]
-
-console.log(invert(myGrams, 'google.com'))
+module.exports = {invert}

@@ -30,16 +30,4 @@ function process(text, stopwordsSet) {
   return filtered;
 }
 
-// Load stopwords from the file in the current directory TODO: LOAD ONCE AND STORE IN GLOBAL VAR
-const stopwordsFile = path.join(__dirname, 'stopwords.txt');
-const stopwords = loadStopwords(stopwordsFile);
-
-// use this for testing later
-const inputText = `
-WELCOME TO CS1380 SIMPLE LINKS
-Check out Some stuff [level_2a/index.html].
-Check out Some more stuff [level_2b/index.html].
-© 2023 CS1380. All rights reserved.
-`;
-
-module.exports = { process }
+module.exports = { process, loadStopwords }
