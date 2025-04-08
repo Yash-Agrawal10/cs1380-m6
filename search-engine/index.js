@@ -1,4 +1,4 @@
-const getIndex = require('./getIndex');
+const { getIndex } = require('./getIndex');
 const { indexGroup, indexOrchestrator, 
     queryGroup, MAX_URLS, URLS_PER_INDEX_BATCH } = require('./searchEngineConfig')
     
