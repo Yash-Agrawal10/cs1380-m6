@@ -1,7 +1,57 @@
-const crawlGroup = {};
-const indexGroup = {};
-const queryGroup = {};
+const distribution = require('../config.js');
+const id = distribution.util.id;
 
-const crawlOrchestrator = null;
-const indexOrchestrator = null;
-const queryOrchestrator = null;
+/*
+    Example startup command for node using terminal
+    const node = {ip: '127.0.0.1', port: 1234};
+    ./distribution.js --ip '127.0.0.1' --port 1234 
+*/
+
+/*
+    Example to kill process on certain port
+    Show: lsof -i :<port>
+    Kill: kill -9 $(lsof -t -i :<port>)
+*/
+
+/*
+    Usage instructions:
+    1. Start all worker nodes using terminal
+    2. Start index orchestrator using index.js
+    3. Start crawl orchestrator using crawl.js
+    4. Query generated index using query.js
+*/
+
+// Orchestrators
+const crawlOrchestrator = {ip: '127.0.0.1', port: 7110, onStart: () => {console.log(global.nodeConfig)}}; 
+const indexOrchestrator = {ip: '127.0.0.1', port: 7112, onStart: () => {console.log(global.nodeConfig)}};
+
+// Workers
+const crawlWorkerOne = {ip: '127.0.0.1', port: 7111, onStart: () => {console.log(global.nodeConfig)}};
+const indexWorkerOne = {ip: '127.0.0.1', port: 7113, onStart: () => {console.log(global.nodeConfig)}};
+const queryWorkerOne = {ip: '127.0.0.1', port: 7114, onStart: () => {console.log(global.nodeConfig)}};
+
+const crawlGroup = {
+    [id.getSID(crawlOrchestrator)]: crawlOrchestrator,
+    [id.getSID(crawlWorkerOne)]: crawlWorkerOne,
+};
+
+const indexGroup = {
+    [id.getSID(indexOrchestrator)]: indexOrchestrator,
+    [id.getSID(indexWorkerOne)]: indexWorkerOne,
+};
+
+const queryGroup = {
+    [id.getSID(queryWorkerOne)]: queryWorkerOne,
+};
+
+const seedURLs = ['https://www.gutenberg.org/'];
+
+const MAX_URLS = 25;
+const URLS_PER_CRAWL_BATCH = 10;
+const URLS_PER_INDEX_BATCH = 10;
+
+module.exports = {
+    crawlGroup, indexGroup, queryGroup,
+    crawlOrchestrator, indexOrchestrator,
+    seedURLs, MAX_URLS, URLS_PER_CRAWL_BATCH, URLS_PER_INDEX_BATCH
+}

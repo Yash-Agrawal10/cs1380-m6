@@ -73,9 +73,10 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
 
     // Define workflow
     const crawlStep = (toCrawl, visited, cb) => {
+        console.log('crawl step starting');
         // Termination condition
         if (visited.size >= MAX_URLS) {
-            console.log('Done crawling!');
+            console.log('crawled max URLs');
             cb(toCrawl, Array.from(visited));
             return;
         }
@@ -90,10 +91,11 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
         }
 
         if (batch.length == 0) {
-            console.log('Out of URLs to crawl');
+            console.log('toCrawl empty');
             cb(toCrawl, visited);
             return;
         }
+        console.log('crawling batch', batch);
 
         // Call map-reduce (value is url: [new_urls])
         distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, (e1, v1) => {
@@ -116,6 +118,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
                     distribution.local.comm.send(message, remote, (e, v) => {
                         const remote2 = {node: indexOrchestrator, service: 'index', method: 'index'};
                         distribution.local.comm.send([], remote2, (e2, v2) => {
+                            console.log('crawl step ending');
                             crawlStep(toCrawl, visited, cb);
                         });
                     });

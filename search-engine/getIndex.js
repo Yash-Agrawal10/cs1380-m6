@@ -1,4 +1,5 @@
 const distribution = require('../config');
+const { invert } = require('./invert');
 
 const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     // Set up toIndex list
@@ -30,18 +31,18 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
 
     // Define map and reduce functions
     const mapper = async (key, value) => {
-        console.log('in mapper');
         const url = key;
         const text = value;
         try {
+            // Delete data
             await new Promise((resolve, reject) => {
                 distribution.index.store.del(url, (err, res) => {
                     if (err) return reject(err);
                     resolve(res);
                 });
             });
-            // Process text, counting words and stuff (temp random stuff)
-            const output = [{'term1': {url, freq: 1}}];
+            // Process text
+            const output = [{'term1': {url, freq: 1}}, {'term2': {url, freq: 2}}];
             return output;
         } catch (err) {
             console.log('Error occurred in index mapper: ', err);
@@ -61,7 +62,6 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
             });
             const newState = state.concat(urlFreqPairs);
             const newSortedState = newState.sort(distribution.util.compare);
-            console.log(state, urlFreqPairs, newState, newSortedState);
             await new Promise((resolve, reject) => {
                 distribution.query.store.put(newSortedState, term, (err, res) => {
                     if (err) return reject(err);
@@ -76,9 +76,10 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     }
 
     const indexStep = (toIndex, numURLs, cb) => {
+        console.log('index step starting')
         // Termination condition
         if (numURLs >= MAX_URLS) {
-            console.log('Indexed max URLs');
+            console.log('indexed max URLs');
             cb(toIndex);
             return;
         }
@@ -86,17 +87,17 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
         // Get batch
         const batch = toIndex.splice(0, URLS_PER_BATCH);   
         if (batch.length == 0) {
-            console.log('Out of URLs to index');
+            console.log('toIndex empty');
             cb(toIndex);
             return;
         } else {
             numURLs += batch.length;
         }
-        console.log('batch:', batch);
 
         // Call map-reduce
         distribution.index.mr.exec({keys: batch, map: mapper, reduce: reducer}, (e1, v1) => {
             distribution.local.store.put(toIndex, 'toIndex', (e2, v2) => {
+                console.log('index step ending');
                 indexStep(toIndex, numURLs, cb);
             });
         });
