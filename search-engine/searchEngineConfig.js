@@ -3,11 +3,8 @@ const id = distribution.util.id;
 
 /*
     Example serialized node to start up other nodes
-    const node = {ip: '127.0.0.1', port: 1234, onStart: () => console.log(global.distribution.node.config)};
-
-    c='{"type":"object","value":"{\"ip\":\"{\\\"type\\\":\\\"string\\\",\\\"value\\\":\\\"127.0.0.1\\\"}\",\"port\":\"{\\\"type\\\":\\\"number\\\",\\\"value\\\":\\\"1234\\\"}\",\"onStart\":\"{\\\"type\\\":\\\"function\\\",\\\"value\\\":\\\"() => console.log(global.distribution.node.config)\\\"}\"}"}'
-
-    ./distribution.js --config "$c"
+    const node = {ip: '127.0.0.1', port: 1234};
+    ./distribution.js --ip '127.0.0.1' --port 1234 
 */
 
 /*
@@ -33,12 +30,12 @@ const indexOrchestrator = n3;
 
 const crawlGroup = {
     [id.getSID(n1)]: n1,
-    [id.getSID(n2)]: n2,
+    // [id.getSID(n2)]: n2,
 };
 
 const indexGroup = {
     [id.getSID(n3)]: n3,
-    [id.getSID(n4)]: n4,
+    // [id.getSID(n4)]: n4,
 };
 
 const queryGroup = {
