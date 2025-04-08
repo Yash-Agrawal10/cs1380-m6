@@ -1,6 +1,8 @@
 const { getQuery } = require('./getQuery')
 
-const query = getQuery();
+const queryGroup = {};
+
+const query = getQuery(queryGroup);
 
 const args = process.argv.slice(2);
 const term = args[0];
