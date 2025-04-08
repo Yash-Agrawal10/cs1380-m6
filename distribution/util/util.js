@@ -2,6 +2,7 @@ const serialization = require('./serialization');
 const id = require('./id');
 const wire = require('./wire');
 const { compare } = require('./compare');
+const { inverter } = require('./inverter/inverter');
 
 module.exports = {
   serialize: serialization.serialize,
@@ -9,4 +10,5 @@ module.exports = {
   id: id,
   wire: wire,
   compare: compare,
+  inverter: inverter,
 };

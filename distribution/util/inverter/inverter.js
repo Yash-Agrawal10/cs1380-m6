@@ -2,7 +2,6 @@ const {convert} = require('html-to-text');
 const {process, loadStopwords} = require('./process')
 const {stem} = require('./stem')
 const {invert} = require('./invert')
-const fs = require('fs');
 const path = require('path');
 
 // Takes in string of html markup and URL string
