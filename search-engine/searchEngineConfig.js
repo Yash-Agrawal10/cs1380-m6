@@ -46,9 +46,9 @@ const queryGroup = {
 
 const seedURLs = ['https://www.gutenberg.org/'];
 
-const MAX_URLS = 25;
-const URLS_PER_CRAWL_BATCH = 10;
-const URLS_PER_INDEX_BATCH = 10;
+const MAX_URLS = 1000;
+const URLS_PER_CRAWL_BATCH = 20;
+const URLS_PER_INDEX_BATCH = 20;
 
 module.exports = {
     crawlGroup, indexGroup, queryGroup,

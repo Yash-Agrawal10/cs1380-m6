@@ -30,7 +30,6 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
 
     // Define map and reduce functions
     const mapper = async (key, value) => {
-        console.log('in mapper');
         const url = key;
         const text = value;
         try {
@@ -42,7 +41,6 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
                 });
             });
             // Process text
-            // const output = [{'term1': {url, freq: 1}}, {'term2': {url, freq: 2}}];
             const output = distribution.util.inverter(text, url);
             return output;
         } catch (err) {
@@ -52,7 +50,6 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     }
 
     const reducer = async (key, values) => {
-        console.log('in reducer');
         const term = key;
         const urlFreqPairs = values;
         try {

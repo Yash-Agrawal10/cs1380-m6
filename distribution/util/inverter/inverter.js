@@ -25,4 +25,13 @@ function inverter(html, URL) {
     return index
 }
 
+// Testing
+const testInverter = async () => {
+    const url = 'https://www.gutenberg.org/';
+    const response = await fetch(url);
+    const text = await response.text();
+    const index = inverter(text, url);
+    console.log(index);
+}
+
 module.exports = { inverter }
