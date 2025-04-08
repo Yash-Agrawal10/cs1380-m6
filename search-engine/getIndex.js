@@ -1,4 +1,5 @@
 const distribution = require('../config');
+const { invert } = require('./invert');
 
 const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     // Set up toIndex list
@@ -33,13 +34,14 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
         const url = key;
         const text = value;
         try {
+            // Delete data
             await new Promise((resolve, reject) => {
                 distribution.index.store.del(url, (err, res) => {
                     if (err) return reject(err);
                     resolve(res);
                 });
             });
-            // Process text, counting words and stuff (temp random stuff)
+            // Process text
             const output = [{'term1': {url, freq: 1}}, {'term2': {url, freq: 2}}];
             return output;
         } catch (err) {
