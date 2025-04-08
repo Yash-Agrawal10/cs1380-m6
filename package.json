@@ -70,7 +70,7 @@
         "insertion": "3.74 ms/item",
         "retrieval": "3.25 ms/item"
       }
-    }, 
+    },
     "M5": {
       "hours": 10,
       "throughput": "1.32 items/ms",
@@ -81,6 +81,7 @@
   "license": "ISC",
   "dependencies": {
     "@brown-ds/distribution": "^0.1.7",
+    "natural": "^8.0.1",
     "yargs": "^17.7.2"
   }
 }

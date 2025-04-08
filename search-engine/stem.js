@@ -17,5 +17,7 @@ myTokens = [
     'rights'
 ]
 
+console.log(stem(myTokens))
+
 module.exports = { stem }
 
