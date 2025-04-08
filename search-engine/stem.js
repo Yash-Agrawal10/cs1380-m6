@@ -7,14 +7,6 @@ function stem(tokens) {
     })
     return stemmed
 }
-// TODO: Use this for testing later
-myTokens = [
-    'simple', 'links',
-    'check',  'stuff',
-    'level',  'check',
-    'stuff',  'level',
-    'rights'
-]
 
 module.exports = { stem }
 
