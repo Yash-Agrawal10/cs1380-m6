@@ -44,7 +44,7 @@ const queryGroup = {
     [id.getSID(queryWorkerOne)]: queryWorkerOne,
 };
 
-const seedURLs = ['https://www.gutenberg.org/'];
+const seedURLs = ['https://www.usenix.org/publications/proceedings'];
 
 const MAX_URLS = 1000;
 const URLS_PER_CRAWL_BATCH = 20;
