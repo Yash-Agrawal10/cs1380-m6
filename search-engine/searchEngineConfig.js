@@ -15,10 +15,10 @@ const id = distribution.util.id;
 
 /*
     Usage instructions:
-    1. Start all worker nodes using terminal
-    2. Start index orchestrator using index.js
-    3. Start crawl orchestrator using crawl.js
-    4. Query generated index using query.js
+    1. Start all worker nodes using terminal (./distribution.js --ip '127.0.0.1' --port 1234)
+    2. Start index orchestrator using index.js (node search-engine/index.js)
+    3. Start crawl orchestrator using crawl.js (node search-engine/crawl.js)
+    4. Query generated index using query.js (node search-engine/query.js <term>)
 */
 
 // Orchestrators
