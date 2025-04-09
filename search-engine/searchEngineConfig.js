@@ -4,7 +4,7 @@ const id = distribution.util.id;
 /*
     Example startup command for node using terminal
     const node = {ip: '127.0.0.1', port: 1234};
-    ./distribution.js --ip '127.0.0.1' --port 1234 
+    ./distribution.js --ip '127.0.0.1' --port 7112
 */
 
 /*
@@ -23,10 +23,10 @@ const id = distribution.util.id;
 
 // Orchestrators
 const crawlOrchestrator = {ip: '127.0.0.1', port: 7110, onStart: () => {console.log(global.nodeConfig)}}; 
-const indexOrchestrator = {ip: '127.0.0.1', port: 7112, onStart: () => {console.log(global.nodeConfig)}};
+const indexOrchestrator = {ip: '127.0.0.1', port: 7111, onStart: () => {console.log(global.nodeConfig)}};
 
 // Workers
-const crawlWorkerOne = {ip: '127.0.0.1', port: 7111, onStart: () => {console.log(global.nodeConfig)}};
+const crawlWorkerOne = {ip: '127.0.0.1', port: 7112, onStart: () => {console.log(global.nodeConfig)}};
 const indexWorkerOne = {ip: '127.0.0.1', port: 7113, onStart: () => {console.log(global.nodeConfig)}};
 const queryWorkerOne = {ip: '127.0.0.1', port: 7114, onStart: () => {console.log(global.nodeConfig)}};
 const indexWorkerTwo = {ip: '127.0.0.1', port: 7115, onStart: () => {console.log(global.nodeConfig)}};

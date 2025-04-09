@@ -59,15 +59,15 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
                     resolve(res);
                 });
             });
-            const newState = state.concat(urlFreqPairs);
-            const newSortedState = newState.sort(distribution.util.compare);
+            const sortedPairs = urlFreqPairs.sort(distribution.util.compare);
+            const newState = distribution.util.mergeSortedArrays(sortedPairs, state);
             await new Promise((resolve, reject) => {
-                distribution.query.store.put(newSortedState, term, (err, res) => {
+                distribution.query.store.put(newState, term, (err, res) => {
                     if (err) return reject(err);
                     resolve(res);
                 });
             });
-            return [{[term]: newSortedState}];
+            return [];
         } catch (err) {
             console.log('Error occurred in index reducer');
             return [];

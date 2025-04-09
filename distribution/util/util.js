@@ -3,6 +3,7 @@ const id = require('./id');
 const wire = require('./wire');
 const { compare } = require('./compare');
 const { inverter } = require('./inverter/inverter.js');
+const { mergeSortedArrays } = require('./mergeArrays.js')
 
 module.exports = {
   serialize: serialization.serialize,
@@ -11,4 +12,5 @@ module.exports = {
   wire: wire,
   compare: compare,
   inverter: inverter,
+  mergeSortedArrays: mergeSortedArrays,
 };
