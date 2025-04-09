@@ -32,12 +32,12 @@ const queryWorkerOne = {ip: '127.0.0.1', port: 7114, onStart: () => {console.log
 
 const crawlGroup = {
     [id.getSID(crawlOrchestrator)]: crawlOrchestrator,
-    [id.getSID(crawlWorkerOne)]: crawlWorkerOne,
+    // [id.getSID(crawlWorkerOne)]: crawlWorkerOne,
 };
 
 const indexGroup = {
     [id.getSID(indexOrchestrator)]: indexOrchestrator,
-    [id.getSID(indexWorkerOne)]: indexWorkerOne,
+    // [id.getSID(indexWorkerOne)]: indexWorkerOne,
 };
 
 const queryGroup = {
@@ -46,7 +46,7 @@ const queryGroup = {
 
 const seedURLs = ['https://www.usenix.org/publications/proceedings'];
 
-const MAX_URLS = 1000;
+const MAX_URLS = 100;
 const URLS_PER_CRAWL_BATCH = 20;
 const URLS_PER_INDEX_BATCH = 20;
 

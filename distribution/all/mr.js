@@ -142,6 +142,7 @@ function mr(config) {
             mapCb();
           });
         }
+
         nodeKeys.forEach((key) => {
           // console.log(useStore);
           if (useStore) {
@@ -186,23 +187,33 @@ function mr(config) {
         // Perform reduce operation on these keys
         let counter = 0;
         let output = [];
+
+        const operate = (key, value) => {
+          const reduceCb = () => {
+            counter++;
+            if (counter == nodeKeys.length) {
+              // Send output back to orchestrator
+              callback(null, output);
+              return;
+            }
+          }
+
+          Promise.resolve(reduce(key, value))
+          .then((keyOutput) => {
+            output = output.concat(keyOutput);
+            reduceCb();
+          })
+          .catch((err) => {
+            console.log(err);
+            reduceCb();
+          });
+        }
+
         nodeKeys.forEach((key) => {
           const usedKey = 'mr-' + serviceName + '-' + key;
           global.distribution.local.store.get({gid: gid, key: usedKey}, (error, value) => {
             global.distribution.local.store.del({gid: gid, key: usedKey}, (error2, value2) => {
-              if (error) {
-                counter++;
-              } else {
-                const keyOutput = reduce(key, value);
-                output = output.concat(keyOutput);
-                counter++;
-              }
-  
-              if (counter == nodeKeys.length) {
-                // Send output back to orchestrator
-                callback(null, output);
-                return;
-              }
+              operate(key, value);
             });
           });
         });
