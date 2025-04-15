@@ -56,6 +56,7 @@ distribution.local = require('./distribution/local/local.js');
 distribution.node = require('./distribution/local/node.js');
 // Student additions
 distribution.jsdom = require('jsdom');
+distribution.cheerio = require('cheerio');
 
 // Student global state
 global.rpcMap = {};

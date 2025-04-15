@@ -41,12 +41,24 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
         try {
             const response = await fetch(url);
             const text = await response.text();
+            const contentType = response.headers.get('content-type') || '';
+
+            let toStore = text;
+            if (contentType.includes('text/html')) {
+                const cheerio = distribution.cheerio;
+                const $ = cheerio.load(text);
+                toStore = $('body').text().replace(/\s+/g, ' ').trim();
+            } else {
+                toStore = text;
+            }
+
             await new Promise((resolve, reject) => {
-                distribution.index.store.put(text, url, (err, res) => {
+                distribution.index.store.put(toStore, url, (err, res) => {
                     if (err) return reject(err);
                     resolve(res);
                 });
             });
+
             return [{[url]: text}];
         } catch (err) {
             console.log('Error occurred in crawl mapper:', err);

@@ -39,7 +39,16 @@ async function process(url, text) {
 
 // Test
 // (async () => {
-//     // const url = 'https://www.gutenberg.org/files/11/11-0.txt';
+//     const url = 'https://www.gutenberg.org/files/11/11-0.txt';
+//     const response = await fetch(url);
+//     const text = await response.text();
+//     const result = await process(url, text);
+
+//     console.log(result.slice(0, 10));
+// })();
+
+// // Test 2
+// (async () => {
 //     const url = 'https://www.usenix.org/publications/proceedings';
 //     const response = await fetch(url);
 //     const text = await response.text();
@@ -47,5 +56,9 @@ async function process(url, text) {
 
 //     console.log(result.slice(0, 10));
 // })();
+
+// const cheerio = require('cheerio');
+// const $ = cheerio.load(rawText);
+// toStore = $('body').text().replace(/\s+/g, ' ').trim();
 
 module.exports = { process };
