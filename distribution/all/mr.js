@@ -249,6 +249,10 @@ function mr(config) {
         const remote1 = {service: serviceName, method: 'doMap'};
         const message1 = [keys, v1, context.gid, map, serviceName, useStore];
         global.distribution[context.gid].comm.send(message1, remote1, (e3, v3) => {
+          if (e3) {
+            console.error('work4 ERROR:', e3);
+            return;
+          }
           console.log('work4')
           // Collect keys
           const keySet = new Set();
