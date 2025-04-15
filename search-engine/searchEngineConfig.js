@@ -27,10 +27,10 @@ const indexOrchestrator = {ip: '127.0.0.1', port: 7111, onStart: () => {console.
 
 // Workers
 const crawlWorkerOne = {ip: '127.0.0.1', port: 7112, onStart: () => {console.log(global.nodeConfig)}};
-const crawlWorkerTwo = {ip: '127.0.0.1', port: 7116, onStart: () => {console.log(global.nodeConfig)}};
-const crawlWorkerThree = {ip: '127.0.0.1', port: 7115, onStart: () => {console.log(global.nodeConfig)}};
-const indexWorkerOne = {ip: '127.0.0.1', port: 7113, onStart: () => {console.log(global.nodeConfig)}};
-const queryWorkerOne = {ip: '127.0.0.1', port: 7114, onStart: () => {console.log(global.nodeConfig)}};
+const crawlWorkerTwo = {ip: '127.0.0.1', port: 7113, onStart: () => {console.log(global.nodeConfig)}};
+const crawlWorkerThree = {ip: '127.0.0.1', port: 7114, onStart: () => {console.log(global.nodeConfig)}};
+const indexWorkerOne = {ip: '127.0.0.1', port: 7115, onStart: () => {console.log(global.nodeConfig)}};
+const queryWorkerOne = {ip: '127.0.0.1', port: 7116, onStart: () => {console.log(global.nodeConfig)}};
 const queryWorkerTwo = {ip: '127.0.0.1', port: 7117, onStart: () => {console.log(global.nodeConfig)}};
 
 const crawlGroup = {

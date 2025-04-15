@@ -85,7 +85,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
         let batch = [];
         while (toCrawl.length != 0 && batch.length < URLS_PER_BATCH && visited.size + batch.length < MAX_URLS) {
             const url = toCrawl.shift();
-            if (!visited.has(url)) {
+            if (!visited.has(url) && !batch.includes(url)) {
                 batch.push(url);
             }
         }
