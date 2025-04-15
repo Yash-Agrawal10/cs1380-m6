@@ -41,7 +41,7 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
                 });
             });
             // Process text
-            const output = distribution.util.inverter(text, url);
+            const output = await distribution.util.process(url, text);
             return [{url: output}];
         } catch (err) {
             console.log('Error occurred in index mapper: ', err);
@@ -97,4 +97,4 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     return (cb) => setupGroups(() => setupList((toIndex) => indexStep(toIndex, 0, cb)));
 }
 
-module.exports = {getIndex};
+module.exports = { getIndex };
