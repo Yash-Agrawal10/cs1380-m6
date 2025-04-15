@@ -50,8 +50,8 @@ function idToNum(id) {
 }
 
 function naiveHash(kid, nids) {
-  nids.sort();
-  return nids[idToNum(kid) % nids.length];
+  const sortedNIDs = [...nids].sort();
+  return sortedNIDs[idToNum(kid) % sortedNIDs.length];
 }
 
 function consistentHash(kid, nids) {

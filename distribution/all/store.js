@@ -5,7 +5,7 @@ const { send } = require('../local/comm');
 function store(config) {
   const context = {};
   context.gid = config.gid || 'all';
-  context.hash = config.hash || global.distribution.util.id.naiveHash;
+  context.hash = config.hash || global.distribution.util.id.consistentHash;
 
   /* For the distributed store service, the configuration will
           always be a string */
@@ -25,7 +25,7 @@ function store(config) {
     const targetNIDs = kids.map((kid) => context.hash(kid, nids));
     const targetNodes = targetNIDs.map((targetNID) => nodes.filter((node) => id.getNID(node) == targetNID)[0]);
 
-    console.log(nodes, keys, targetNodes);
+    console.log(nodes, nids, keys.slice(0, 10), kids.slice(0, 10), targetNIDs.slice(0, 10), targetNodes.slice(0, 10), context.hash);
 
     if (!Array.isArray(configuration)) {
       callback(null, targetNodes[0]);
