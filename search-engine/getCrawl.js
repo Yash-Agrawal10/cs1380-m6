@@ -95,7 +95,6 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
             cb(toCrawl, visited);
             return;
         }
-        console.log('crawling batch', batch);
 
         // Call map-reduce (value is url: [new_urls])
         distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, (e1, v1) => {

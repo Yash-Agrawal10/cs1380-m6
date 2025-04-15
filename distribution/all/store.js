@@ -25,8 +25,6 @@ function store(config) {
     const targetNIDs = kids.map((kid) => context.hash(kid, nids));
     const targetNodes = targetNIDs.map((targetNID) => nodes.filter((node) => id.getNID(node) == targetNID)[0]);
 
-    console.log(nodes, nids, keys.slice(0, 10), kids.slice(0, 10), targetNIDs.slice(0, 10), targetNodes.slice(0, 10), context.hash);
-
     if (!Array.isArray(configuration)) {
       callback(null, targetNodes[0]);
     } else {
