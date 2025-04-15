@@ -41,12 +41,29 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
         try {
             const response = await fetch(url);
             const text = await response.text();
+            const contentType = response.headers.get('Content-Type') || '';
+
+            const isHtml = contentType.includes('text/html');
+            const isPlainText = contentType.includes('text/plain');
+            let textToSave = text;
+            // if (isHtml) {
+            //     const cheerio = distribution.cheerio;
+            //     const $ = cheerio.load(text);
+            //     textToSave = $('body').text().replace(/\s+/g, ' ').trim();
+            // } else if (isPlainText) {
+            //     textToSave = text;
+            // } else {
+            //     console.log(`Unsupported content-type at url ${url}`);
+            //     return [];
+            // }
+
             await new Promise((resolve, reject) => {
-                distribution.index.store.put(text, url, (err, res) => {
+                distribution.index.store.put(textToSave, url, (err, res) => {
                     if (err) return reject(err);
                     resolve(res);
                 });
             });
+
             return [{[url]: text}];
         } catch (err) {
             console.log('Error occurred in crawl mapper:', err);
