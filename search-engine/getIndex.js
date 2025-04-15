@@ -52,6 +52,9 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     const reducer = async (key, values) => {
         const term = key;
         const urlFreqPairs = values;
+        if (!Array.isArray(urlFreqPairs)) {
+            console.log('NOT ARRAY: ', urlFreqPairs);
+        }
         try {
             const state = await new Promise((resolve, reject) => {
                 distribution.query.store.get({key: term, orEmpty: true}, (err, res) => {
@@ -60,7 +63,7 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
                 });
             });
             const sortedPairs = urlFreqPairs.sort(distribution.util.compare);
-            const newState = distribution.util.mergeSortedArrays(sortedPairs, state);
+            const newState = distribution.util.mergeSortedArrays(sortedPairs, state, distribution.util.compare);
             await new Promise((resolve, reject) => {
                 distribution.query.store.put(newState, term, (err, res) => {
                     if (err) return reject(err);
@@ -69,7 +72,7 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
             });
             return [];
         } catch (err) {
-            console.log('Error occurred in index reducer');
+            console.log('Error occurred in index reducer: ', err);
             return [];
         }
     }

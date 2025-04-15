@@ -7,6 +7,9 @@ const distribution = require('../distribution')(indexOrchestrator);
 const index = getIndex(indexGroup, queryGroup, MAX_URLS, URLS_PER_INDEX_BATCH);
 
 distribution.node.start((server) => {
+    const address = server.address();
+    console.log(`Indexer running at http://${address.address}:${address.port}`);
+
     const indexService = {
         index: (cb) => {index(cb)},
     }

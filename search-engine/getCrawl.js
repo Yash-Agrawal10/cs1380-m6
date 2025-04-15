@@ -47,12 +47,6 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
                     resolve(res);
                 });
             });
-            // await new Promise((resolve, reject) => {
-            //     distribution.local.mem.put(text, url, (err, res) => {
-            //         if (err) return reject(err);
-            //         resolve(res);
-            //     });
-            // });
             return [{[url]: text}];
         } catch (err) {
             console.log('Error occurred in mapper: ', err);
