@@ -97,4 +97,4 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     return (cb) => setupGroups(() => setupList((toIndex) => indexStep(toIndex, 0, cb)));
 }
 
-module.exports = {getIndex};
+module.exports = { getIndex };

@@ -2,7 +2,7 @@ const serialization = require('./serialization');
 const id = require('./id');
 const wire = require('./wire');
 const { compare } = require('./compare');
-const { process, } = require('./process.js');
+const { process } = require('./process.js');
 const { mergeSortedArrays } = require('./mergeArrays.js')
 
 module.exports = {
