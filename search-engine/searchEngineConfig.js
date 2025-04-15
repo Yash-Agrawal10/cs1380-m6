@@ -28,26 +28,27 @@ const indexOrchestrator = {ip: '127.0.0.1', port: 7111, onStart: () => {console.
 // Workers
 const crawlWorkerOne = {ip: '127.0.0.1', port: 7112, onStart: () => {console.log(global.nodeConfig)}};
 const indexWorkerOne = {ip: '127.0.0.1', port: 7113, onStart: () => {console.log(global.nodeConfig)}};
-const queryWorkerOne = {ip: '127.0.0.1', port: 7114, onStart: () => {console.log(global.nodeConfig)}};
-// const indexWorkerTwo = {ip: '127.0.0.1', port: 7115, onStart: () => {console.log(global.nodeConfig)}};
-// const crawlWorkerTwo = {ip: '127.0.0.1', port: 7116, onStart: () => {console.log(global.nodeConfig)}};
-// const queryWorkerTwo = {ip: '127.0.0.1', port: 7117, onStart: () => {console.log(global.nodeConfig)}};
+// Skip 7114
+const queryWorkerOne = {ip: '127.0.0.1', port: 7115, onStart: () => {console.log(global.nodeConfig)}};
+const indexWorkerTwo = {ip: '127.0.0.1', port: 7116, onStart: () => {console.log(global.nodeConfig)}};
+const crawlWorkerTwo = {ip: '127.0.0.1', port: 7117, onStart: () => {console.log(global.nodeConfig)}};
+const queryWorkerTwo = {ip: '127.0.0.1', port: 7118, onStart: () => {console.log(global.nodeConfig)}};
 
 const crawlGroup = {
     [id.getSID(crawlOrchestrator)]: crawlOrchestrator,
     [id.getSID(crawlWorkerOne)]: crawlWorkerOne,
-    // [id.getSID(crawlWorkerTwo)]: crawlWorkerTwo,
+    [id.getSID(crawlWorkerTwo)]: crawlWorkerTwo,
 };
 
 const indexGroup = {
     [id.getSID(indexOrchestrator)]: indexOrchestrator,
     [id.getSID(indexWorkerOne)]: indexWorkerOne,
-    // [id.getSID(indexWorkerTwo)]: indexWorkerTwo,
+    [id.getSID(indexWorkerTwo)]: indexWorkerTwo,
 };
 
 const queryGroup = {
     [id.getSID(queryWorkerOne)]: queryWorkerOne,
-    // [id.getSID(queryWorkerTwo)]: queryWorkerTwo,
+    [id.getSID(queryWorkerTwo)]: queryWorkerTwo,
 };
 
 const seedURLs = ['https://www.usenix.org/publications/proceedings'];

@@ -12,6 +12,7 @@ function store(config) {
   function getNodes(configuration, group, callback){
     // Handle parameters
     callback = callback || function() { };
+    let keys;
     if (!Array.isArray(configuration)) {
       keys = [configuration];
     } else {
@@ -23,6 +24,8 @@ function store(config) {
     const kids = keys.map((key) => id.getID(key));
     const targetNIDs = kids.map((kid) => context.hash(kid, nids));
     const targetNodes = targetNIDs.map((targetNID) => nodes.filter((node) => id.getNID(node) == targetNID)[0]);
+
+    console.log(nodes, keys, targetNodes);
 
     if (!Array.isArray(configuration)) {
       callback(null, targetNodes[0]);
@@ -180,7 +183,7 @@ function store(config) {
     callback = callback || function() { };
     
     groups.get(context.gid, (e, v) => {
-      const keys = localIndex.map(o => Object.keys(o)[0]);
+       const keys = localIndex.map(o => Object.keys(o)[0]);
       getNodes(keys, v, (e0, v0) => {
         const nodes = v0;
         const nodeToLists = new Map();
