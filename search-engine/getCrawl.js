@@ -43,13 +43,21 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
             const text = await response.text();
             const contentType = response.headers.get('content-type') || '';
 
+            if (text.length > 1_000_000) {
+                console.log(`Page too long at url ${url}`);
+                return [];
+            }
+
             let toStore = text;
             if (contentType.includes('text/html')) {
                 const cheerio = distribution.cheerio;
                 const $ = cheerio.load(text);
                 toStore = $('body').text().replace(/\s+/g, ' ').trim();
-            } else {
+            } else if (contentType.includes('text/plain')) {
                 toStore = text;
+            } else {
+                console.log(`Invalid content type at url ${url}`);
+                return [];
             }
 
             await new Promise((resolve, reject) => {
