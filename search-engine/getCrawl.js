@@ -122,9 +122,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
         }
 
         // Call map-reduce (value is url: [new_urls])
-        console.log('mr starting');
         distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, (e1, v1) => {
-            console.log('mr complete');
             let allNewURLs = [];
             let completedURLs = [];
             v1.map((o) => {
