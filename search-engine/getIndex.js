@@ -52,9 +52,6 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     const reducer = async (key, values) => {
         const term = key;
         const urlFreqPairs = values;
-        if (!Array.isArray(urlFreqPairs)) {
-            console.log('NOT ARRAY: ', urlFreqPairs);
-        }
         try {
             const state = await new Promise((resolve, reject) => {
                 distribution.query.store.get({key: term, orEmpty: true}, (err, res) => {

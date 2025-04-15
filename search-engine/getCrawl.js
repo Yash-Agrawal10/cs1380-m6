@@ -49,7 +49,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
             });
             return [{[url]: text}];
         } catch (err) {
-            console.log('Error occurred in mapper: ', err);
+            console.log('Error occurred in crawl mapper:', err);
             return [];
         }
     };
@@ -66,7 +66,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
                 .filter(href => href.startsWith('http'));
             return { [url]: links };
         } catch (err) {
-            console.error(`Reducer error for ${url}:`, err);
+            console.error(`Error occurred in crawl reducer:`, err);
             return { [url]: [] };
         }
     };

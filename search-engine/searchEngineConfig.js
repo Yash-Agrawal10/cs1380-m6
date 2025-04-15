@@ -31,6 +31,7 @@ const indexWorkerOne = {ip: '127.0.0.1', port: 7113, onStart: () => {console.log
 const queryWorkerOne = {ip: '127.0.0.1', port: 7114, onStart: () => {console.log(global.nodeConfig)}};
 // const indexWorkerTwo = {ip: '127.0.0.1', port: 7115, onStart: () => {console.log(global.nodeConfig)}};
 // const crawlWorkerTwo = {ip: '127.0.0.1', port: 7116, onStart: () => {console.log(global.nodeConfig)}};
+const queryWorkerTwo = {ip: '127.0.0.1', port: 7117, onStart: () => {console.log(global.nodeConfig)}};
 
 const crawlGroup = {
     [id.getSID(crawlOrchestrator)]: crawlOrchestrator,
@@ -46,6 +47,7 @@ const indexGroup = {
 
 const queryGroup = {
     [id.getSID(queryWorkerOne)]: queryWorkerOne,
+    [id.getSID(queryWorkerTwo)]: queryWorkerTwo,
 };
 
 const seedURLs = ['https://www.usenix.org/publications/proceedings'];
