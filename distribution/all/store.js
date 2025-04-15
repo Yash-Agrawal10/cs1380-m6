@@ -193,10 +193,10 @@ function store(config) {
           }
         }
         
-        const numNodes = nodesToLists.size;
+        const numNodes = nodeToLists.size;
         let counter = 0;
         for (const node of nodeToLists.keys()) {
-          const message = nodeToLists.get(node);
+          const message = [nodeToLists.get(node)];
           const remote = {node: node, service: 'query', method: 'addToIndex'};
           send(message, remote, (e2, v2) => {
             counter++;
@@ -212,7 +212,7 @@ function store(config) {
   function reconf(configuration, callback){
   }
 
-  return {getNodes, get, put, append, del, reconf};
+  return {getNodes, get, put, append, del, reconf, getKey, addToIndex};
 };
 
 module.exports = store;

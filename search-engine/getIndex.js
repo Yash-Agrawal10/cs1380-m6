@@ -42,7 +42,7 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
             });
             // Process text
             const output = distribution.util.inverter(text, url);
-            return output;
+            return [{url: output}];
         } catch (err) {
             console.log('Error occurred in index mapper: ', err);
             return [];
@@ -50,19 +50,11 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
     }
 
     const reducer = async (key, values) => {
-        const term = key;
-        const urlFreqPairs = values;
+        const url = key;
+        const localIndex = values[0];
         try {
-            const state = await new Promise((resolve, reject) => {
-                distribution.query.store.get({key: term, orEmpty: true}, (err, res) => {
-                    if (err) return reject(err);
-                    resolve(res);
-                });
-            });
-            const sortedPairs = urlFreqPairs.sort(distribution.util.compare);
-            const newState = distribution.util.mergeSortedArrays(sortedPairs, state, distribution.util.compare);
             await new Promise((resolve, reject) => {
-                distribution.query.store.put(newState, term, (err, res) => {
+                distribution.query.store.addToIndex(localIndex, (err, res) => {
                     if (err) return reject(err);
                     resolve(res);
                 });

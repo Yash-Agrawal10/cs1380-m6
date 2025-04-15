@@ -10,7 +10,7 @@ const getQuery = (queryGroup) => {
 
     // Make query
     const makeQuery = (query, count, cb) => {
-        distribution.query.store.get(query, (e, v) => {
+        distribution.query.store.getKey(query, (e, v) => {
             v = v || [];
             const output = v.slice(0, count);
             cb(output);
