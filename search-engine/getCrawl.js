@@ -6,6 +6,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
         // Initialize toCrawl list
         distribution.local.store.get('toCrawl', (e1, v1) => {
             const toCrawl = v1 || seedURLs;
+            console.log('here', seedURLs)
             distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
                 // Initialize visited list
                 distribution.local.store.get('visited', (e3, v3) => {

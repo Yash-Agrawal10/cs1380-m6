@@ -23,7 +23,7 @@ const id = distribution.util.id;
 
 /*
 N1: 172.31.5.125 -> CrawlOrchestrator | node distribution.js --ip '172.31.5.125' --port 7110
-N2: 172.31.4.204 -> IndexOrchestrator | node distribution.js --ip '172.31.4.204' --port 7110
+N2: 172.31.4.204 -> IndexOrchestrator | node --max-old-space-size=4096 search-engine/index.js TODO:
 
 N3: 172.31.5.207 -> crawlWorkerOne | node distribution.js --ip '172.31.5.207' --port 7110
 N4: 172.31.14.200 -> crawlWorkerTwo | node distribution.js --ip '172.31.14.200' --port 7110
