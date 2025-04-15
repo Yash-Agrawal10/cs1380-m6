@@ -21,17 +21,30 @@ const id = distribution.util.id;
     4. Query generated index using query.js (node search-engine/query.js <term>)
 */
 
+/*
+N1: 172.31.5.125 -> CrawlOrchestrator | node distribution.js --ip '172.31.5.125' --port 7110
+N2: 172.31.4.204 -> IndexOrchestrator | node distribution.js --ip '172.31.4.204' --port 7110
+
+N3: 172.31.5.207 -> crawlWorkerOne | node distribution.js --ip '172.31.5.207' --port 7110
+N4: 172.31.14.200 -> crawlWorkerTwo | node distribution.js --ip '172.31.14.200' --port 7110
+N5: 172.31.13.134 -> crawlWorkerThree | node distribution.js --ip '172.31.13.134' --port 7110
+N6: 172.31.5.90 -> indexWorkerOne | node distribution.js --ip '172.31.5.90' --port 7110
+N7: 172.31.5.40 -> queryWorkerOne | node distribution.js --ip '172.31.5.40' --port 7110
+N8: 172.31.12.83 -> queryWorkerTwo | node distribution.js --ip '172.31.12.83' --port 7110
+*/
+
+
 // Orchestrators
-const crawlOrchestrator = {ip: '127.0.0.1', port: 7110, onStart: () => {console.log(global.nodeConfig)}}; 
-const indexOrchestrator = {ip: '127.0.0.1', port: 7111, onStart: () => {console.log(global.nodeConfig)}};
+const crawlOrchestrator = {ip: '172.31.5.125', port: 7110, onStart: () => {console.log(global.nodeConfig)}}; 
+const indexOrchestrator = {ip: '172.31.4.204', port: 7110, onStart: () => {console.log(global.nodeConfig)}};
 
 // Workers
-const crawlWorkerOne = {ip: '127.0.0.1', port: 7112, onStart: () => {console.log(global.nodeConfig)}};
-// const crawlWorkerTwo = {ip: '127.0.0.1', port: 7113, onStart: () => {console.log(global.nodeConfig)}};
-// const crawlWorkerThree = {ip: '127.0.0.1', port: 7114, onStart: () => {console.log(global.nodeConfig)}};
-const indexWorkerOne = {ip: '127.0.0.1', port: 7115, onStart: () => {console.log(global.nodeConfig)}};
-const queryWorkerOne = {ip: '127.0.0.1', port: 7116, onStart: () => {console.log(global.nodeConfig)}};
-// const queryWorkerTwo = {ip: '127.0.0.1', port: 7117, onStart: () => {console.log(global.nodeConfig)}};
+const crawlWorkerOne = {ip: '172.31.5.207', port: 7110, onStart: () => {console.log(global.nodeConfig)}};
+// const crawlWorkerTwo = {ip: '172.31.14.200', port: 7110, onStart: () => {console.log(global.nodeConfig)}};
+// const crawlWorkerThree = {ip: '172.31.13.134', port: 7110, onStart: () => {console.log(global.nodeConfig)}};
+const indexWorkerOne = {ip: '172.31.5.90', port: 7110, onStart: () => {console.log(global.nodeConfig)}};
+const queryWorkerOne = {ip: '172.31.5.40', port: 7110, onStart: () => {console.log(global.nodeConfig)}};
+// const queryWorkerTwo = {ip: '172.31.12.83', port: 7110, onStart: () => {console.log(global.nodeConfig)}};
 // const queryWorkerThree = {ip: '127.0.0.1', port: 7118, onStart: () => {console.log(global.nodeConfig)}};
 
 const crawlGroup = {
