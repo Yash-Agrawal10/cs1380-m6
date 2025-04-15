@@ -42,6 +42,7 @@ function mr(config) {
    */
   function exec(configuration, cb) {
     // Handle parameters
+    console.log('exec 1')
     const keys = configuration.keys || [];
     const map = configuration.map || function(x) {return x};
     const reduce = configuration.reduce || function(x) {return x};
@@ -78,24 +79,32 @@ function mr(config) {
       if (!Array.isArray(keys) || typeof callback != 'function' || typeof gid != 'string' || typeof map != 'function') {
         callback(new Error('Invalid parameters'), null);
       }
+      console.log('doMap 1')
 
       // Filter for keys node is responsible for
       global.distribution[gid].store.getNodes(keys, group, (e, v) => {
+        console.log('doMap 2')
         if (e) {
           callback(e, null);
           return;
         }
+        console.log('doMap 3')
         const id = global.distribution.util.id;
         const nodeKeys = keys.filter((key, index) => (id.getNID(v[index]) == id.getNID(global.nodeConfig)));
+        console.log('doMap 4')
+
         if (nodeKeys.length == 0) {
           callback(null, []);
           return;
         }
+        console.log('doMap 5')
 
         // Perform map operation on these keys
         let counter = 0;
         let output = [];
+        console.log('doMap 6')
         const operate = (key, value) => {
+          console.log('stop operate')
           const mapCb = () => {
             counter++;
             if (counter == nodeKeys.length) {
@@ -141,8 +150,9 @@ function mr(config) {
             console.log(err);
             mapCb();
           });
-        }
+          console.log('end operate')
 
+        }
         nodeKeys.forEach((key) => {
           // console.log(useStore);
           if (useStore) {
@@ -154,11 +164,13 @@ function mr(config) {
           }
         });
       });
+      console.log('end doMap')
     }
 
 
     // Worker reduce function
     function doReduce(keys, group, gid, reduce, serviceName, callback) {
+      console.log('Start doReduce')
       // Handle parameters
       keys = keys || [];
       callback = callback || function() { };
@@ -218,36 +230,47 @@ function mr(config) {
           });
         });
       });
+      console.log('end do reduce')
     }
 
     // Map-Reduce workflow (ignore error handling for now)
     const service = {doMap, doReduce};
     const serviceID = global.distribution.util.id.getID(configuration);
     const serviceName = 'mr-' + serviceID;
+    console.log('work1')
 
     // Get local view of group
     global.distribution.local.groups.get(context.gid, (e1, v1) => {
+      console.log('work2')
       // Instantiate relevant functions on workers
       global.distribution[context.gid].routes.put(service, serviceName, (e2, v2) => {
+        console.log('work3')
         // Call map on workers
         const remote1 = {service: serviceName, method: 'doMap'};
         const message1 = [keys, v1, context.gid, map, serviceName, useStore];
         global.distribution[context.gid].comm.send(message1, remote1, (e3, v3) => {
+          console.log('work4')
           // Collect keys
           const keySet = new Set();
           for (let keyList of Object.values(v3)) {
             keyList.forEach(el => keySet.add(el));
           }
           const keyList = Array.from(keySet);
+          console.log('work5')
+
 
           // Call reduce on workers
           const remote2 = {service: serviceName, method: 'doReduce'};
           const message2 = [keyList, v1, context.gid, reduce, serviceName];
+          console.log('work6')
+
           global.distribution[context.gid].comm.send(message2, remote2, (e4, v4) => {
             let output = [];
             for (let values of Object.values(v4)) {
               output = output.concat(values);
             }
+            console.log('work7')
+
             // Cleanup routes
             global.distribution[context.gid].routes.rem(serviceName, (e5, v5) => {
               cb(null, output);
