@@ -158,6 +158,57 @@ function store(config) {
     });
   }
 
+  function getKey(key, callback) {
+    callback = callback || function() { };
+    
+    groups.get(context.gid, (e, v) => {
+      getNodes(key, v, (e0, v0) => {
+        const message = [key];
+        const remote = {node: v0, service: 'query', method: 'getKey'};
+        send(message, remote, (e1, v1) => {
+          if (e1) {
+            callback(e1, null);
+          } else {
+            callback(null, v1);
+          }
+        });
+      });
+    });
+  }
+
+  function addToIndex(localIndex, callback) {
+    callback = callback || function() { };
+    
+    groups.get(context.gid, (e, v) => {
+      const keys = localIndex.map(o => Object.keys(o)[0]);
+      getNodes(keys, v, (e0, v0) => {
+        const nodes = v0;
+        const nodeToLists = new Map();
+        for (let i = 0; i < localIndex.length; i++) {
+          const node = nodes[i];
+          if (nodeToLists.has(node)) {
+            nodeToLists.get(node).push(localIndex[i]);
+          } else {
+            nodeToLists.set(node, [localIndex[i]]);
+          }
+        }
+        
+        const numNodes = nodesToLists.size;
+        let counter = 0;
+        for (const node of nodeToLists.keys()) {
+          const message = nodeToLists.get(node);
+          const remote = {node: node, service: 'query', method: 'addToIndex'};
+          send(message, remote, (e2, v2) => {
+            counter++;
+            if (counter == numNodes) {
+              callback(null, null);
+            }
+          });
+        }
+      });
+    });
+  }
+
   function reconf(configuration, callback){
   }
 

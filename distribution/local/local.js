@@ -37,6 +37,10 @@ const mem = require('./mem');
 
 const store = require('./store');
 
+/* Student services */
+
+const query = require('./query');
+
 module.exports = {
   status: status,
   routes: routes,
@@ -45,4 +49,5 @@ module.exports = {
   gossip: gossip,
   mem: mem,
   store: store,
+  query: query,
 };
