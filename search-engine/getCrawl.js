@@ -79,7 +79,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
         const text = values[0].text;
         const valid = values[0].valid;
         if (!valid) {
-            return { [url]: [] };
+            return { [url]: {valid: false, urls: []} };
         }
 
         try {
@@ -89,10 +89,10 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
             const links = Array.from(document.querySelectorAll('a[href]'))
                 .map(link => link.href)
                 .filter(href => href.startsWith('http'));
-            return { [url]: links };
+                return { [url]: {valid: true, urls: links} };
         } catch (err) {
             console.error(`Error occurred in crawl reducer:`, err);
-            return { [url]: [] };
+            return { [url]: {valid: false, urls: []} };
         }
     };
 
@@ -127,9 +127,12 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
             let completedURLs = [];
             v1.map((o) => {
                 const completedURL = Object.keys(o)[0];
+                const newURLs = Object.values(o)[0].urls;
+                const valid = Object.values(o)[0].valid;
                 visited.add(completedURL);
-                completedURLs.push(completedURL);
-                const newURLs = Object.values(o)[0];
+                if (valid) {
+                    completedURLs.push(completedURL);
+                }
                 allNewURLs = allNewURLs.concat(newURLs);
             });
             toCrawl = toCrawl.concat(allNewURLs);
