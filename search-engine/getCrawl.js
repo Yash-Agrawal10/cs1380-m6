@@ -45,7 +45,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
 
             if (text.length > 1_000_000) {
                 console.log(`Page too long at url ${url}`);
-                return [];
+                return [{[url]: {valid: false, text: null}}];
             }
 
             let toStore = text;
@@ -57,7 +57,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
                 toStore = text;
             } else {
                 console.log(`Invalid content type at url ${url}`);
-                return [];
+                return [{[url]: {valid: false, text: null}}];
             }
 
             await new Promise((resolve, reject) => {
@@ -67,16 +67,21 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
                 });
             });
 
-            return [{[url]: text}];
+            return [{[url]: {valid: true, text: text}}];
         } catch (err) {
             console.log('Error occurred in crawl mapper:', err);
-            return [];
+            return [{[url]: {valid: false, text: null}}];
         }
     };
 
     const reducer = (key, values) => {
         const url = key;
-        const text = values[0];
+        const text = values[0].text;
+        const valid = values[0].valid;
+        if (!valid) {
+            return { [url]: [] };
+        }
+
         try {
             const { JSDOM } = distribution.jsdom;
             const dom = new JSDOM(text, { url });
