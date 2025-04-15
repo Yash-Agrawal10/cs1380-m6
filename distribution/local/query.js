@@ -28,9 +28,12 @@ function deserializeIndex(data) {
     return rebuilt;
 }
 
-function getIndex(callback) {
+function getIndex(term, callback) {
     const nid = id.getNID(global.distribution.node.config);
     const gid = 'query';
+    if (term.length > 0) {
+
+    }
     const storePath = path.resolve(__dirname, '../../store', nid, gid);
     if (!fs.existsSync(storePath)) {
         fs.mkdirSync(storePath, { recursive: true });
@@ -47,7 +50,7 @@ function getIndex(callback) {
 }
 
 function addToIndex(localIndex, callback) {
-    getIndex((error, globalIndex) => {
+    getIndex("", (error, globalIndex) => {
         for (let o of localIndex) {
             const key = Object.keys(o)[0];
             const newValues = Object.values(o).sort(global.distribution.util.compare);
@@ -72,7 +75,7 @@ function addToIndex(localIndex, callback) {
 }
 
 function getKey(key, callback) {
-    getIndex((error, globalIndex) => {
+    getIndex("", (error, globalIndex) => {
         const values = globalIndex[key] || [];
         callback(null, values);
     });

@@ -45,7 +45,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
 
             if (text.length > 1_000_000) {
                 console.log(`Page too long at url ${url}`);
-                return [];
+                return [{[url]: {valid: false, text: null}}];
             }
 
             let toStore = text;
@@ -57,7 +57,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
                 toStore = text;
             } else {
                 console.log(`Invalid content type at url ${url}`);
-                return [];
+                return [{[url]: {valid: false, text: null}}];
             }
 
             await new Promise((resolve, reject) => {
@@ -67,16 +67,22 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
                 });
             });
 
-            return [{[url]: text}];
+            return [{[url]: {valid: true, text: text}}];
         } catch (err) {
             console.log('Error occurred in crawl mapper:', err);
-            return [];
+            return [{[url]: {valid: false, text: null}}];
         }
     };
 
     const reducer = (key, values) => {
         const url = key;
-        const text = values[0];
+        const valid = values[0].valid;
+        const text = values[0].text;
+        console.log(url, valid, text);
+        if (!valid) {
+            return { [url]: {valid: false, newURLs: []} };
+        }
+
         try {
             const { JSDOM } = distribution.jsdom;
             const dom = new JSDOM(text, { url });
@@ -84,10 +90,10 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
             const links = Array.from(document.querySelectorAll('a[href]'))
                 .map(link => link.href)
                 .filter(href => href.startsWith('http'));
-            return { [url]: links };
+                return { [url]: {valid: true, newURLs: links} };
         } catch (err) {
             console.error(`Error occurred in crawl reducer:`, err);
-            return { [url]: [] };
+            return { [url]: {valid: false, newURLs: []} };
         }
     };
 
@@ -117,14 +123,19 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
         }
 
         // Call map-reduce (value is url: [new_urls])
+        console.log('mr starting');
         distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, (e1, v1) => {
+            console.log('mr complete');
             let allNewURLs = [];
             let completedURLs = [];
             v1.map((o) => {
                 const completedURL = Object.keys(o)[0];
+                const newURLs = Object.values(o).newURLs;
+                const valid = Object.values(o)[0].valid;
                 visited.add(completedURL);
-                completedURLs.push(completedURL);
-                const newURLs = Object.values(o)[0];
+                if (valid) {
+                    completedURLs.push(completedURL);
+                }
                 allNewURLs = allNewURLs.concat(newURLs);
             });
             toCrawl = toCrawl.concat(allNewURLs);
