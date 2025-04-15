@@ -36,7 +36,7 @@ N8: 172.31.12.83 -> queryWorkerTwo | node distribution.js --ip '172.31.12.83' --
 
 // Orchestrators
 const crawlOrchestrator = {ip: '172.31.5.125', port: 7110, onStart: () => {console.log(global.nodeConfig)}}; 
-const indexOrchestrator = {ip: '172-31-12-83', port: 7110, onStart: () => {console.log(global.nodeConfig)}};
+const indexOrchestrator = {ip: '172.31.12.83', port: 7110, onStart: () => {console.log(global.nodeConfig)}};
 
 // Workers
 const crawlWorkerOne = {ip: '172.31.5.207', port: 7110, onStart: () => {console.log(global.nodeConfig)}};
