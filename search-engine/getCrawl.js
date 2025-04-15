@@ -76,11 +76,10 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
 
     const reducer = (key, values) => {
         const url = key;
-        const valid = values[0].valid;
         const text = values[0].text;
-        console.log(url, valid, text);
+        const valid = values[0].valid;
         if (!valid) {
-            return { [url]: {valid: false, newURLs: []} };
+            return { [url]: {valid: false, urls: []} };
         }
 
         try {
@@ -90,10 +89,10 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
             const links = Array.from(document.querySelectorAll('a[href]'))
                 .map(link => link.href)
                 .filter(href => href.startsWith('http'));
-                return { [url]: {valid: true, newURLs: links} };
+                return { [url]: {valid: true, urls: links} };
         } catch (err) {
             console.error(`Error occurred in crawl reducer:`, err);
-            return { [url]: {valid: false, newURLs: []} };
+            return { [url]: {valid: false, urls: []} };
         }
     };
 
@@ -130,7 +129,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
             let completedURLs = [];
             v1.map((o) => {
                 const completedURL = Object.keys(o)[0];
-                const newURLs = Object.values(o).newURLs;
+                const newURLs = Object.values(o)[0].urls;
                 const valid = Object.values(o)[0].valid;
                 visited.add(completedURL);
                 if (valid) {
