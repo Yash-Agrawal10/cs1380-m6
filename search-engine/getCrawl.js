@@ -39,12 +39,25 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
     const mapper = async (key, value) => {
         const url = key;
         try {
+            const MAX_LENGTH = 200_000;
             const response = await fetch(url);
-            const text = await response.text();
             const contentType = response.headers.get('content-type') || '';
+            const length  = response.headers.get('content-length');
 
-            if (text.length > 1_000_000) {
-                console.log(`Page too long at url ${url}`);
+            if (!contentType.includes('text/html') && !contentType.includes('text/plain')) {
+                console.log(`Invalid content type at url ${url}, type ${contentType}`);
+                return [{[url]: {valid: false, text: null}}]; 
+            }
+
+            if (length && Number(length) > MAX_LENGTH) {
+                console.log(`Page too long at url ${url}, len ${length}`);
+                return [{[url]: {valid: false, text: null}}]; 
+            }
+
+
+            const text = await response.text();
+            if (text.length > MAX_LENGTH) {
+                console.log(`Downloaded page too long at url ${url}, len ${text.length}`);
                 return [{[url]: {valid: false, text: null}}];
             }
 
@@ -56,7 +69,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
             } else if (contentType.includes('text/plain')) {
                 toStore = text;
             } else {
-                console.log(`Invalid content type at url ${url}`);
+                console.log(`Should not reach here, did at ${url}`);
                 return [{[url]: {valid: false, text: null}}];
             }
 
