@@ -17,6 +17,7 @@ for (let i = 0; i < count; i++) {
     const term = termList[i % termList.length];
     const resCount = Math.floor(Math.random() * 10) + 1;
     query(term, resCount, (response) => {
+        counter++;
         console.log(response);
         if (counter == count) {
             const endTime = performance.now();
