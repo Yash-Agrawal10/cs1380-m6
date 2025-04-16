@@ -2,19 +2,24 @@ const fs = require('node:fs/promises');
 const natural = require('natural');
 const path = require('node:path');
 
-async function loadWordList(filepath) {
+let stopwordsCache = null;
+
+async function loadStopwordList(filepath) {
+    if (stopwordsCache) return stopwordsCache;
     try {
         const text = await fs.readFile(filepath, 'utf-8');
-        return new Set(text.split(/\r?\n/).map(word => word.trim()).filter(Boolean));
+        const stopwords = new Set(text.split(/\r?\n/).map(word => word.trim()).filter(Boolean));
+        stopwordsCache = stopwords;
+        return stopwords;
     } catch (error) {
-        console.log('Error loading word list:', error);
+        console.log('Error loading stopword list:', error);
         return new Set();
     }
 }
 
 async function process(url, text) {
     const stopwordsPath = path.resolve(__dirname, 'stopwords.txt');
-    const stopwords = await loadWordList(stopwordsPath);
+    const stopwords = await loadStopwordList(stopwordsPath);
 
     const words = text.match(/\b\w+\b/g) || [];
     const stemmedWords = words.map((word) => natural.PorterStemmer.stem(word));
