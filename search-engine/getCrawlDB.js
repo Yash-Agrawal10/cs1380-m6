@@ -1,22 +1,27 @@
 const distribution = require('../config');
+const { enqueue, dequeueBatch, markVisited, visitedCount } = require('./db');
 
-const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_BATCH) => {
+const getCrawlDB = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_BATCH) => {
     // Set up toCrawl and visited lists
-    const setupLists = (callback) => {
-        // Initialize toCrawl list
-        distribution.local.store.get('toCrawl', (e1, v1) => {
-            const toCrawl = v1 || seedURLs;
-            distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
-                // Initialize visited list
-                distribution.local.store.get('visited', (e3, v3) => {
-                    const visited = v3 || [];
-                    distribution.local.store.put(visited, 'visited', (e4, v4) => {
-                        const visitedSet = new Set(visited);
-                         callback(toCrawl, visitedSet);
-                    });
-                });
-            });
-        });
+    // const setupLists = (callback) => {
+    //     // Initialize toCrawl list
+    //     distribution.local.store.get('toCrawl', (e1, v1) => {
+    //         const toCrawl = v1 || seedURLs;
+    //         distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
+    //             // Initialize visited list
+    //             distribution.local.store.get('visited', (e3, v3) => {
+    //                 const visited = v3 || [];
+    //                 distribution.local.store.put(visited, 'visited', (e4, v4) => {
+    //                     const visitedSet = new Set(visited);
+    //                      callback(toCrawl, visitedSet);
+    //                 });
+    //             });
+    //         });
+    //     });
+    // }
+
+    const setupDB = () => {
+        for (const url of seedURLs) enqueue(url);
     }
 
     // Set up groups
@@ -110,64 +115,76 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
     };
 
     // Define workflow
-    const crawlStep = (toCrawl, visited, cb) => {
+    const crawlStep = (cb) => {
         console.log('crawl step starting');
-        // Termination condition
-        if (visited.size >= MAX_URLS) {
-            console.log('crawled max URLs');
-            cb(toCrawl, Array.from(visited));
-            return;
-        }
 
-        // Get batch
-        let batch = [];
-        while (toCrawl.length != 0 && batch.length < URLS_PER_BATCH && visited.size + batch.length < MAX_URLS) {
-            const url = toCrawl.shift();
-            if (!visited.has(url) && !batch.includes(url)) {
-                batch.push(url);
-            }
-        }
-
-        if (batch.length == 0) {
+        const batch = dequeueBatch(URLS_PER_BATCH);
+        // console.log(batch);
+        if (batch.length === 0) {
             console.log('toCrawl empty');
-            cb(toCrawl, visited);
-            return;
+            return cb();
         }
 
         // Call map-reduce (value is url: [new_urls])
         distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, (e1, v1) => {
-            let allNewURLs = [];
-            let completedURLs = [];
-            v1.map((o) => {
-                const completedURL = Object.keys(o)[0];
-                const newURLs = Object.values(o)[0].urls;
-                const valid = Object.values(o)[0].valid;
-                visited.add(completedURL);
+            const completedURLs = [];
+            const allNewURLs    = [];
+
+            for (const resultObj of v1) {
+                const [url] = Object.keys(resultObj);
+                const { valid, urls } = resultObj[url];
                 if (valid) {
-                    completedURLs.push(completedURL);
+                    completedURLs.push(url);
+                    allNewURLs.push(...urls);
                 }
-                allNewURLs = allNewURLs.concat(newURLs);
-            });
-            toCrawl = toCrawl.concat(allNewURLs);
-            // Persist toCrawl and visited
-            distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
-                const visitedList = Array.from(visited);
-                distribution.local.store.put(visitedList, 'visited', (e2, v2) => {
-                    const remote = {node: indexOrchestrator, service: 'store', method: 'append'};
-                    const message = [completedURLs, 'toIndex'];
-                    distribution.local.comm.send(message, remote, (e, v) => {
-                        const remote2 = {node: indexOrchestrator, service: 'index', method: 'index'};
-                        distribution.local.comm.send([], remote2, (e2, v2) => {
-                            console.log(`crawl step ending, crawled ${visited.size} urls`);
-                            crawlStep(toCrawl, visited, cb);
-                        });
-                    });
+            }
+
+            for (const link of allNewURLs) {
+                if (markVisited(link)) {
+                    enqueue(link);
+                }
+            }
+
+            const remote = {node: indexOrchestrator, service: 'store', method: 'append'};
+            const message = [completedURLs, 'toIndex'];
+            distribution.local.comm.send(message, remote, (e, v) => {
+                const remote2 = {node: indexOrchestrator, service: 'index', method: 'index'};
+                distribution.local.comm.send([], remote2, (e2, v2) => {
+                    const visitedURLs = visitedCount();
+                    console.log(`crawl step ending, crawled ${visitedURLs} urls`);
+                    if (visitedURLs >= MAX_URLS) {
+                        console.log('done crawling!');
+                        return cb();
+                    }
+                    crawlStep(cb);
                 });
             });
+
+            // toCrawl = toCrawl.concat(allNewURLs);
+            // // Persist toCrawl and visited
+            // distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
+            //     const visitedList = Array.from(visited);
+            //     distribution.local.store.put(visitedList, 'visited', (e2, v2) => {
+            //         const remote = {node: indexOrchestrator, service: 'store', method: 'append'};
+            //         const message = [completedURLs, 'toIndex'];
+            //         distribution.local.comm.send(message, remote, (e, v) => {
+            //             const remote2 = {node: indexOrchestrator, service: 'index', method: 'index'};
+            //             distribution.local.comm.send([], remote2, (e2, v2) => {
+            //                 console.log(`crawl step ending, crawled ${visited.size} urls`);
+            //                 crawlStep(toCrawl, visited, cb);
+            //             });
+            //         });
+            //     });
+            // });
         });
     }
 
-    return (cb) => setupGroups(() => setupLists((toCrawl, visited) => crawlStep(toCrawl, visited, cb)));
+    return (cb) => {
+        setupDB();
+        setupGroups(() => {
+            crawlStep(cb);
+        });
+    }
 }
 
-module.exports = { getCrawl };
+module.exports = { getCrawlDB };

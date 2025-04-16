@@ -1,11 +1,12 @@
 const { getCrawl } = require('./getCrawl');
+const { getCrawlDB } = require('./getCrawlDB');
 const { crawlGroup, crawlOrchestrator, 
     indexGroup, indexOrchestrator, 
     seedURLs, MAX_URLS, URLS_PER_CRAWL_BATCH } = require('./searchEngineConfig')
     
 const distribution = require('../distribution')(crawlOrchestrator);
 
-const crawl = getCrawl(crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_CRAWL_BATCH);
+const crawl = getCrawlDB(crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_CRAWL_BATCH);
 
 const startTime = performance.now();
 
