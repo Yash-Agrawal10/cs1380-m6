@@ -1,14 +1,15 @@
 const path = require('node:path');
 const fs = require('node:fs');
 const id = require('../util/id');
-const { index } = require('cheerio/dist/commonjs/api/traversing');
+
+const NUM_BUCKETS = 100;
 
 function serializeIndex(indexObj) {
     const optimized = {};
     // Loop over each key and map the list of objects to arrays
     for (const key in indexObj) {
         if (Object.hasOwnProperty.call(indexObj, key)) {
-        optimized[key] = indexObj[key].map(item => [item.url, item.freq]);
+            optimized[key] = indexObj[key].map(item => [item.url, item.freq]);
         }
     }
     return JSON.stringify(optimized, null, 2);
@@ -17,29 +18,34 @@ function serializeIndex(indexObj) {
 function deserializeIndex(data) {
     const parsed = JSON.parse(data);
     const rebuilt = {};
-    // Recreate original object structure from the optimized format
     for (const key in parsed) {
         if (Object.hasOwnProperty.call(parsed, key)) {
-        rebuilt[key] = parsed[key].map(item => ({
-            url: item[0],
-            freq: item[1]
-        }));
+            rebuilt[key] = parsed[key].map(item => ({
+                url: item[0],
+                freq: item[1]
+            }));
         }
     }
     return rebuilt;
 }
 
-function getIndex(term, callback) {
+function getBucket(key, numBuckets = NUM_BUCKETS) {
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+        hash = ((hash << 5) - hash) + key.charCodeAt(i);
+        hash |= 0;
+    }
+    return (Math.abs(hash) % numBuckets).toString();
+}
+
+function getIndex(bucket, callback) {
     const nid = id.getNID(global.distribution.node.config);
     const gid = 'query';
-    const prefix = term[0];
-
     const storePath = path.resolve(__dirname, '../../store', nid, gid);
     if (!fs.existsSync(storePath)) {
         fs.mkdirSync(storePath, { recursive: true });
     }
-    const indexPath = path.join(storePath, prefix);
-
+    const indexPath = path.join(storePath, bucket);
     if (!fs.existsSync(indexPath)) {
         callback(null, {});
     } else {
@@ -50,20 +56,19 @@ function getIndex(term, callback) {
 }
 
 function addToIndex(localIndex, callback) {
-    const indexByPrefix = new Map();
-    for (let o of localIndex) {
+    const indexByBucket = new Map();
+    for (const o of localIndex) {
         const key = Object.keys(o)[0];
-        const prefix = key[0];
-        if (indexByPrefix.has(prefix)) {
-            indexByPrefix.set(indexByPrefix.get(prefix).append(o));
-        } else {
-            indexByPrefix.set([o]);
+        const bucket = getBucket(key);
+        if (!indexByBucket.has(bucket)) {
+            indexByBucket.set(bucket, []);
         }
+        indexByBucket.get(bucket).push(o);
     }
 
     let counter = 0;
-    for (let [prefix, index] of indexByPrefix) {
-        getIndex(prefix, (error, globalIndex) => {
+    for (const [bucket, index] of indexByBucket.entries()) {
+        getIndex(bucket, (error, globalIndex) => {
             for (let o of index) {
                 const key = Object.keys(o)[0];
                 const newValues = Object.values(o).sort(global.distribution.util.compare);
@@ -78,12 +83,12 @@ function addToIndex(localIndex, callback) {
             if (!fs.existsSync(storePath)) {
                 fs.mkdirSync(storePath, { recursive: true });
             }
-            const indexPath = path.join(storePath, prefix);
+            const indexPath = path.join(storePath, bucket);
     
-            const serializedIndex = serializeIndex(index);
+            const serializedIndex = serializeIndex(globalIndex);
             fs.writeFileSync(indexPath, serializedIndex, 'utf8');
             counter++;
-            if (counter == indexByPrefix.size) {
+            if (counter == indexByBucket.size) {
                 callback(null, null);
             }
         });
@@ -91,8 +96,9 @@ function addToIndex(localIndex, callback) {
 }
 
 function getKey(key, callback) {
-    getIndex(key, (error, globalIndex) => {
-        const values = globalIndex[key] || [];
+    const bucket = getBucket(key);
+    getIndex(bucket, (error, bucketIndex) => {
+        const values = bucketIndex[key] || [];
         callback(null, values);
     });
 }

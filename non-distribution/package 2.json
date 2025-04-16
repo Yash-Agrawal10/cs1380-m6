@@ -1,0 +1,46 @@
+{
+  "name": "cs1380:m0",
+  "version": "1.0.0",
+  "author": {
+    "name": "Yash Agrawal",
+    "email": "yagrawal@brown.edu",
+    "cslogin": "yagrawa1"
+  },
+  "description": "A set of components for cs1380's search engine.",
+  "dependencies": {
+    "html-to-text": "^9.0.5",
+    "jsdom": "^23.2.0",
+    "natural": "^6.10.4"
+  },
+  "scripts": {
+    "pretest": "../scripts/pretest.sh",
+    "test": "jest --maxWorkers=1",
+    "lint": "eslint . --config .eslintrc --fix"
+  },
+  "devDependencies": {
+    "eslint": "^8.55.0",
+    "eslint-config-google": "^0.14.0",
+    "javascript-obfuscator": "^4.1.0",
+    "jest": "^29.7.0"
+  },
+  "report": {
+    "hours": 999,
+    "loc": 999,
+    "dev": {
+      "cpu-no": 999,
+      "mem-gb": 999,
+      "ssd-gb": 999
+    },
+    "throughput": {
+      "dev": ["Crawl - 2.63 urls/sec", "Index - 3.84 urls/sec", "Query - 4.17 queries/sec"],
+      "aws": ["Crawl - 0.694 urls/sec", "Index - 0.961 urls/sec", "Query - 1.136 queries/sec"],
+      "gs": []
+    },
+    "latency": {
+      "dev": ["Crawl - 0.38 secs/url", "Index - 0.26 secs/url", "Query - 0.24 secs/query"],
+      "aws": ["Crawl - 1.44 secs/url", "Index - 1.04 secs/url", "Query - 0.88 secs/query"],
+      "gs": []
+    },
+    "dloc": 300
+  }
+}
