@@ -54,7 +54,7 @@ const queryGroup = {
 
 const seedURLs = ['https://www.usenix.org/publications/proceedings'];
 
-const MAX_URLS = 3000;
+const MAX_URLS = 1000;
 const URLS_PER_CRAWL_BATCH = 30;
 const URLS_PER_INDEX_BATCH = 30;
 
