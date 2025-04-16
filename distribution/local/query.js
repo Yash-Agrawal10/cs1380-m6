@@ -1,6 +1,7 @@
 const path = require('node:path');
 const fs = require('node:fs');
 const id = require('../util/id');
+const { index } = require('cheerio/dist/commonjs/api/traversing');
 
 function serializeIndex(indexObj) {
     const optimized = {};
@@ -31,14 +32,13 @@ function deserializeIndex(data) {
 function getIndex(term, callback) {
     const nid = id.getNID(global.distribution.node.config);
     const gid = 'query';
-    if (term.length > 0) {
+    const prefix = term[0];
 
-    }
     const storePath = path.resolve(__dirname, '../../store', nid, gid);
     if (!fs.existsSync(storePath)) {
         fs.mkdirSync(storePath, { recursive: true });
     }
-    const indexPath = path.join(storePath, 'index');
+    const indexPath = path.join(storePath, prefix);
 
     if (!fs.existsSync(indexPath)) {
         callback(null, {});
@@ -50,32 +50,48 @@ function getIndex(term, callback) {
 }
 
 function addToIndex(localIndex, callback) {
-    getIndex("", (error, globalIndex) => {
-        for (let o of localIndex) {
-            const key = Object.keys(o)[0];
-            const newValues = Object.values(o).sort(global.distribution.util.compare);
-            const oldValues = globalIndex[key] || [];
-            // console.log('newValues:', newValues, 'oldValues:', oldValues);
-            const values = global.distribution.util.mergeSortedArrays(newValues, oldValues, global.distribution.util.compare);
-            globalIndex[key] = values;
+    const indexByPrefix = new Map();
+    for (let o of localIndex) {
+        const key = Object.keys(o)[0];
+        const prefix = key[0];
+        if (indexByPrefix.has(prefix)) {
+            indexByPrefix.set(indexByPrefix.get(prefix).append(o));
+        } else {
+            indexByPrefix.set([o]);
         }
+    }
 
-        const nid = id.getNID(global.distribution.node.config);
-        const gid = 'query';
-        const storePath = path.resolve(__dirname, '../../store', nid, gid);
-        if (!fs.existsSync(storePath)) {
-            fs.mkdirSync(storePath, { recursive: true });
-        }
-        const indexPath = path.join(storePath, 'index');
-
-        const serializedIndex = serializeIndex(globalIndex);
-        fs.writeFileSync(indexPath, serializedIndex, 'utf8');
-        callback(null, globalIndex);
-    });
+    let counter = 0;
+    for (let [prefix, index] of indexByPrefix) {
+        getIndex(prefix, (error, globalIndex) => {
+            for (let o of index) {
+                const key = Object.keys(o)[0];
+                const newValues = Object.values(o).sort(global.distribution.util.compare);
+                const oldValues = globalIndex[key] || [];
+                const values = global.distribution.util.mergeSortedArrays(newValues, oldValues, global.distribution.util.compare);
+                globalIndex[key] = values;
+            }
+    
+            const nid = id.getNID(global.distribution.node.config);
+            const gid = 'query';
+            const storePath = path.resolve(__dirname, '../../store', nid, gid);
+            if (!fs.existsSync(storePath)) {
+                fs.mkdirSync(storePath, { recursive: true });
+            }
+            const indexPath = path.join(storePath, prefix);
+    
+            const serializedIndex = serializeIndex(index);
+            fs.writeFileSync(indexPath, serializedIndex, 'utf8');
+            counter++;
+            if (counter == indexByPrefix.size) {
+                callback(null, null);
+            }
+        });
+    }
 }
 
 function getKey(key, callback) {
-    getIndex("", (error, globalIndex) => {
+    getIndex(key, (error, globalIndex) => {
         const values = globalIndex[key] || [];
         callback(null, values);
     });
