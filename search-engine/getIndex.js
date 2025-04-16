@@ -85,9 +85,9 @@ const getIndex = (indexGroup, queryGroup, MAX_URLS, URLS_PER_BATCH) => {
             numURLs += batch.length;
         }
 
-        // Call map-reduce
-        distribution.index.mr.exec({keys: batch, map: mapper, reduce: reducer}, (e1, v1) => {
-            distribution.local.store.put(toIndex, 'toIndex', (e2, v2) => {
+        distribution.local.store.put(toIndex, 'toIndex', (e2, v2) => {
+            // Call map-reduce
+            distribution.index.mr.exec({keys: batch, map: mapper, reduce: reducer}, (e1, v1) => {
                 console.log('index step ending');
                 indexStep(toIndex, numURLs, cb);
             });
