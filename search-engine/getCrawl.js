@@ -150,7 +150,12 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
             distribution.local.comm.send(message, remote, (e, v) => {
                 const remote2 = {node: indexOrchestrator, service: 'index', method: 'index'};
                 distribution.local.comm.send([], remote2, (e2, v2) => {
-                    console.log(`crawl step ending, crawled ${visitedCount()} urls`);
+                    const visitedURLs = visitedCount();
+                    console.log(`crawl step ending, crawled ${visitedURLs} urls`);
+                    if (visitedURLs >= MAX_URLS) {
+                        console.log('done crawling!');
+                        return cb();
+                    }
                     crawlStep(cb);
                 });
             });
