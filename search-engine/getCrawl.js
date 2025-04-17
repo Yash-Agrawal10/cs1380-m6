@@ -1,22 +1,73 @@
 const distribution = require('../config');
+const fs = require('fs');
+const path = require('path');
+const readline = require('readline');
 
 const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_BATCH) => {
+    const dataDir = path.resolve(__dirname, '../store/orchestrator');
+    const toCrawlPath = path.join(dataDir, 'toCrawl.txt');
+    const visitedPath  = path.join(dataDir, 'visited.txt');
+    const offsetPath   = path.join(dataDir, 'toCrawl.offset');
+
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+    }
+
     // Set up toCrawl and visited lists
-    const setupLists = (callback) => {
-        // Initialize toCrawl list
-        distribution.local.store.get('toCrawl', (e1, v1) => {
-            const toCrawl = v1 || seedURLs;
-            distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
-                // Initialize visited list
-                distribution.local.store.get('visited', (e3, v3) => {
-                    const visited = v3 || [];
-                    distribution.local.store.put(visited, 'visited', (e4, v4) => {
-                        const visitedSet = new Set(visited);
-                         callback(toCrawl, visitedSet);
-                    });
-                });
-            });
+    const setupLists = async () => {
+        if (!fs.existsSync(toCrawlPath)) {
+            await fs.promises.writeFile(
+              toCrawlPath,
+              seedURLs.map(u => u + '\n').join('')
+            );
+        }
+
+        if (!fs.existsSync(visitedPath)) {
+            await fs.promises.writeFile(visitedPath, '');
+        }
+
+        if (!fs.existsSync(offsetPath)) {
+            await fs.promises.writeFile(offsetPath, '0');
+        }
+
+        const offsetStr = await fs.promises.readFile(offsetPath, 'utf-8');
+        const offset = parseInt(offsetStr, 10) || 0;
+
+        // read visited URLs into a Set
+        const visitedData = await fs.promises.readFile(visitedPath, 'utf-8');
+        const visitedArr = visitedData.split(/\r?\n/).filter(Boolean);
+        const visitedSet = new Set(visitedArr);
+
+        return { offset, visitedSet };
+    }
+
+    async function getBatch(offset, visitedSet) {
+        const stream = fs.createReadStream(toCrawlPath, {
+            encoding: 'utf8',
+            start: offset
         });
+        const rl = readline.createInterface({ input: stream, crlfDelay: Infinity });
+
+        const batch = [];
+        let bytes = 0;
+        const newlineLength = Buffer.byteLength('\n', 'utf8');
+
+        for await (const line of rl) {
+            const lineBytes = Buffer.byteLength(line, 'utf8') + newlineLength;
+            if (batch.length >= URLS_PER_BATCH || visitedSet.size + batch.length >= MAX_URLS) {
+                break;
+            }
+            const url = line.trim();
+            if (url && !visitedSet.has(url) && !batch.includes(url)) {
+                batch.push(url);
+            }
+            bytes += lineBytes;
+        }
+    
+        rl.close();
+        stream.close();
+    
+        return { batch, newOffset: offset + bytes };
     }
 
     // Set up groups
@@ -110,64 +161,65 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
     };
 
     // Define workflow
-    const crawlStep = (toCrawl, visited, cb) => {
+    const crawlStep = async (offset, visitedSet, cb) => {
         console.log('crawl step starting');
         // Termination condition
-        if (visited.size >= MAX_URLS) {
+        if (visitedSet.size >= MAX_URLS) {
             console.log('crawled max URLs');
-            cb(toCrawl, Array.from(visited));
-            return;
+            return cb();
         }
 
         // Get batch
-        let batch = [];
-        while (toCrawl.length != 0 && batch.length < URLS_PER_BATCH && visited.size + batch.length < MAX_URLS) {
-            const url = toCrawl.shift();
-            if (!visited.has(url) && !batch.includes(url)) {
-                batch.push(url);
-            }
-        }
+        const { batch, newOffset } = await getBatch(offset, visitedSet);
 
         if (batch.length == 0) {
             console.log('toCrawl empty');
-            cb(toCrawl, visited);
-            return;
+            return cb();
         }
 
         // Call map-reduce (value is url: [new_urls])
-        distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, (e1, v1) => {
-            let allNewURLs = [];
-            let completedURLs = [];
-            v1.map((o) => {
-                const completedURL = Object.keys(o)[0];
-                const newURLs = Object.values(o)[0].urls;
-                const valid = Object.values(o)[0].valid;
-                visited.add(completedURL);
-                if (valid) {
-                    completedURLs.push(completedURL);
-                }
-                allNewURLs = allNewURLs.concat(newURLs);
-            });
-            toCrawl = toCrawl.concat(allNewURLs);
-            // Persist toCrawl and visited
-            distribution.local.store.put(toCrawl, 'toCrawl', (e2, v2) => {
-                const visitedList = Array.from(visited);
-                distribution.local.store.put(visitedList, 'visited', (e2, v2) => {
-                    const remote = {node: indexOrchestrator, service: 'store', method: 'append'};
-                    const message = [completedURLs, 'toIndex'];
-                    distribution.local.comm.send(message, remote, (e, v) => {
-                        const remote2 = {node: indexOrchestrator, service: 'index', method: 'index'};
-                        distribution.local.comm.send([], remote2, (e2, v2) => {
-                            console.log(`crawl step ending, crawled ${visited.size} urls`);
-                            crawlStep(toCrawl, visited, cb);
-                        });
-                    });
+        distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, async (e1, v1) => {
+            const completed = [];
+            let allNew = [];
+
+            for (const res of v1) {
+                const url = Object.keys(res)[0];
+                const { valid, urls } = res[url];
+                visitedSet.add(url);
+                if (valid) completed.push(url);
+                allNew = allNew.concat(urls);
+            }
+
+            await fs.promises.appendFile(
+                visitedPath,
+                completed.map(u => u + '\n').join('')
+            );
+
+            await fs.promises.appendFile(
+                toCrawlPath,
+                allNew.map(u => u + '\n').join('')
+            );
+
+            await fs.promises.writeFile(offsetPath, newOffset.toString());
+  
+            const remote = {node: indexOrchestrator, service: 'store', method: 'append'};
+                const message = [completed, 'toIndex'];
+                distribution.local.comm.send(message, remote, (e, v) => {
+                    const remote2 = {node: indexOrchestrator, service: 'index', method: 'index'};
+                    distribution.local.comm.send([], remote2, (e2, v2) => {
+                        console.log(`crawl step ending, crawled ${visitedSet.size} urls`);
+                        crawlStep(newOffset, visitedSet, cb);
                 });
             });
         });
     }
 
-    return (cb) => setupGroups(() => setupLists((toCrawl, visited) => crawlStep(toCrawl, visited, cb)));
+    return (cb) => {
+        setupGroups(async () => {
+            const { offset, visitedSet } = await setupLists();
+            crawlStep(offset, visitedSet, cb);
+        });
+    }
 }
 
 module.exports = { getCrawl };

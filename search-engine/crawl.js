@@ -6,7 +6,7 @@ const { crawlGroup, crawlOrchestrator,
     
 const distribution = require('../distribution')(crawlOrchestrator);
 
-const crawl = getCrawlDB(crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_CRAWL_BATCH);
+const crawl = getCrawl(crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS, URLS_PER_CRAWL_BATCH);
 
 const startTime = performance.now();
 

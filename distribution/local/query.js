@@ -5,26 +5,21 @@ const id = require('../util/id');
 const NUM_BUCKETS = 100;
 
 function serializeIndex(indexObj) {
-    const optimized = {};
-    // Loop over each key and map the list of objects to arrays
-    for (const key in indexObj) {
-        if (Object.hasOwnProperty.call(indexObj, key)) {
-            optimized[key] = indexObj[key].map(item => [item.url, item.freq]);
-        }
-    }
-    return JSON.stringify(optimized, null, 2);
+    return Object
+    .entries(indexObj)
+    .map(([key, list]) => {
+        const pairs = list.map(({url, freq}) => [url, freq]);
+        return JSON.stringify([ key, pairs ]);
+    })
+    .join('\n');
 }
 
 function deserializeIndex(data) {
-    const parsed = JSON.parse(data);
     const rebuilt = {};
-    for (const key in parsed) {
-        if (Object.hasOwnProperty.call(parsed, key)) {
-            rebuilt[key] = parsed[key].map(item => ({
-                url: item[0],
-                freq: item[1]
-            }));
-        }
+    for (const line of data.split('\n')) {
+        if (!line) continue;
+        const [ key, pairs ] = JSON.parse(line);
+        rebuilt[key] = pairs.map(([url, freq]) => ({ url, freq }));
     }
     return rebuilt;
 }
