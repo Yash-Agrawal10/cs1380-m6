@@ -181,18 +181,22 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
         distribution.crawl.mr.exec({keys: batch, map: mapper, reduce: reducer, useStore: false}, async (e1, v1) => {
             const completed = [];
             let allNew = [];
+            let newVisited = [];
 
             for (const res of v1) {
                 const url = Object.keys(res)[0];
                 const { valid, urls } = res[url];
                 visitedSet.add(url);
-                completed.push(url);
+                newVisited.push(url);
+                if (valid) {
+                    completed.push(url);
+                }
                 allNew = allNew.concat(urls);
             }
 
             await fs.promises.appendFile(
                 visitedPath,
-                completed.map(u => u + '\n').join('')
+                newVisited.map(u => u + '\n').join('')
             );
 
             await fs.promises.appendFile(
