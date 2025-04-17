@@ -188,3 +188,20 @@ My implementation comprises three new software components, totaling 300 added li
 > Which extra features did you implement and how?
 
 I implemented a way for workers to figure out which keys they are responsible for in order to reduce the number of system read calls performed and improve performance. This helped on both the map and reduce ends.
+
+Summarize the process of writing the paper and preparing the poster, including any surprises you encountered.
+Writing the paper and preparing the poster involved reflecting carefully on the system design choices, the technical challenges we encountered, and the solutions we implemented. One unexpected issue was dealing with the physical printing of the poster — the dimensions we originally prepared did not match the printer's requirements, which caused a last-minute adjustment. Beyond that, documenting the distributed architecture, debugging strategies, and scaling challenges required revisiting many small design decisions made earlier in development. Overall, organizing the technical information into a cohesive narrative for both the paper and the poster took longer than anticipated but was a rewarding process.
+
+Roughly, how many hours did M6 take you to complete?
+Hours: 40 hours
+
+How many LoC did the distributed version of the project end up taking?
+DLoC: 3600 lines of code
+
+How does this number compare with your non-distributed version?
+LoC: 2700 line difference
+
+(If your original prediction was, for example, 2000 LoC, you can insert it here.)
+
+How different are these numbers for different members in the team and why?
+The number of lines of code varied between team members based on their assigned tasks. Team members handling the distributed aspects, such as asynchronous MapReduce tasks, AWS resource management, and avoiding race conditions, ended up writing significantly more code compared to those focusing on simpler components. Managing the massive index size and ensuring system resilience across distributed nodes required detailed implementations and additional error handling, which contributed to the higher LoC for certain parts of the project.
