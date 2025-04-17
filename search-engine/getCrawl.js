@@ -186,7 +186,7 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
                 const url = Object.keys(res)[0];
                 const { valid, urls } = res[url];
                 visitedSet.add(url);
-                if (valid) completed.push(url);
+                completed.push(url);
                 allNew = allNew.concat(urls);
             }
 
