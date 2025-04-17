@@ -171,6 +171,8 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
 
         // Get batch
         const { batch, newOffset } = await getBatch(offset, visitedSet);
+        await fs.promises.writeFile(offsetPath, newOffset.toString());
+        // console.log(batch);
 
         if (batch.length == 0) {
             console.log('toCrawl empty');
@@ -204,8 +206,6 @@ const getCrawl = (crawlGroup, indexGroup, indexOrchestrator, seedURLs, MAX_URLS,
                 allNew.map(u => u + '\n').join('')
             );
 
-            await fs.promises.writeFile(offsetPath, newOffset.toString());
-  
             const remote = {node: indexOrchestrator, service: 'store', method: 'append'};
                 const message = [completed, 'toIndex'];
                 distribution.local.comm.send(message, remote, (e, v) => {

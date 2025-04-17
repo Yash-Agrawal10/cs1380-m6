@@ -28,8 +28,8 @@ const indexOrchestrator = {ip: '127.0.0.1', port: 7111, onStart: () => {console.
 // Workers
 const crawlWorkerOne = {ip: '127.0.0.1', port: 7112, onStart: () => {console.log(global.nodeConfig)}};
 const crawlWorkerTwo = {ip: '127.0.0.1', port: 7113, onStart: () => {console.log(global.nodeConfig)}};
-const crawlWorkerThree = {ip: '127.0.0.1', port: 7114, onStart: () => {console.log(global.nodeConfig)}};
 const indexWorkerOne = {ip: '127.0.0.1', port: 7115, onStart: () => {console.log(global.nodeConfig)}};
+const indexWorkerTwo = {ip: '127.0.0.1', port: 7114, onStart: () => {console.log(global.nodeConfig)}};
 const queryWorkerOne = {ip: '127.0.0.1', port: 7116, onStart: () => {console.log(global.nodeConfig)}};
 const queryWorkerTwo = {ip: '127.0.0.1', port: 7117, onStart: () => {console.log(global.nodeConfig)}};
 const queryWorkerThree = {ip: '127.0.0.1', port: 7118, onStart: () => {console.log(global.nodeConfig)}};
@@ -38,12 +38,12 @@ const crawlGroup = {
     [id.getSID(crawlOrchestrator)]: crawlOrchestrator,
     [id.getSID(crawlWorkerOne)]: crawlWorkerOne,
     [id.getSID(crawlWorkerTwo)]: crawlWorkerTwo,
-    [id.getSID(crawlWorkerThree)]: crawlWorkerThree,
 };
 
 const indexGroup = {
     [id.getSID(indexOrchestrator)]: indexOrchestrator,
     [id.getSID(indexWorkerOne)]: indexWorkerOne,
+    [id.getSID(indexWorkerTwo)]: indexWorkerTwo,
 };
 
 const queryGroup = {
@@ -54,7 +54,7 @@ const queryGroup = {
 
 const seedURLs = ['https://www.usenix.org/publications/proceedings'];
 
-const MAX_URLS = 1000;
+const MAX_URLS = 15000;
 const URLS_PER_CRAWL_BATCH = 30;
 const URLS_PER_INDEX_BATCH = 30;
 
