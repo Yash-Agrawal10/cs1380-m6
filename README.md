@@ -206,3 +206,7 @@ Hours: 40 hours
 Around 3,000 more.
 
 ## How different are these numbers for different members in the team and why?
+
+There were differences in lines of code written by each team member based on the responsibilities they took on.
+Yash handled a large portion of the system's implementation, focusing heavily on architecting the distributed search engine and managing asynchronous MapReduce tasks. This involved designing the overall system, implementing core features, and addressing challenges like race conditions and AWS resource management, which resulted in a larger share of the code.
+JC focused on writing utility code for data processing and also did significant work setting up and testing the system across AWS nodes. JC was responsible for measuring system performance, verifying the correctness of the distributed program, and testing the stability of the distributed components. While this testing and setup work was critical to the success of the project, it generally resulted in fewer lines of implementation code compared to building out the core distributed infrastructure.
